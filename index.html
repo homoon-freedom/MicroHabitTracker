@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>작은 습관 트래커</title>
+    <title>계층형 작은 습관 트래커</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -73,10 +73,19 @@
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
 
         .checkbox-custom:checked + div {
             background-color: #10b981;
@@ -85,37 +94,16 @@
         .checkbox-custom:checked + div svg {
             opacity: 1;
         }
-        
-        .sub-habit-indent {
-            position: relative;
-        }
-        .sub-habit-indent::before {
-            content: '';
-            position: absolute;
-            left: -14px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: #e2e8f0;
-        }
-        .sub-habit-indent::after {
-            content: '';
-            position: absolute;
-            left: -14px;
-            top: 50%;
-            width: 10px;
-            height: 2px;
-            background-color: #e2e8f0;
-        }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen p-4 md:p-8">
 
-    <div class="max-w-[1400px] mx-auto">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
         <header class="mb-8 text-center md:text-left flex flex-col md:flex-row md:items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight"><i class="fas fa-layer-group text-blue-500 mr-2"></i>계층형 작은 습관 트래커</h1>
-                <p class="text-slate-500 mt-2">상하위 습관 관리, 연속 달성일, 그룹별 진척도</p>
+                <p class="text-slate-500 mt-2">상위 습관을 달성하고 하위 습관을 이어나가 보세요.</p>
             </div>
             <div class="mt-4 md:mt-0 px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-2">
                 <i class="far fa-calendar-check text-blue-500"></i>
@@ -123,18 +111,26 @@
             </div>
         </header>
 
+        <!-- Main Content Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- 달력 영역 -->
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[750px]">
+            <!-- Left Column: Calendar (Spans 4 cols on lg) -->
+            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px]">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
                     <div class="flex gap-2">
-                        <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600"><i class="fas fa-chevron-left"></i></button>
-                        <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">오늘</button>
-                        <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600"><i class="fas fa-chevron-right"></i></button>
+                        <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">
+                            오늘
+                        </button>
+                        <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
+
                 <div class="calendar-grid mb-2">
                     <div class="text-center text-xs font-semibold text-red-400">일</div>
                     <div class="text-center text-xs font-semibold text-slate-500">월</div>
@@ -144,199 +140,216 @@
                     <div class="text-center text-xs font-semibold text-slate-500">금</div>
                     <div class="text-center text-xs font-semibold text-blue-400">토</div>
                 </div>
+
                 <div id="calendar-days" class="calendar-grid flex-1"></div>
             </div>
 
-            <!-- 일일 실행 영역 -->
-            <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[750px] overflow-hidden">
+            <!-- Middle Column: Daily Tracking (Spans 4 cols on lg) -->
+            <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px] overflow-hidden">
                 <div class="p-6 bg-slate-50 border-b border-slate-100">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
                         <i class="fas fa-tasks text-blue-500"></i>
                         <span id="selected-date-title"></span>
                     </h2>
-                    <div class="mt-2 w-full bg-slate-200 rounded-full h-2.5">
-                        <div id="daily-total-progress" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <p class="text-sm text-slate-500 mt-1 text-right" id="daily-progress-text">0% 완료</p>
+                    <p class="text-sm text-slate-500 mt-1" id="daily-progress-text">완료율: 0%</p>
                 </div>
+                
                 <div class="p-6 overflow-y-auto flex-1 bg-white" id="daily-habits-container">
-                    <!-- Javascript 렌더링 -->
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
+                        <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
+                        <p>등록된 습관이 없습니다.<br>우측에서 새로운 습관을 추가해보세요!</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- 습관 관리 영역 -->
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[750px]">
+            <!-- Right Column: Habit Settings (Spans 4 cols on lg) -->
+            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px]">
                 <h2 class="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
-                    <i class="fas fa-cog text-slate-400"></i>습관 관리 및 추가
+                    <i class="fas fa-cog text-slate-400"></i>전체 습관 목록 (관리용)
                 </h2>
                 
-                <!-- 새 최상위 습관 추가 -->
+                <!-- Add New Habit Form -->
                 <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <input type="text" id="new-habit-name" placeholder="최상위 습관 이름 (예: 기상 후 루틴)" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3 text-sm">
-                    <div class="flex gap-2 mb-2">
-                        <select id="new-habit-time-select" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white" onchange="toggleCustomTimeInput()">
-                            <option value="아침">🌅 아침</option>
-                            <option value="점심">☀️ 점심</option>
-                            <option value="저녁">🌙 저녁</option>
-                            <option value="자기전">💤 자기전</option>
-                            <option value="수시">🔄 수시</option>
-                            <option value="custom">직접 입력...</option>
+                    <div class="flex gap-2 mb-3">
+                        <select id="new-habit-time" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white text-slate-700" onchange="checkCustomTime()">
+                            <!-- Generated by JS -->
                         </select>
-                        <input type="text" id="new-habit-time-custom" placeholder="시간대 입력" class="hidden flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <input type="text" id="custom-time-input" placeholder="새로운 시간대" class="hidden flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                     </div>
-                    <button onclick="addTopHabit()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-sm font-medium">
-                        최상위 습관 추가
-                    </button>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-habit-name" placeholder="최상위 습관 이름" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <button onclick="addParentHabit()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-sm font-medium whitespace-nowrap">
+                            습관 추가
+                        </button>
+                    </div>
                 </div>
 
-                <!-- 전체 습관 목록 관리 -->
-                <div class="flex-1 overflow-y-auto pr-2">
-                    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">전체 습관 목록</h3>
-                    <div id="managed-habits-list" class="space-y-4">
-                        <!-- Javascript 렌더링 -->
-                    </div>
+                <!-- Managed Habits List -->
+                <div class="flex-1 overflow-y-auto pr-2" id="managed-habits-list">
+                    <!-- Managed habits will be generated by JS -->
                 </div>
             </div>
+        </div>
+    </div>
 
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">습관 이름 수정</h3>
+            <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeEditModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
+                <button onclick="saveEditHabit()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium">저장</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 데이터 구조 ---
-        // habits: [{ id, name, time, createdAt, isExpanded, subHabits: [{ id, name, createdAt }] }]
-        let habits = JSON.parse(localStorage.getItem('microHabitsData')) || [];
-        // records: { "YYYY-MM-DD": ["habit_id_1", "sub_id_1"] }
-        let records = JSON.parse(localStorage.getItem('microHabitsRecords')) || {};
+        // Data Structure
+        let customTimes = JSON.parse(localStorage.getItem('customTimes')) || ['아침', '점심', '저녁', '자기전', '수시'];
         
+        // habits array of objects: { id, name, time, isExpanded, subHabits: [{id, name}] }
+        let habits = JSON.parse(localStorage.getItem('habits')) || [];
+        
+        // records: { "YYYY-MM-DD": ["habit_id_1", "sub_id_2"] }
+        let records = JSON.parse(localStorage.getItem('records')) || {};
+        
+        // Dates
         let currentMonthDate = new Date();
-        let selectedDate = new Date();
+        let selectedDate = new Date(); 
 
-        // 날짜 유틸리티
+        // Modal state
+        let editTarget = { id: null, parentId: null };
+
+        const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50'];
+
+        function getTimeColor(timeStr) {
+            const index = customTimes.indexOf(timeStr);
+            if (index === -1) return 'text-slate-500 bg-slate-100';
+            return TIME_COLORS[index % TIME_COLORS.length];
+        }
+
         function formatDateToYYYYMMDD(date) {
-            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-        }
-        function formatDisplayDate(date) {
-            return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
-        }
-        function generateId() { return Math.random().toString(36).substr(2, 9); }
-        function saveData() {
-            localStorage.setItem('microHabitsData', JSON.stringify(habits));
-            localStorage.setItem('microHabitsRecords', JSON.stringify(records));
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
-        // 초기화
+        function formatDisplayDate(date) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
+            return date.toLocaleDateString('ko-KR', options);
+        }
+
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        function saveData() {
+            localStorage.setItem('customTimes', JSON.stringify(customTimes));
+            localStorage.setItem('habits', JSON.stringify(habits));
+            localStorage.setItem('records', JSON.stringify(records));
+        }
+
         function init() {
             document.getElementById('today-display').innerText = formatDisplayDate(new Date());
-            renderAll();
-        }
-
-        function renderAll() {
+            updateTimeSelects();
             renderCalendar();
-            renderManageView();
-            renderDailyView();
+            renderManagedHabits();
+            updateDailyView();
         }
 
-        // --- 기능: 연속 달성일(Streak) 계산 ---
-        function calculateStreak(habitId, baseDate) {
-            let streak = 0;
-            let current = new Date(baseDate);
-            
-            // 오늘(선택일) 체크
-            let dStr = formatDateToYYYYMMDD(current);
-            let isDoneToday = records[dStr] && records[dStr].includes(habitId);
-            
-            if (!isDoneToday) {
-                // 오늘 안했으면 어제 했는지 확인. 어제도 안했으면 0.
-                current.setDate(current.getDate() - 1);
-                dStr = formatDateToYYYYMMDD(current);
-                if (!records[dStr] || !records[dStr].includes(habitId)) {
-                    return 0;
-                }
-            }
-            
-            // 어제 또는 오늘부터 과거로 연속 카운트
-            while (true) {
-                let checkStr = formatDateToYYYYMMDD(current);
-                if (records[checkStr] && records[checkStr].includes(habitId)) {
-                    streak++;
-                    current.setDate(current.getDate() - 1);
-                } else {
-                    break;
-                }
-            }
-            return streak;
+        function updateTimeSelects() {
+            const select = document.getElementById('new-habit-time');
+            select.innerHTML = customTimes.map(t => `<option value="${t}">${t}</option>`).join('');
+            select.innerHTML += `<option value="custom">+ 직접 입력</option>`;
         }
 
-        // --- 기능: 최상위/하위 습관 관리 ---
-        function toggleCustomTimeInput() {
-            const select = document.getElementById('new-habit-time-select');
-            const customInput = document.getElementById('new-habit-time-custom');
+        function checkCustomTime() {
+            const select = document.getElementById('new-habit-time');
+            const input = document.getElementById('custom-time-input');
             if (select.value === 'custom') {
-                select.classList.add('hidden');
-                customInput.classList.remove('hidden');
-                customInput.focus();
+                input.classList.remove('hidden');
+                input.focus();
+            } else {
+                input.classList.add('hidden');
+                input.value = '';
             }
         }
 
-        function addTopHabit() {
-            const name = document.getElementById('new-habit-name').value.trim();
-            const select = document.getElementById('new-habit-time-select');
-            let time = select.value;
+        function addParentHabit() {
+            const nameInput = document.getElementById('new-habit-name');
+            const timeSelect = document.getElementById('new-habit-time');
+            const customTimeInput = document.getElementById('custom-time-input');
+            
+            const name = nameInput.value.trim();
+            let time = timeSelect.value;
+
             if (time === 'custom') {
-                time = document.getElementById('new-habit-time-custom').value.trim();
-                if (!time) time = '기타';
+                time = customTimeInput.value.trim();
+                if (time && !customTimes.includes(time)) {
+                    customTimes.push(time);
+                    updateTimeSelects();
+                }
             }
 
-            if (!name) return;
+            if (!name || !time) {
+                nameInput.classList.add('border-red-500');
+                setTimeout(() => nameInput.classList.remove('border-red-500'), 1000);
+                return;
+            }
 
             habits.push({
-                id: 'top_' + generateId(),
+                id: generateId(),
                 name: name,
                 time: time,
-                createdAt: formatDateToYYYYMMDD(new Date()),
                 isExpanded: true,
                 subHabits: []
             });
-
-            document.getElementById('new-habit-name').value = '';
-            document.getElementById('new-habit-time-select').value = '아침';
-            document.getElementById('new-habit-time-select').classList.remove('hidden');
-            document.getElementById('new-habit-time-custom').classList.add('hidden');
-            document.getElementById('new-habit-time-custom').value = '';
-
+            
             saveData();
-            renderAll();
+            nameInput.value = '';
+            if(timeSelect.value === 'custom') {
+                timeSelect.value = time;
+                checkCustomTime();
+            }
+            
+            renderManagedHabits();
+            updateDailyView();
+            renderCalendar();
         }
 
         function addSubHabit(parentId, inputId = null) {
             let name = "";
-            if (inputId) {
-                const inputEl = document.getElementById(inputId);
-                name = inputEl.value.trim();
-                inputEl.value = "";
-            } else {
-                name = prompt("하위 습관 이름을 입력하세요:");
-            }
+            let inputEl = null;
             
+            if (inputId) {
+                inputEl = document.getElementById(inputId);
+                name = inputEl.value.trim();
+            } else {
+                // Management view fallback
+                inputEl = document.getElementById(`new-sub-${parentId}`);
+                name = inputEl.value.trim();
+            }
+
             if (!name) return;
 
             const parent = habits.find(h => h.id === parentId);
             if (parent) {
-                parent.subHabits.push({
-                    id: 'sub_' + generateId(),
-                    name: name,
-                    createdAt: formatDateToYYYYMMDD(new Date())
-                });
+                if (!parent.subHabits) parent.subHabits = [];
+                parent.subHabits.push({ id: generateId(), name: name });
                 parent.isExpanded = true;
                 saveData();
-                renderAll();
+                if(inputEl) inputEl.value = '';
+                
+                renderManagedHabits();
+                updateDailyView();
+                renderCalendar();
             }
         }
 
-        function deleteHabit(id, parentId = null) {
-            if (!confirm("정말 삭제하시겠습니까? 관련 기록도 함께 지워집니다.")) return;
-
-            if (parentId) {
+        function deleteHabit(id, isSub, parentId = null) {
+            if (isSub && parentId) {
                 const parent = habits.find(h => h.id === parentId);
                 if (parent) {
                     parent.subHabits = parent.subHabits.filter(s => s.id !== id);
@@ -344,287 +357,180 @@
             } else {
                 habits = habits.filter(h => h.id !== id);
             }
+            
+            // Clean records
+            for (let date in records) {
+                records[date] = records[date].filter(recordId => recordId !== id);
+                if (records[date].length === 0) delete records[date];
+            }
+            
             saveData();
-            renderAll();
+            renderManagedHabits();
+            updateDailyView();
+            renderCalendar();
         }
 
-        function editHabitName(id, parentId = null) {
-            const newName = prompt("새로운 이름을 입력하세요:");
+        function moveSubHabit(parentId, subId, direction) {
+            const parent = habits.find(h => h.id === parentId);
+            if (!parent || !parent.subHabits) return;
+            
+            const idx = parent.subHabits.findIndex(s => s.id === subId);
+            if (idx === -1) return;
+            
+            if (direction === 'up' && idx > 0) {
+                const temp = parent.subHabits[idx];
+                parent.subHabits[idx] = parent.subHabits[idx - 1];
+                parent.subHabits[idx - 1] = temp;
+            } else if (direction === 'down' && idx < parent.subHabits.length - 1) {
+                const temp = parent.subHabits[idx];
+                parent.subHabits[idx] = parent.subHabits[idx + 1];
+                parent.subHabits[idx + 1] = temp;
+            }
+            
+            saveData();
+            renderManagedHabits();
+            updateDailyView();
+        }
+
+        function openEditModal(id, parentId = null, currentName) {
+            editTarget = { id, parentId };
+            const input = document.getElementById('edit-habit-input');
+            input.value = currentName;
+            document.getElementById('edit-modal').classList.remove('hidden');
+            input.focus();
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+            editTarget = { id: null, parentId: null };
+        }
+
+        function saveEditHabit() {
+            const newName = document.getElementById('edit-habit-input').value.trim();
             if (!newName) return;
 
-            if (parentId) {
-                const parent = habits.find(h => h.id === parentId);
+            if (editTarget.parentId) {
+                // Edit sub habit
+                const parent = habits.find(h => h.id === editTarget.parentId);
                 if (parent) {
-                    const sub = parent.subHabits.find(s => s.id === id);
+                    const sub = parent.subHabits.find(s => s.id === editTarget.id);
                     if (sub) sub.name = newName;
                 }
             } else {
-                const habit = habits.find(h => h.id === id);
-                if (habit) habit.name = newName;
+                // Edit parent habit
+                const parent = habits.find(h => h.id === editTarget.id);
+                if (parent) parent.name = newName;
             }
-            saveData();
-            renderAll();
-        }
 
-        function moveSubHabit(parentId, index, direction) {
-            const parent = habits.find(h => h.id === parentId);
-            if (!parent) return;
-            
-            if (direction === -1 && index > 0) {
-                const temp = parent.subHabits[index];
-                parent.subHabits[index] = parent.subHabits[index - 1];
-                parent.subHabits[index - 1] = temp;
-            } else if (direction === 1 && index < parent.subHabits.length - 1) {
-                const temp = parent.subHabits[index];
-                parent.subHabits[index] = parent.subHabits[index + 1];
-                parent.subHabits[index + 1] = temp;
-            }
             saveData();
-            renderManageView();
-            renderDailyView();
+            closeEditModal();
+            renderManagedHabits();
+            updateDailyView();
         }
 
         function toggleExpand(id) {
-            const habit = habits.find(h => h.id === id);
-            if (habit) {
-                habit.isExpanded = !habit.isExpanded;
+            const parent = habits.find(h => h.id === id);
+            if (parent) {
+                parent.isExpanded = !parent.isExpanded;
                 saveData();
-                renderManageView();
-                renderDailyView();
+                renderManagedHabits();
+                updateDailyView();
             }
         }
 
-        function toggleCompletion(id, dateStr) {
-            if (!records[dateStr]) records[dateStr] = [];
-            const idx = records[dateStr].indexOf(id);
-            if (idx > -1) {
-                records[dateStr].splice(idx, 1);
-            } else {
-                records[dateStr].push(id);
-            }
-            saveData();
-            renderAll();
-        }
-
-        // --- 렌더링: 관리 뷰 ---
-        function renderManageView() {
+        function renderManagedHabits() {
             const container = document.getElementById('managed-habits-list');
             container.innerHTML = '';
 
-            habits.forEach(parent => {
-                const parentEl = document.createElement('div');
-                parentEl.className = 'bg-white border border-slate-200 rounded-xl overflow-hidden';
-                
-                // Parent Header
-                parentEl.innerHTML = `
-                    <div class="p-3 bg-slate-50 flex items-center justify-between border-b border-slate-100">
-                        <div class="flex items-center gap-2">
-                            <button onclick="toggleExpand('${parent.id}')" class="text-slate-400 hover:text-slate-600 w-5">
-                                <i class="fas ${parent.isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'} text-sm"></i>
-                            </button>
-                            <span class="text-xs font-bold px-2 py-1 bg-slate-200 text-slate-600 rounded">${parent.time}</span>
-                            <span class="font-semibold text-slate-800">${parent.name}</span>
-                            <span class="text-[10px] text-slate-400 ml-2 bg-white px-1 border rounded">시작일: ${parent.createdAt}</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <button onclick="editHabitName('${parent.id}')" class="p-1.5 text-slate-400 hover:text-blue-500 rounded"><i class="fas fa-pen text-xs"></i></button>
-                            <button onclick="addSubHabit('${parent.id}')" class="p-1.5 text-slate-400 hover:text-green-500 rounded" title="하위 습관 추가"><i class="fas fa-plus text-xs"></i></button>
-                            <button onclick="deleteHabit('${parent.id}')" class="p-1.5 text-slate-400 hover:text-red-500 rounded"><i class="fas fa-trash text-xs"></i></button>
-                        </div>
-                    </div>
-                `;
-
-                // Sub Habits
-                if (parent.isExpanded && parent.subHabits.length > 0) {
-                    const subContainer = document.createElement('div');
-                    subContainer.className = 'p-2 space-y-1 bg-white';
-                    
-                    parent.subHabits.forEach((sub, idx) => {
-                        subContainer.innerHTML += `
-                            <div class="flex items-center justify-between p-2 pl-8 hover:bg-slate-50 rounded-lg group">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-level-up-alt rotate-90 text-slate-300 text-xs"></i>
-                                    <span class="text-base text-slate-700">${sub.name}</span>
-                                    <span class="text-[10px] text-slate-300 opacity-0 group-hover:opacity-100 transition">시작: ${sub.createdAt}</span>
-                                </div>
-                                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
-                                    <button onclick="moveSubHabit('${parent.id}', ${idx}, -1)" class="p-1 text-slate-400 hover:text-blue-500"><i class="fas fa-arrow-up text-xs"></i></button>
-                                    <button onclick="moveSubHabit('${parent.id}', ${idx}, 1)" class="p-1 text-slate-400 hover:text-blue-500"><i class="fas fa-arrow-down text-xs"></i></button>
-                                    <button onclick="editHabitName('${sub.id}', '${parent.id}')" class="p-1 text-slate-400 hover:text-blue-500"><i class="fas fa-pen text-xs"></i></button>
-                                    <button onclick="deleteHabit('${sub.id}', '${parent.id}')" class="p-1 text-slate-400 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    parentEl.appendChild(subContainer);
-                }
-                container.appendChild(parentEl);
-            });
-        }
-
-        // --- 렌더링: 일일 뷰 ---
-        function renderDailyView() {
-            const dateStr = formatDateToYYYYMMDD(selectedDate);
-            document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
-            
-            const container = document.getElementById('daily-habits-container');
-            container.innerHTML = '';
-
             if (habits.length === 0) {
-                container.innerHTML = '<div class="text-center text-slate-400 mt-10"><i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i><p>등록된 습관이 없습니다.</p></div>';
-                document.getElementById('daily-total-progress').style.width = '0%';
-                document.getElementById('daily-progress-text').innerText = '0% 완료';
+                container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">등록된 습관이 없습니다.</p>';
                 return;
             }
 
-            // 그룹핑 (시간대별)
-            const grouped = {};
-            habits.forEach(h => {
-                if (!grouped[h.time]) grouped[h.time] = [];
-                grouped[h.time].push(h);
-            });
-
-            let totalItems = 0;
-            let totalCompleted = 0;
-
-            Object.keys(grouped).forEach(time => {
-                const section = document.createElement('div');
-                section.className = 'mb-6';
-                section.innerHTML = `<h3 class="text-sm font-bold text-slate-700 mb-3 px-1">${time}</h3>`;
+            habits.forEach(parent => {
+                const timeColorClass = getTimeColor(parent.time);
+                const hasSubs = parent.subHabits && parent.subHabits.length > 0;
                 
-                const list = document.createElement('div');
-                list.className = 'space-y-3';
-
-                grouped[time].forEach(parent => {
-                    // 계산
-                    const parentCompleted = records[dateStr] && records[dateStr].includes(parent.id);
-                    let groupTotalCount = 1 + parent.subHabits.length;
-                    let groupCompletedCount = parentCompleted ? 1 : 0;
-                    
-                    parent.subHabits.forEach(sub => {
-                        if (records[dateStr] && records[dateStr].includes(sub.id)) groupCompletedCount++;
-                    });
-
-                    totalItems += groupTotalCount;
-                    totalCompleted += groupCompletedCount;
-
-                    const parentStreak = calculateStreak(parent.id, selectedDate);
-                    const groupProgressPercent = Math.round((groupCompletedCount / groupTotalCount) * 100);
-                    
-                    const parentItem = document.createElement('div');
-                    parentItem.className = 'bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm';
-                    
-                    // 최상위 습관 UI
-                    let parentHtml = `
-                        <div class="p-3 ${parentCompleted ? 'bg-green-50' : 'bg-white'} transition-colors flex flex-col gap-2">
-                            <div class="flex items-center justify-between">
-                                <label class="flex items-center gap-3 cursor-pointer flex-1 group">
-                                    <div class="relative flex items-center justify-center w-6 h-6">
-                                        <input type="checkbox" class="checkbox-custom absolute opacity-0 w-full h-full cursor-pointer" 
-                                            ${parentCompleted ? 'checked' : ''} 
-                                            onchange="toggleCompletion('${parent.id}', '${dateStr}')">
-                                        <div class="w-5 h-5 rounded border-2 ${parentCompleted ? 'border-green-500 bg-green-500' : 'border-slate-300'} flex items-center justify-center">
-                                            <svg class="w-3 h-3 text-white ${parentCompleted ? 'opacity-100' : 'opacity-0'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                        </div>
-                                    </div>
-                                    <span class="font-semibold text-slate-800 ${parentCompleted ? 'line-through text-slate-500' : ''}">${parent.name}</span>
-                                    ${parentStreak > 1 ? `<span class="text-xs text-orange-500 font-bold bg-orange-50 px-2 py-0.5 rounded-full ml-2">🔥 ${parentStreak}일 연속</span>` : ''}
-                                </label>
-                                
-                                <div class="flex items-center gap-3">
-                                    <div class="flex flex-col items-end">
-                                        <span class="text-[10px] font-bold ${groupProgressPercent === 100 ? 'text-green-500' : 'text-blue-500'}">${groupProgressPercent}%</span>
-                                        <div class="w-12 h-1.5 bg-slate-200 rounded-full mt-0.5">
-                                            <div class="h-full rounded-full ${groupProgressPercent === 100 ? 'bg-green-500' : 'bg-blue-500'}" style="width: ${groupProgressPercent}%"></div>
-                                        </div>
-                                    </div>
-                                    ${parent.subHabits.length > 0 ? `
-                                        <button onclick="toggleExpand('${parent.id}')" class="p-1 text-slate-400 hover:text-slate-700 bg-slate-100 rounded">
-                                            <i class="fas ${parent.isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'} text-xs"></i>
-                                        </button>
-                                    ` : ''}
-                                </div>
+                let html = `
+                    <div class="mb-3 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                        <!-- Parent Header -->
+                        <div class="flex items-center justify-between p-3 bg-slate-50 border-b border-slate-100 group">
+                            <div class="flex items-center gap-3 overflow-hidden flex-1 cursor-pointer" onclick="toggleExpand('${parent.id}')">
+                                <span class="text-xs font-semibold px-2 py-1 rounded-md ${timeColorClass} whitespace-nowrap">
+                                    ${parent.time}
+                                </span>
+                                <span class="text-base font-semibold text-slate-800 truncate" title="${parent.name}">${parent.name}</span>
+                                ${hasSubs ? `<i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'} text-slate-400 text-xs ml-2"></i>` : ''}
+                            </div>
+                            <div class="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity pl-2">
+                                <button onclick="openEditModal('${parent.id}', null, '${parent.name.replace(/'/g, "\\'")}')" class="p-1.5 text-slate-400 hover:text-blue-500 transition rounded"><i class="fas fa-pen text-sm"></i></button>
+                                <button onclick="deleteHabit('${parent.id}', false)" class="p-1.5 text-slate-400 hover:text-red-500 transition rounded"><i class="fas fa-trash-alt text-sm"></i></button>
                             </div>
                         </div>
-                    `;
+                        
+                        <!-- Sub Habits Area -->
+                        <div class="${parent.isExpanded ? 'block' : 'hidden'} p-3 space-y-2 bg-white">
+                `;
 
-                    // 하위 습관 UI
-                    if (parent.isExpanded && parent.subHabits.length > 0) {
-                        parentHtml += `<div class="bg-slate-50 border-t border-slate-100 p-2 space-y-1 pl-10">`;
-                        parent.subHabits.forEach(sub => {
-                            const subCompleted = records[dateStr] && records[dateStr].includes(sub.id);
-                            const subStreak = calculateStreak(sub.id, selectedDate);
-                            
-                            parentHtml += `
-                                <div class="flex items-center py-1 sub-habit-indent">
-                                    <label class="flex items-center gap-3 cursor-pointer flex-1 group">
-                                        <div class="relative flex items-center justify-center w-5 h-5">
-                                            <input type="checkbox" class="checkbox-custom absolute opacity-0 w-full h-full cursor-pointer" 
-                                                ${subCompleted ? 'checked' : ''} 
-                                                onchange="toggleCompletion('${sub.id}', '${dateStr}')">
-                                            <div class="w-4 h-4 rounded border-2 ${subCompleted ? 'border-green-500 bg-green-500' : 'border-slate-300'} flex items-center justify-center">
-                                                <svg class="w-2.5 h-2.5 text-white ${subCompleted ? 'opacity-100' : 'opacity-0'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                            </div>
-                                        </div>
-                                        <span class="text-base text-slate-700 ${subCompleted ? 'line-through text-slate-400' : ''}">${sub.name}</span>
-                                        ${subStreak > 1 ? `<span class="text-[10px] text-orange-500 font-bold ml-2">🔥 ${subStreak}일</span>` : ''}
-                                    </label>
+                if (parent.subHabits) {
+                    parent.subHabits.forEach((sub, index) => {
+                        html += `
+                            <div class="flex items-center justify-between pl-4 py-1.5 group border-b border-slate-50 last:border-0">
+                                <div class="flex items-center gap-2 flex-1 overflow-hidden">
+                                    <i class="fas fa-level-up-alt rotate-90 text-slate-300 text-xs"></i>
+                                    <span class="text-[15px] text-slate-700 truncate" title="${sub.name}">${sub.name}</span>
+                                    <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded ml-1">Sub</span>
                                 </div>
-                            `;
-                        });
-                        parentHtml += `</div>`;
-                    }
-
-                    // 체인 습관 입력창 (최상위 습관 완료 시 표시)
-                    if (parentCompleted && parent.isExpanded) {
-                        parentHtml += `
-                            <div class="bg-slate-50 p-2 pl-10 border-t border-slate-100 flex items-center gap-2">
-                                <i class="fas fa-link text-slate-300 text-xs"></i>
-                                <input type="text" id="chain-input-${parent.id}" placeholder="이어서 할 하위 습관 추가 (Enter)" 
-                                    class="text-sm bg-white border border-slate-200 rounded px-2 py-1 w-full focus:outline-none focus:border-blue-400"
-                                    onkeydown="if(event.key === 'Enter') addSubHabit('${parent.id}', 'chain-input-${parent.id}')">
+                                <div class="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="moveSubHabit('${parent.id}', '${sub.id}', 'up')" class="p-1 text-slate-400 hover:text-slate-700 transition" ${index === 0 ? 'disabled style="opacity:0.2"' : ''}><i class="fas fa-arrow-up text-xs"></i></button>
+                                    <button onclick="moveSubHabit('${parent.id}', '${sub.id}', 'down')" class="p-1 text-slate-400 hover:text-slate-700 transition" ${index === parent.subHabits.length - 1 ? 'disabled style="opacity:0.2"' : ''}><i class="fas fa-arrow-down text-xs"></i></button>
+                                    <button onclick="openEditModal('${sub.id}', '${parent.id}', '${sub.name.replace(/'/g, "\\'")}')" class="p-1 text-slate-400 hover:text-blue-500 transition ml-2"><i class="fas fa-pen text-xs"></i></button>
+                                    <button onclick="deleteHabit('${sub.id}', true, '${parent.id}')" class="p-1 text-slate-400 hover:text-red-500 transition"><i class="fas fa-trash-alt text-xs"></i></button>
+                                </div>
                             </div>
                         `;
-                    }
+                    });
+                }
 
-                    parentItem.innerHTML = parentHtml;
-                    list.appendChild(parentItem);
-                });
-                
-                section.appendChild(list);
-                container.appendChild(section);
+                html += `
+                            <div class="flex items-center gap-2 mt-2 pl-4">
+                                <i class="fas fa-level-up-alt rotate-90 text-slate-300 text-xs"></i>
+                                <input type="text" id="new-sub-${parent.id}" placeholder="하위 습관 추가..." class="flex-1 px-2 py-1.5 text-sm rounded border border-slate-200 focus:outline-none focus:border-blue-400 bg-slate-50 focus:bg-white transition" onkeypress="if(event.key==='Enter') addSubHabit('${parent.id}')">
+                                <button onclick="addSubHabit('${parent.id}')" class="px-2 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 text-slate-600 rounded transition whitespace-nowrap">추가</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
             });
-
-            // 전체 진척도 업데이트
-            const totalPercent = totalItems === 0 ? 0 : Math.round((totalCompleted / totalItems) * 100);
-            document.getElementById('daily-total-progress').style.width = `${totalPercent}%`;
-            document.getElementById('daily-progress-text').innerText = `${totalPercent}% 완료 (${totalCompleted}/${totalItems})`;
         }
 
-        // --- 렌더링: 달력 ---
+        function getTotalHabitCount() {
+            let count = 0;
+            habits.forEach(p => {
+                count += 1;
+                if(p.subHabits) count += p.subHabits.length;
+            });
+            return count;
+        }
+
+        function calculateProgress(dateStr) {
+            const total = getTotalHabitCount();
+            if (total === 0) return 0;
+            const completed = records[dateStr] ? records[dateStr].length : 0;
+            return Math.round((completed / total) * 100);
+        }
+
         function changeMonth(delta) {
             currentMonthDate.setMonth(currentMonthDate.getMonth() + delta);
-            renderAll();
+            renderCalendar();
         }
 
         function goToToday() {
             currentMonthDate = new Date();
             selectedDate = new Date();
-            renderAll();
-        }
-
-        function getDailyTotalProgress(dateStr) {
-            let total = 0;
-            let completed = 0;
-            habits.forEach(parent => {
-                total++;
-                if (records[dateStr] && records[dateStr].includes(parent.id)) completed++;
-                parent.subHabits.forEach(sub => {
-                    total++;
-                    if (records[dateStr] && records[dateStr].includes(sub.id)) completed++;
-                });
-            });
-            return total === 0 ? 0 : Math.round((completed / total) * 100);
+            renderCalendar();
+            updateDailyView();
         }
 
         function renderCalendar() {
@@ -638,7 +544,6 @@
 
             const firstDayIndex = new Date(year, month, 1).getDay();
             const lastDay = new Date(year, month + 1, 0).getDate();
-
             const todayStr = formatDateToYYYYMMDD(new Date());
             const selectedStr = formatDateToYYYYMMDD(selectedDate);
 
@@ -651,7 +556,7 @@
             for (let i = 1; i <= lastDay; i++) {
                 const dateObj = new Date(year, month, i);
                 const dateStr = formatDateToYYYYMMDD(dateObj);
-                const progress = getDailyTotalProgress(dateStr);
+                const progress = calculateProgress(dateStr);
                 
                 const dayDiv = document.createElement('div');
                 dayDiv.className = `calendar-day text-sm bg-slate-50 border border-slate-100/50`;
@@ -668,9 +573,10 @@
                 }
 
                 let progressBarHtml = '';
-                if (habits.length > 0) {
+                if (getTotalHabitCount() > 0) {
                     let fillColor = progress === 100 ? '#10b981' : (progress > 0 ? '#3b82f6' : 'transparent');
                     if (dayDiv.classList.contains('selected') && progress > 0) fillColor = '#ffffff';
+                    
                     progressBarHtml = `
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${progress}%; background-color: ${fillColor}"></div>
@@ -681,13 +587,146 @@
                 dayDiv.innerHTML = `<span class="${textClass} font-medium relative z-10">${i}</span>${progressBarHtml}`;
                 dayDiv.onclick = () => {
                     selectedDate = new Date(year, month, i);
-                    renderAll();
+                    renderCalendar();
+                    updateDailyView();
                 };
                 daysContainer.appendChild(dayDiv);
             }
         }
 
+        function toggleRecord(id, dateStr) {
+            if (!records[dateStr]) records[dateStr] = [];
+            const index = records[dateStr].indexOf(id);
+            if (index > -1) records[dateStr].splice(index, 1);
+            else records[dateStr].push(id);
+
+            if (records[dateStr].length === 0) delete records[dateStr];
+
+            saveData();
+            updateDailyView();
+            renderCalendar(); 
+        }
+
+        function updateDailyView() {
+            const dateStr = formatDateToYYYYMMDD(selectedDate);
+            document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
+            
+            const progress = calculateProgress(dateStr);
+            const progressText = document.getElementById('daily-progress-text');
+            progressText.innerText = getTotalHabitCount() === 0 ? '등록된 습관이 없습니다.' : `오늘의 달성률: ${progress}%`;
+            
+            const container = document.getElementById('daily-habits-container');
+            const emptyMsg = document.getElementById('empty-habits-msg');
+
+            if (habits.length === 0) {
+                emptyMsg.style.display = 'flex';
+                Array.from(container.children).forEach(child => { if (child.id !== 'empty-habits-msg') child.remove(); });
+                return;
+            }
+
+            emptyMsg.style.display = 'none';
+
+            // Group by Time
+            const grouped = {};
+            habits.forEach(h => {
+                if (!grouped[h.time]) grouped[h.time] = [];
+                grouped[h.time].push(h);
+            });
+
+            Array.from(container.children).forEach(child => { if (child.id !== 'empty-habits-msg') child.remove(); });
+            const completedIds = records[dateStr] || [];
+
+            // Sort times based on customTimes array order
+            const sortedTimes = Object.keys(grouped).sort((a, b) => {
+                let ia = customTimes.indexOf(a);
+                let ib = customTimes.indexOf(b);
+                if(ia === -1) ia = 999; if(ib === -1) ib = 999;
+                return ia - ib;
+            });
+
+            sortedTimes.forEach(time => {
+                const section = document.createElement('div');
+                section.className = 'mb-6 last:mb-0';
+                const timeColorClass = getTimeColor(time);
+
+                let html = `
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-current ${timeColorClass.split(' ')[0]}"></span>
+                        ${time}
+                    </h3>
+                    <div class="space-y-2">
+                `;
+
+                grouped[time].forEach(parent => {
+                    const isParentCompleted = completedIds.includes(parent.id);
+                    const bgClass = isParentCompleted ? 'bg-green-50/40 border-green-200' : 'bg-white border-slate-200 shadow-sm';
+                    const textClass = isParentCompleted ? 'text-slate-400 line-through' : 'text-slate-800';
+                    const hasSubs = parent.subHabits && parent.subHabits.length > 0;
+
+                    html += `
+                        <div class="rounded-xl border ${bgClass} transition-all duration-300 overflow-hidden">
+                            <label class="flex items-center p-3 cursor-pointer hover:bg-slate-50/50 select-none group">
+                                <div class="relative flex items-center justify-center w-6 h-6 mr-3">
+                                    <input type="checkbox" class="checkbox-custom absolute opacity-0 w-full h-full cursor-pointer" 
+                                        ${isParentCompleted ? 'checked' : ''} 
+                                        onchange="toggleRecord('${parent.id}', '${dateStr}')">
+                                    <div class="w-5 h-5 rounded border-2 border-slate-300 flex items-center justify-center transition-colors">
+                                        <svg class="w-3 h-3 text-white opacity-0 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                </div>
+                                <span class="${textClass} font-semibold flex-1 transition-colors text-lg">${parent.name}</span>
+                                ${hasSubs ? `<button type="button" onclick="event.preventDefault(); toggleExpand('${parent.id}')" class="p-2 text-slate-400 hover:text-slate-600 focus:outline-none"><i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'}"></i></button>` : ''}
+                            </label>
+                    `;
+
+                    // Parent 완료 시 체인 습관(하위 습관) 빠른 추가 입력창 표시
+                    if (isParentCompleted) {
+                        html += `
+                            <div class="px-4 py-3 bg-blue-50/50 border-t border-blue-100 flex items-center gap-2 animate-[fadeIn_0.3s_ease-out]">
+                                <i class="fas fa-link text-blue-400 text-sm"></i>
+                                <input type="text" id="chain-sub-${parent.id}" placeholder="이어서 할 하위 습관 추가..." class="flex-1 px-3 py-1.5 text-[15px] rounded border border-blue-200 focus:outline-none focus:border-blue-500 bg-white" onkeypress="if(event.key==='Enter') addSubHabit('${parent.id}', 'chain-sub-${parent.id}')">
+                                <button onclick="addSubHabit('${parent.id}', 'chain-sub-${parent.id}')" class="px-3 py-1.5 text-[15px] bg-blue-500 hover:bg-blue-600 text-white rounded font-medium transition">추가</button>
+                            </div>
+                        `;
+                    }
+
+                    // Render Sub Habits (Font size increased to text-base)
+                    if (hasSubs && parent.isExpanded) {
+                        html += `<div class="bg-slate-50/50 border-t border-slate-100 py-1">`;
+                        parent.subHabits.forEach(sub => {
+                            const isSubCompleted = completedIds.includes(sub.id);
+                            const subTextClass = isSubCompleted ? 'text-slate-400 line-through' : 'text-slate-700';
+                            
+                            html += `
+                                <label class="flex items-center p-2.5 pl-12 cursor-pointer hover:bg-slate-100/50 select-none group">
+                                    <div class="relative flex items-center justify-center w-5 h-5 mr-3">
+                                        <input type="checkbox" class="checkbox-custom absolute opacity-0 w-full h-full cursor-pointer" 
+                                            ${isSubCompleted ? 'checked' : ''} 
+                                            onchange="toggleRecord('${sub.id}', '${dateStr}')">
+                                        <div class="w-4 h-4 rounded-sm border-2 border-slate-300 flex items-center justify-center transition-colors">
+                                            <svg class="w-2.5 h-2.5 text-white opacity-0 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                    </div>
+                                    <!-- 하위 습관 폰트 크기를 text-base로 조정 -->
+                                    <span class="${subTextClass} text-base transition-colors flex-1">${sub.name}</span>
+                                </label>
+                            `;
+                        });
+                        html += `</div>`;
+                    }
+
+                    html += `</div>`;
+                });
+
+                html += `</div>`;
+                section.innerHTML = html;
+                container.appendChild(section);
+            });
+        }
+
+        // Initialize on load
         window.onload = init;
+
     </script>
 </body>
 </html>
