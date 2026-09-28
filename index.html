@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>작은 습관 트래커</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover:not(.empty) {
+            background-color: #e2e8f0;
+        }
+
+        .calendar-day.selected {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
+        }
+
+        .calendar-day.today {
+            border: 2px solid #3b82f6;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 4px;
+            left: 10%;
+            width: 80%;
+            height: 4px;
+            border-radius: 2px;
+            background-color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #10b981;
+            transition: width 0.3s ease;
+        }
+        
+        .selected .progress-bar {
+            background-color: rgba(255,255,255,0.3);
+        }
+        .selected .progress-fill {
+            background-color: #fff;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .checkbox-custom:checked + div {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        .checkbox-custom:checked + div svg {
+            opacity: 1;
+        }
+
+        /* 아코디언 애니메이션을 위한 CSS Grid 트릭 */
+        .sub-habits-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-in-out;
+        }
+        .sub-habits-wrapper.expanded {
+            grid-template-rows: 1fr;
+        }
+        .sub-habits-inner {
+            overflow: hidden;
+        }
+        
+        .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        .expanded-chevron {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 text-center md:text-left flex flex-col md:flex-row md:items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight"><i class="fas fa-leaf text-green-500 mr-2"></i>작은 습관 트래커</h1>
+                <p class="text-slate-500 mt-2">매일매일 조금씩, 계층형 루틴 만들기</p>
+            </div>
+            <div class="mt-4 md:mt-0 px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-2">
+                <i class="far fa-calendar-check text-blue-500"></i>
+                <span id="today-display" class="font-medium text-slate-700"></span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Calendar (Spans 4 cols) -->
+            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px]">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
+                    <div class="flex gap-2">
+                        <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">
+                            오늘
+                        </button>
+                        <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid mb-2">
+                    <div class="text-center text-xs font-semibold text-red-400">일</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">월</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">화</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">수</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">목</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">금</div>
+                    <div class="text-center text-xs font-semibold text-blue-400">토</div>
+                </div>
+
+                <div id="calendar-days" class="calendar-grid flex-1">
+                    <!-- Days dynamically generated -->
+                </div>
+            </div>
+
+            <!-- Middle Column: Daily Tracking (Spans 4 cols) -->
+            <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px] overflow-hidden">
+                <div class="p-6 bg-slate-50 border-b border-slate-100">
+                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-tasks text-blue-500"></i>
+                        <span id="selected-date-title"></span>
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1" id="daily-progress-text">완료율: 0%</p>
+                </div>
+                
+                <div class="p-6 overflow-y-auto flex-1 bg-white" id="daily-habits-container">
+                    <!-- Habit checklist generated by JS -->
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
+                        <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
+                        <p>등록된 습관이 없습니다.<br>우측에서 새로운 습관을 추가해보세요!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Habit Settings (Spans 4 cols) -->
+            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px]">
+                <h2 class="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-cog text-slate-400"></i>습관 관리
+                </h2>
+                
+                <!-- Add Top Level Habit -->
+                <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <input type="text" id="new-habit-name" placeholder="최상위 습관 이름 (예: 6시30분 기상하기)" class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3 text-sm">
+                    <div class="flex gap-2">
+                        <select id="new-habit-time" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white text-slate-700">
+                            <option value="아침">🌅 아침</option>
+                            <option value="점심">☀️ 점심</option>
+                            <option value="저녁">🌙 저녁</option>
+                            <option value="자기전">💤 자기전</option>
+                            <option value="수시">🔄 수시</option>
+                        </select>
+                        <button onclick="addHabit()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-sm font-medium whitespace-nowrap shadow-sm">
+                            습관 추가
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Managed Habits List -->
+                <div class="flex-1 overflow-y-auto pr-2">
+                    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">전체 습관 목록 (관리용)</h3>
+                    <div id="managed-habits-list" class="space-y-3 pb-4">
+                        <!-- Managed habits generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        /* 
+           habits format: 
+           { id, name, time, parentId (null if top), isCollapsed (boolean) }
+        */
+        let habits = JSON.parse(localStorage.getItem('micro_habits_v2')) || [];
+        let records = JSON.parse(localStorage.getItem('micro_records_v2')) || {};
+        
+        let currentMonthDate = new Date();
+        let selectedDate = new Date();
+
+        const TIME_COLORS = {
+            '아침': 'text-orange-500 bg-orange-50',
+            '점심': 'text-yellow-500 bg-yellow-50',
+            '저녁': 'text-indigo-500 bg-indigo-50',
+            '자기전': 'text-purple-500 bg-purple-50',
+            '수시': 'text-teal-500 bg-teal-50'
+        };
+
+        const TIME_ORDER = { '아침': 1, '점심': 2, '저녁': 3, '자기전': 4, '수시': 5 };
+
+        // Helper Functions
+        function formatDateToYYYYMMDD(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDisplayDate(date) {
+            return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+        }
+
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        function saveData() {
+            localStorage.setItem('micro_habits_v2', JSON.stringify(habits));
+            localStorage.setItem('micro_records_v2', JSON.stringify(records));
+        }
+
+        function init() {
+            document.getElementById('today-display').innerText = formatDisplayDate(new Date());
+            renderCalendar();
+            renderManagedHabits();
+            updateDailyView();
+        }
+
+        function addHabit() {
+            const nameInput = document.getElementById('new-habit-name');
+            const timeInput = document.getElementById('new-habit-time');
+            const name = nameInput.value.trim();
+            const time = timeInput.value;
+
+            if (!name) {
+                nameInput.classList.add('border-red-500');
+                setTimeout(() => nameInput.classList.remove('border-red-500'), 1500);
+                return;
+            }
+
+            habits.push({
+                id: generateId(),
+                name: name,
+                time: time,
+                parentId: null,
+                isCollapsed: false
+            });
+
+            saveData();
+            nameInput.value = '';
+            
+            renderManagedHabits();
+            updateDailyView();
+            renderCalendar();
+        }
+
+        function toggleAddSubInput(parentId) {
+            const el = document.getElementById(`add-sub-box-${parentId}`);
+            el.classList.toggle('hidden');
+            if(!el.classList.contains('hidden')){
+                document.getElementById(`sub-input-${parentId}`).focus();
+            }
+        }
+
+        function addSubHabit(parentId) {
+            const input = document.getElementById(`sub-input-${parentId}`);
+            const name = input.value.trim();
+            if (!name) return;
+
+            const parent = habits.find(h => h.id === parentId);
+            
+            habits.push({
+                id: generateId(),
+                name: name,
+                time: parent.time,
+                parentId: parentId,
+                isCollapsed: false
+            });
+
+            // Auto expand parent when adding sub
+            parent.isCollapsed = false;
+            
+            saveData();
+            renderManagedHabits();
+            updateDailyView();
+            renderCalendar();
+        }
+
+        function deleteHabit(id) {
+            const children = habits.filter(h => h.parentId === id).map(h => h.id);
+            const idsToDelete = [id, ...children];
+
+            habits = habits.filter(h => !idsToDelete.includes(h.id));
+            
+            for (let date in records) {
+                records[date] = records[date].filter(recordId => !idsToDelete.includes(recordId));
+                if (records[date].length === 0) delete records[date];
+            }
+            
+            saveData();
+            renderManagedHabits();
+            updateDailyView();
+            renderCalendar();
+        }
+
+        function toggleCollapseDOM(event, viewType, habitId) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const habit = habits.find(h => h.id === habitId);
+            if (habit) {
+                habit.isCollapsed = !habit.isCollapsed;
+                saveData();
+            }
+            
+            // Animate Management View
+            const wrapManage = document.getElementById(`sub-wrap-manage-${habitId}`);
+            const chevronManage = document.getElementById(`chevron-manage-${habitId}`);
+            if(wrapManage && chevronManage) {
+                if(habit.isCollapsed) {
+                    wrapManage.classList.remove('expanded');
+                    chevronManage.classList.remove('expanded-chevron');
+                } else {
+                    wrapManage.classList.add('expanded');
+                    chevronManage.classList.add('expanded-chevron');
+                }
+            }
+
+            // Animate Daily View
+            const wrapDaily = document.getElementById(`sub-wrap-daily-${habitId}`);
+            const chevronDaily = document.getElementById(`chevron-daily-${habitId}`);
+            if(wrapDaily && chevronDaily) {
+                if(habit.isCollapsed) {
+                    wrapDaily.classList.remove('expanded');
+                    chevronDaily.classList.remove('expanded-chevron');
+                } else {
+                    wrapDaily.classList.add('expanded');
+                    chevronDaily.classList.add('expanded-chevron');
+                }
+            }
+        }
+
+        function renderManagedHabits() {
+            const container = document.getElementById('managed-habits-list');
+            container.innerHTML = '';
+
+            const topLevelHabits = habits.filter(h => !h.parentId).sort((a, b) => TIME_ORDER[a.time] - TIME_ORDER[b.time]);
+
+            if (topLevelHabits.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">등록된 최상위 습관이 없습니다.</p>';
+                return;
+            }
+
+            topLevelHabits.forEach(parent => {
+                const children = habits.filter(h => h.parentId === parent.id);
+                const hasChildren = children.length > 0;
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm';
+                
+                const timeColorClass = TIME_COLORS[parent.time] || 'text-slate-500 bg-slate-100';
+
+                // Parent Row
+                let html = `
+                    <div class="flex items-center justify-between p-3 bg-white border-b border-slate-100 hover:bg-slate-50 transition group">
+                        <div class="flex items-center gap-3 overflow-hidden flex-1 cursor-pointer" onclick="toggleCollapseDOM(event, 'manage', '${parent.id}')">
+                            <button class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-700 focus:outline-none ${!hasChildren ? 'invisible' : ''}">
+                                <i id="chevron-manage-${parent.id}" class="fas fa-chevron-down chevron-icon ${!parent.isCollapsed ? 'expanded-chevron' : ''}"></i>
+                            </button>
+                            <span class="text-xs font-semibold px-2 py-1 rounded-md ${timeColorClass} whitespace-nowrap">
+                                ${parent.time}
+                            </span>
+                            <span class="text-sm font-semibold text-slate-800 truncate flex-1">${parent.name}</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="toggleAddSubInput('${parent.id}')" class="w-8 h-8 rounded text-blue-500 hover:bg-blue-50 transition" title="하위 습관 추가">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button onclick="deleteHabit('${parent.id}')" class="w-8 h-8 rounded text-slate-300 hover:bg-red-50 hover:text-red-500 transition" title="삭제">
+                                <i class="fas fa-trash-alt text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden Add Sub-habit Input -->
+                    <div id="add-sub-box-${parent.id}" class="hidden p-3 bg-slate-50 border-b border-slate-100 flex gap-2 pl-12">
+                        <span class="text-slate-300 mt-2">└</span>
+                        <input type="text" id="sub-input-${parent.id}" placeholder="하위 습관 이름..." class="flex-1 px-3 py-1.5 rounded border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm">
+                        <button onclick="addSubHabit('${parent.id}')" class="px-3 py-1.5 bg-blue-50 text-blue-600 font-medium rounded hover:bg-blue-100 transition text-sm">저장</button>
+                    </div>
+                `;
+
+                // Children Container (Animated)
+                html += `
+                    <div id="sub-wrap-manage-${parent.id}" class="sub-habits-wrapper ${!parent.isCollapsed ? 'expanded' : ''}">
+                        <div class="sub-habits-inner bg-slate-50 flex flex-col">
+                `;
+
+                children.forEach(sub => {
+                    html += `
+                        <div class="flex items-center justify-between py-2.5 px-4 hover:bg-slate-100 transition group border-t border-slate-100/50 first:border-0 pl-12">
+                            <div class="flex items-center gap-2 overflow-hidden flex-1 text-slate-600">
+                                <span class="text-slate-300">└</span>
+                                <span class="text-sm truncate">${sub.name}</span>
+                                <span class="text-[10px] bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded font-medium">Sub</span>
+                            </div>
+                            <button onclick="deleteHabit('${sub.id}')" class="text-slate-300 hover:text-red-500 transition opacity-0 group-hover:opacity-100 p-1">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+                wrapper.innerHTML = html;
+                container.appendChild(wrapper);
+            });
+        }
+
+        function calculateProgress(dateStr) {
+            if (habits.length === 0) return 0;
+            const completed = records[dateStr] ? records[dateStr].length : 0;
+            return Math.round((completed / habits.length) * 100);
+        }
+
+        function changeMonth(delta) {
+            currentMonthDate.setMonth(currentMonthDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentMonthDate = new Date();
+            selectedDate = new Date();
+            renderCalendar();
+            updateDailyView();
+        }
+
+        function renderCalendar() {
+            const year = currentMonthDate.getFullYear();
+            const month = currentMonthDate.getMonth();
+            
+            document.getElementById('current-month-year').innerText = `${year}년 ${month + 1}월`;
+            
+            const daysContainer = document.getElementById('calendar-days');
+            daysContainer.innerHTML = '';
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const todayStr = formatDateToYYYYMMDD(new Date());
+            const selectedStr = formatDateToYYYYMMDD(selectedDate);
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'calendar-day empty';
+                daysContainer.appendChild(emptyDiv);
+            }
+
+            for (let i = 1; i <= lastDay; i++) {
+                const dateObj = new Date(year, month, i);
+                const dateStr = formatDateToYYYYMMDD(dateObj);
+                const progress = calculateProgress(dateStr);
+                
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `calendar-day text-sm bg-slate-50 border border-slate-100/50`;
+                
+                if (dateStr === todayStr) dayDiv.classList.add('today');
+                if (dateStr === selectedStr) dayDiv.classList.add('selected');
+                
+                const dayOfWeek = dateObj.getDay();
+                let textClass = dayDiv.classList.contains('selected') ? "text-white" : 
+                                (dayOfWeek === 0 ? "text-red-500" : (dayOfWeek === 6 ? "text-blue-500" : "text-slate-700"));
+
+                let progressBarHtml = '';
+                if (habits.length > 0) {
+                    let fillColor = progress === 100 ? '#10b981' : (progress > 0 ? '#3b82f6' : 'transparent');
+                    if (dayDiv.classList.contains('selected') && progress > 0) fillColor = '#ffffff';
+                    
+                    progressBarHtml = `
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%; background-color: ${fillColor}"></div>
+                        </div>
+                    `;
+                }
+
+                dayDiv.innerHTML = `<span class="${textClass} font-medium relative z-10">${i}</span>${progressBarHtml}`;
+                dayDiv.onclick = () => {
+                    selectedDate = new Date(year, month, i);
+                    renderCalendar();
+                    updateDailyView();
+                };
+
+                daysContainer.appendChild(dayDiv);
+            }
+        }
+
+        function toggleHabit(habitId, dateStr) {
+            if (!records[dateStr]) records[dateStr] = [];
+            const index = records[dateStr].indexOf(habitId);
+            
+            if (index > -1) records[dateStr].splice(index, 1);
+            else records[dateStr].push(habitId);
+
+            if (records[dateStr].length === 0) delete records[dateStr];
+
+            saveData();
+            updateDailyView();
+            renderCalendar(); 
+        }
+
+        function updateDailyView() {
+            const dateStr = formatDateToYYYYMMDD(selectedDate);
+            document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
+            
+            const progress = calculateProgress(dateStr);
+            document.getElementById('daily-progress-text').innerText = habits.length === 0 ? '등록된 습관이 없습니다.' : `오늘의 달성률: ${progress}%`;
+            
+            const container = document.getElementById('daily-habits-container');
+            const emptyMsg = document.getElementById('empty-habits-msg');
+
+            const topLevelHabits = habits.filter(h => !h.parentId);
+
+            if (topLevelHabits.length === 0) {
+                emptyMsg.style.display = 'flex';
+                Array.from(container.children).forEach(c => { if (c.id !== 'empty-habits-msg') c.remove(); });
+                return;
+            }
+
+            emptyMsg.style.display = 'none';
+            Array.from(container.children).forEach(c => { if (c.id !== 'empty-habits-msg') c.remove(); });
+
+            // Group by Time
+            const grouped = {};
+            topLevelHabits.forEach(h => {
+                if (!grouped[h.time]) grouped[h.time] = [];
+                grouped[h.time].push(h);
+            });
+
+            const sortedCategories = Object.keys(grouped).sort((a, b) => TIME_ORDER[a] - TIME_ORDER[b]);
+            const completedHabitsForDate = records[dateStr] || [];
+
+            sortedCategories.forEach(time => {
+                const section = document.createElement('div');
+                section.className = 'mb-6 last:mb-0';
+                
+                const timeColorClass = TIME_COLORS[time] || 'text-slate-500 bg-slate-100';
+
+                let html = `
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <span class="w-2 h-2 rounded-full bg-current ${timeColorClass.split(' ')[0]}"></span>
+                        ${time}
+                    </h3>
+                    <div class="space-y-3">
+                `;
+
+                grouped[time].forEach(parent => {
+                    const children = habits.filter(h => h.parentId === parent.id);
+                    const hasChildren = children.length > 0;
+                    
+                    const isCompleted = completedHabitsForDate.includes(parent.id);
+                    const bgClass = isCompleted ? 'bg-green-50/50 border-green-200 shadow-sm' : 'bg-white border-slate-200 hover:border-blue-300';
+                    const textClass = isCompleted ? 'text-slate-400 line-through' : 'text-slate-800 font-semibold';
+
+                    // Parent Checkbox
+                    html += `
+                        <div class="border rounded-xl transition-all duration-200 ${bgClass}">
+                            <div class="flex items-center p-1 group">
+                                <label class="flex items-center p-2 flex-1 cursor-pointer select-none">
+                                    <div class="relative flex items-center justify-center w-6 h-6 mr-3">
+                                        <input type="checkbox" class="checkbox-custom absolute opacity-0 w-full h-full cursor-pointer" 
+                                            ${isCompleted ? 'checked' : ''} 
+                                            onchange="toggleHabit('${parent.id}', '${dateStr}')">
+                                        <div class="w-5 h-5 rounded border-2 border-slate-300 flex items-center justify-center transition-colors">
+                                            <svg class="w-3 h-3 text-white opacity-0 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <span class="${textClass} flex-1 transition-colors">${parent.name}</span>
+                                </label>
+                                
+                                <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-500 transition ${!hasChildren ? 'invisible' : ''}" 
+                                        onclick="toggleCollapseDOM(event, 'daily', '${parent.id}')">
+                                    <i id="chevron-daily-${parent.id}" class="fas fa-chevron-down chevron-icon ${!parent.isCollapsed ? 'expanded-chevron' : ''}"></i>
+                                </button>
+                            </div>
+                    `;
+
+                    // Children Sub-checkboxes
+                    if (hasChildren) {
+                        html += `
+                            <div id="sub-wrap-daily-${parent.id}" class="sub-habits-wrapper ${!parent.isCollapsed ? 'expanded' : ''}">
+                                <div class="sub-habits-inner bg-slate-50/50 rounded-b-xl border-t border-slate-100">
+                                    <div class="p-2 pl-12 space-y-1">
+                        `;
+                        
+                        children.forEach(sub => {
+                            const subCompleted = completedHabitsForDate.includes(sub.id);
+                            const subTextClass = subCompleted ? 'text-slate-400 line-through' : 'text-slate-600';
+                            
+                            html += `
+                                <label class="flex items-center p-1.5 rounded-lg cursor-pointer hover:bg-slate-100/80 transition select-none group">
+                                    <div class="relative flex items-center justify-center w-5 h-5 mr-3">
+                                        <input type="checkbox" class="checkbox-custom absolute opacity-0 w-full h-full cursor-pointer" 
+                                            ${subCompleted ? 'checked' : ''} 
+                                            onchange="toggleHabit('${sub.id}', '${dateStr}')">
+                                        <div class="w-4 h-4 rounded-sm border-2 border-slate-300 flex items-center justify-center transition-colors">
+                                            <svg class="w-2.5 h-2.5 text-white opacity-0 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <span class="text-slate-300 mr-2">└</span>
+                                    <span class="${subTextClass} text-sm flex-1 transition-colors">${sub.name}</span>
+                                    <span class="text-[10px] bg-slate-200/70 text-slate-500 px-1.5 py-0.5 rounded font-medium ml-2">Sub</span>
+                                </label>
+                            `;
+                        });
+                        
+                        html += `</div></div></div>`;
+                    }
+                    html += `</div>`; // Close parent border div
+                });
+
+                html += `</div>`;
+                section.innerHTML = html;
+                container.appendChild(section);
+            });
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+</html>
