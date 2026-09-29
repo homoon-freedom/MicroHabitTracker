@@ -16,37 +16,27 @@
 
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 0.5rem;
         }
 
         .calendar-day {
-            aspect-ratio: 1;
-            border-radius: 0.75rem;
             cursor: pointer;
-            transition: all 0.2s ease;
             position: relative;
-            overflow: hidden;
-            background-color: transparent;
         }
 
-        .calendar-day:hover:not(.empty) {
+        .calendar-day:hover:not(.empty) .day-box {
             background-color: #e2e8f0;
         }
 
-        .calendar-day.selected {
+        .calendar-day.selected .day-box {
             background-color: #3b82f6;
-            color: white;
-            font-weight: bold;
+            border-color: #3b82f6;
             box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
         }
 
-        .calendar-day.today {
+        .calendar-day.today .day-box {
             border: 2px solid #3b82f6;
-        }
-        
-        .calendar-day.selected .habit-bg {
-            background-color: rgba(255, 255, 255, 0.3) !important;
         }
 
         /* Custom Scrollbar */
@@ -98,7 +88,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <!-- Left Column: Calendar -->
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px]">
+            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[720px]">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
                     <div class="flex gap-2">
@@ -124,11 +114,11 @@
                     <div class="text-center text-xs font-semibold text-blue-400">토</div>
                 </div>
 
-                <div id="calendar-days" class="calendar-grid flex-1"></div>
+                <div id="calendar-days" class="calendar-grid flex-1 content-start gap-y-4"></div>
             </div>
 
             <!-- Middle Column: Daily Tracking -->
-            <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px] overflow-hidden">
+            <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[720px] overflow-hidden">
                 <div class="p-6 bg-slate-50 border-b border-slate-100">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
                         <i class="fas fa-tasks text-blue-500"></i>
@@ -146,10 +136,15 @@
             </div>
 
             <!-- Right Column: Habit Settings -->
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[650px]">
-                <h2 class="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
-                    <i class="fas fa-cog text-slate-400"></i>전체 습관 목록 (관리용)
-                </h2>
+            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[720px]">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-cog text-slate-400"></i>습관 관리
+                    </h2>
+                    <button onclick="openPeriodicModal()" class="text-sm px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition font-medium">
+                        <i class="fas fa-list-ul mr-1"></i>주기 습관 모아보기
+                    </button>
+                </div>
                 
                 <!-- Add New Habit Form -->
                 <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -160,7 +155,31 @@
                             </select>
                             <input type="text" id="custom-time-input" placeholder="새로운 시간대" class="hidden flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">
                         </div>
+                        
+                        <!-- 주기 설정 -->
                         <div class="flex gap-2">
+                            <select id="new-habit-freq-type" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base bg-white text-slate-700" onchange="checkFreqType()">
+                                <option value="daily">매일</option>
+                                <option value="days">N일 주기</option>
+                                <option value="weeks">N주 주기</option>
+                                <option value="months">N개월 주기</option>
+                            </select>
+                            <input type="number" id="new-habit-freq-value" placeholder="주기(숫자)" min="1" value="1" class="hidden flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">
+                        </div>
+
+                        <!-- 시작일 / 종료일 (주기 설정 시 나타남) -->
+                        <div id="periodic-date-inputs" class="hidden flex gap-2">
+                            <div class="flex-1">
+                                <label class="block text-[10px] text-slate-500 mb-0.5 ml-1">시작일</label>
+                                <input type="date" id="new-habit-start-date" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white text-slate-700">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-[10px] text-slate-500 mb-0.5 ml-1">종료일</label>
+                                <input type="date" id="new-habit-end-date" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white text-slate-700">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 mt-1">
                             <input type="text" id="new-habit-name" placeholder="최상위 습관 이름" class="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">
                             <button onclick="addParentHabit()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-base font-medium whitespace-nowrap shrink-0">
                                 습관 추가
@@ -177,14 +196,44 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
-    <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <!-- Edit Modal (z-index 70으로 올려 다른 모달 위로 배치) -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">습관 이름 수정</h3>
-            <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6 text-base">
-            <div class="flex justify-end gap-2">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">습관 수정</h3>
+            
+            <label class="block text-xs text-slate-500 mb-1 ml-1">습관 이름</label>
+            <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 text-base">
+            
+            <!-- 주기적 습관 날짜 수정 영역 -->
+            <div id="edit-periodic-dates" class="hidden mb-6">
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="block text-xs text-slate-500 mb-1 ml-1">시작일</label>
+                        <input type="date" id="edit-habit-start-date" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm bg-white text-slate-700">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs text-slate-500 mb-1 ml-1">종료일</label>
+                        <input type="date" id="edit-habit-end-date" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm bg-white text-slate-700">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-2">
                 <button onclick="closeEditModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
                 <button onclick="saveEditHabit()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Periodic Habits List Modal -->
+    <div id="periodic-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[60] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-xl shadow-xl border border-slate-100 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
+                <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-calendar-alt text-blue-500 mr-2"></i>주기적 습관 목록</h3>
+                <button onclick="closePeriodicModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-lg transition"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <div id="periodic-modal-list" class="overflow-y-auto flex-1 space-y-3 pr-2">
+                <!-- Generated by JS -->
             </div>
         </div>
     </div>
@@ -218,6 +267,11 @@
             const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
             return date.toLocaleDateString('ko-KR', options);
         }
+        
+        function parseDateStr(str) {
+            const [y, m, d] = str.split('-');
+            return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+        }
 
         function generateId() {
             return Math.random().toString(36).substr(2, 9);
@@ -231,6 +285,8 @@
 
         function init() {
             document.getElementById('today-display').innerText = formatDisplayDate(new Date());
+            document.getElementById('new-habit-start-date').value = formatDateToYYYYMMDD(new Date());
+            
             updateTimeSelects();
             renderCalendar();
             renderManagedHabits();
@@ -255,13 +311,69 @@
             }
         }
 
+        function checkFreqType() {
+            const typeSelect = document.getElementById('new-habit-freq-type');
+            const valueInput = document.getElementById('new-habit-freq-value');
+            const dateInputs = document.getElementById('periodic-date-inputs');
+            
+            if (typeSelect.value !== 'daily') {
+                valueInput.classList.remove('hidden');
+                dateInputs.classList.remove('hidden');
+            } else {
+                valueInput.classList.add('hidden');
+                dateInputs.classList.add('hidden');
+            }
+        }
+
+        function isHabitActiveOnDate(habit, dateStr) {
+            if (!habit.frequency || habit.frequency.type === 'daily') return true;
+            if (!habit.startDate) return true;
+
+            const start = parseDateStr(habit.startDate);
+            const target = parseDateStr(dateStr);
+            
+            if (target < start) return false;
+            
+            if (habit.endDate) {
+                const end = parseDateStr(habit.endDate);
+                if (target > end) return false;
+            }
+
+            const diffTime = target.getTime() - start.getTime();
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+            if (habit.frequency.type === 'days') {
+                return diffDays % habit.frequency.value === 0;
+            } else if (habit.frequency.type === 'weeks') {
+                return diffDays % (habit.frequency.value * 7) === 0;
+            } else if (habit.frequency.type === 'months') {
+                const monthDiff = (target.getFullYear() - start.getFullYear()) * 12 + (target.getMonth() - start.getMonth());
+                if (monthDiff % habit.frequency.value !== 0) return false;
+                
+                const startDay = start.getDate();
+                const targetDay = target.getDate();
+                const daysInTargetMonth = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+                
+                if (startDay > daysInTargetMonth) {
+                    return targetDay === daysInTargetMonth;
+                }
+                return targetDay === startDay;
+            }
+            return true;
+        }
+
         function addParentHabit() {
             const nameInput = document.getElementById('new-habit-name');
             const timeSelect = document.getElementById('new-habit-time');
             const customTimeInput = document.getElementById('custom-time-input');
+            const freqType = document.getElementById('new-habit-freq-type').value;
+            const freqValueInput = document.getElementById('new-habit-freq-value');
+            const startDateInput = document.getElementById('new-habit-start-date');
+            const endDateInput = document.getElementById('new-habit-end-date');
             
             const name = nameInput.value.trim();
             let time = timeSelect.value;
+            let freqValue = parseInt(freqValueInput.value);
 
             if (time === 'custom') {
                 time = customTimeInput.value.trim();
@@ -277,16 +389,30 @@
                 return;
             }
 
+            if (isNaN(freqValue) || freqValue < 1) freqValue = 1;
+
+            let startDate = startDateInput.value || formatDateToYYYYMMDD(new Date());
+            let endDate = endDateInput.value || null;
+
             habits.push({
                 id: generateId(),
                 name: name,
                 time: time,
                 isExpanded: true,
-                subHabits: []
+                subHabits: [],
+                startDate: freqType !== 'daily' ? startDate : formatDateToYYYYMMDD(new Date()),
+                endDate: freqType !== 'daily' ? endDate : null,
+                frequency: { type: freqType, value: freqValue }
             });
             
             saveData();
+            
             nameInput.value = '';
+            freqValueInput.value = '1';
+            endDateInput.value = '';
+            document.getElementById('new-habit-freq-type').value = 'daily';
+            checkFreqType();
+            
             if(timeSelect.value === 'custom') {
                 timeSelect.value = time;
                 checkCustomTime();
@@ -336,6 +462,9 @@
             renderManagedHabits();
             updateDailyView();
             renderCalendar();
+            if (!document.getElementById('periodic-modal').classList.contains('hidden')) {
+                openPeriodicModal();
+            }
         }
 
         function moveSubHabit(parentId, subId, direction) {
@@ -360,12 +489,32 @@
             updateDailyView();
         }
 
+        // 모달 열기 시 데이터 바인딩
         function openEditModal(id, parentId = null, currentName) {
             editTarget = { id, parentId };
-            const input = document.getElementById('edit-habit-input');
-            input.value = currentName;
+            const nameInput = document.getElementById('edit-habit-input');
+            const datesContainer = document.getElementById('edit-periodic-dates');
+            const startInput = document.getElementById('edit-habit-start-date');
+            const endInput = document.getElementById('edit-habit-end-date');
+
+            nameInput.value = currentName;
+
+            // 최상위 습관이고, 주기적 습관인 경우에만 날짜 수정 영역 표시
+            if (!parentId) {
+                const parent = habits.find(h => h.id === id);
+                if (parent && parent.frequency && parent.frequency.type !== 'daily') {
+                    datesContainer.classList.remove('hidden');
+                    startInput.value = parent.startDate || '';
+                    endInput.value = parent.endDate || '';
+                } else {
+                    datesContainer.classList.add('hidden');
+                }
+            } else {
+                datesContainer.classList.add('hidden');
+            }
+
             document.getElementById('edit-modal').classList.remove('hidden');
-            input.focus();
+            nameInput.focus();
         }
 
         function closeEditModal() {
@@ -373,6 +522,7 @@
             editTarget = { id: null, parentId: null };
         }
 
+        // 모달에서 저장 클릭 시 데이터 갱신
         function saveEditHabit() {
             const newName = document.getElementById('edit-habit-input').value.trim();
             if (!newName) return;
@@ -385,13 +535,29 @@
                 }
             } else {
                 const parent = habits.find(h => h.id === editTarget.id);
-                if (parent) parent.name = newName;
+                if (parent) {
+                    parent.name = newName;
+                    
+                    // 주기적 습관일 경우 시작일/종료일 업데이트
+                    if (parent.frequency && parent.frequency.type !== 'daily') {
+                        const newStart = document.getElementById('edit-habit-start-date').value;
+                        const newEnd = document.getElementById('edit-habit-end-date').value;
+                        parent.startDate = newStart || parent.startDate; // 값이 비어있으면 기존 값 유지
+                        parent.endDate = newEnd || null;
+                    }
+                }
             }
 
             saveData();
             closeEditModal();
             renderManagedHabits();
             updateDailyView();
+            renderCalendar();
+            
+            // 주기 모달창이 띄워져 있는 상태라면 함께 갱신
+            if (!document.getElementById('periodic-modal').classList.contains('hidden')) {
+                openPeriodicModal();
+            }
         }
 
         function toggleExpand(id) {
@@ -402,6 +568,64 @@
                 renderManagedHabits();
                 updateDailyView();
             }
+        }
+
+        function getFreqText(freq) {
+            if (!freq || freq.type === 'daily') return '';
+            if (freq.type === 'days') return `${freq.value}일 주기`;
+            if (freq.type === 'weeks') return `${freq.value}주 주기`;
+            if (freq.type === 'months') return `${freq.value}개월 주기`;
+            return '';
+        }
+
+        function openPeriodicModal() {
+            const modal = document.getElementById('periodic-modal');
+            const listContainer = document.getElementById('periodic-modal-list');
+            
+            const periodicHabits = habits.filter(h => h.frequency && h.frequency.type !== 'daily');
+            
+            if (periodicHabits.length === 0) {
+                listContainer.innerHTML = '<div class="text-center py-8 text-slate-400">등록된 주기적 습관이 없습니다.</div>';
+            } else {
+                let html = '';
+                periodicHabits.forEach((habit, index) => {
+                    const barColor = HABIT_COLORS[habits.findIndex(h => h.id === habit.id) % HABIT_COLORS.length];
+                    const freqText = getFreqText(habit.frequency);
+                    const endDateText = habit.endDate ? habit.endDate : '종료일 없음';
+                    
+                    html += `
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${barColor}"></span>
+                                    <span class="font-bold text-slate-800 text-lg truncate">${habit.name}</span>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 pl-4">
+                                    <span class="bg-white px-2 py-0.5 rounded border border-slate-200">${habit.time}</span>
+                                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 font-medium">${freqText}</span>
+                                    <span class="text-xs ml-1"><i class="far fa-calendar text-slate-400 mr-1"></i>${habit.startDate} ~ ${endDateText}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <!-- 주기 모달에서도 수정이 가능하도록 펜 아이콘 추가 -->
+                                <button onclick="openEditModal('${habit.id}', null, '${habit.name.replace(/'/g, "\\'")}')" class="p-2 text-slate-400 hover:text-blue-500 transition rounded ml-2">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button onclick="deleteHabit('${habit.id}', false)" class="p-2 text-slate-400 hover:text-red-500 transition rounded">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                listContainer.innerHTML = html;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closePeriodicModal() {
+            document.getElementById('periodic-modal').classList.add('hidden');
         }
 
         function renderManagedHabits() {
@@ -417,17 +641,20 @@
                 const timeColorClass = getTimeColor(parent.time);
                 const hasSubs = parent.subHabits && parent.subHabits.length > 0;
                 const barColor = HABIT_COLORS[index % HABIT_COLORS.length];
+                const freqText = getFreqText(parent.frequency);
+                const freqBadge = freqText ? `<span class="text-[10px] font-medium bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded shrink-0">${freqText}</span>` : '';
                 
                 let html = `
                     <div class="mb-3 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                         <div class="flex items-center justify-between p-3 bg-slate-50 border-b border-slate-100 group">
                             <div class="flex items-center gap-3 overflow-hidden flex-1 cursor-pointer" onclick="toggleExpand('${parent.id}')">
-                                <span class="text-xs font-semibold px-2 py-1 rounded-md ${timeColorClass} whitespace-nowrap relative pl-4">
+                                <span class="text-xs font-semibold px-2 py-1 rounded-md ${timeColorClass} whitespace-nowrap relative pl-4 shrink-0">
                                     <span class="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full" style="background-color: ${barColor}"></span>
                                     ${parent.time}
                                 </span>
                                 <span class="text-base font-semibold text-slate-800 truncate" title="${parent.name}">${parent.name}</span>
-                                ${hasSubs ? `<i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'} text-slate-400 text-xs ml-2"></i>` : ''}
+                                ${freqBadge}
+                                ${hasSubs ? `<i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'} text-slate-400 text-xs ml-auto pr-1"></i>` : ''}
                             </div>
                             <div class="flex items-center gap-1 transition-opacity pl-2">
                                 <button onclick="openEditModal('${parent.id}', null, '${parent.name.replace(/'/g, "\\'")}')" class="p-1.5 text-slate-400 hover:text-blue-500 transition rounded"><i class="fas fa-pen text-sm"></i></button>
@@ -470,17 +697,19 @@
             });
         }
 
-        function getTotalHabitCount() {
+        function getTotalHabitCount(dateStr) {
             let count = 0;
             habits.forEach(p => {
-                count += 1;
-                if(p.subHabits) count += p.subHabits.length;
+                if (isHabitActiveOnDate(p, dateStr)) {
+                    count += 1;
+                    if(p.subHabits) count += p.subHabits.length;
+                }
             });
             return count;
         }
 
         function calculateOverallProgress(dateStr) {
-            const total = getTotalHabitCount();
+            const total = getTotalHabitCount(dateStr);
             if (total === 0) return 0;
             const completed = records[dateStr] ? records[dateStr].length : 0;
             return Math.round((completed / total) * 100);
@@ -523,23 +752,38 @@
                 const dateStr = formatDateToYYYYMMDD(dateObj);
                 
                 const dayDiv = document.createElement('div');
-                dayDiv.className = `calendar-day text-sm bg-slate-50 border border-slate-100/50`;
+                dayDiv.className = `calendar-day flex flex-col items-center relative`;
                 
                 if (dateStr === todayStr) dayDiv.classList.add('today');
                 if (dateStr === selectedStr) dayDiv.classList.add('selected');
                 
                 const dayOfWeek = dateObj.getDay();
                 let textClass = "text-slate-700";
-                if(dayDiv.classList.contains('selected')) textClass = "text-white";
-                else {
+                
+                if (dateStr === selectedStr) {
+                    textClass = "text-white";
+                } else {
                     if(dayOfWeek === 0) textClass = "text-red-500";
                     if(dayOfWeek === 6) textClass = "text-blue-500";
                 }
 
-                let progressBarsHtml = `<div class="absolute bottom-1.5 left-0 w-full px-1.5 flex flex-col justify-end gap-[3px] items-center h-[55%]">`;
+                const hasPeriodicHabit = habits.some(h => h.frequency && h.frequency.type !== 'daily' && isHabitActiveOnDate(h, dateStr));
                 
-                if (habits.length > 0) {
-                    habits.forEach((parent, index) => {
+                const dotHtml = hasPeriodicHabit ? `<div class="absolute top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-500 rounded-full"></div>` : '';
+
+                const topHtml = `
+                    <div class="day-box w-full aspect-square bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center transition-all duration-200 relative">
+                        ${dotHtml}
+                        <span class="${textClass} text-sm font-medium z-10 ${hasPeriodicHabit ? 'mt-2' : ''}">${i}</span>
+                    </div>
+                `;
+
+                let progressBarsHtml = `<div class="w-full flex flex-col gap-[4px] items-center mt-1.5 px-0.5">`;
+                const activeHabitsOnDate = habits.filter(h => isHabitActiveOnDate(h, dateStr));
+                const dailyActiveHabitsOnDate = activeHabitsOnDate.filter(h => !h.frequency || h.frequency.type === 'daily');
+                
+                if (dailyActiveHabitsOnDate.length > 0) {
+                    dailyActiveHabitsOnDate.forEach((parent) => {
                         const totalItems = 1 + (parent.subHabits ? parent.subHabits.length : 0);
                         let completedItems = 0;
                         
@@ -553,18 +797,19 @@
                         }
                         
                         const progress = (completedItems / totalItems) * 100;
-                        const barColor = HABIT_COLORS[index % HABIT_COLORS.length];
+                        const pIndex = habits.findIndex(h => h.id === parent.id);
+                        const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
                         
                         progressBarsHtml += `
-                            <div class="habit-bg w-full max-w-[85%] bg-slate-200/60 rounded-full overflow-hidden shrink-0" style="height: 6px;">
-                                <div class="h-full transition-all duration-300" style="width: ${progress}%; background-color: ${barColor}"></div>
+                            <div class="w-full bg-slate-200/60 rounded-full overflow-hidden shrink-0" style="height: 4px;">
+                                <div class="h-full transition-all duration-300 rounded-full" style="width: ${progress}%; background-color: ${barColor}"></div>
                             </div>
                         `;
                     });
                 }
                 progressBarsHtml += `</div>`;
 
-                dayDiv.innerHTML = `<span class="${textClass} font-medium absolute top-1.5 left-1/2 -translate-x-1/2 z-10">${i}</span>${progressBarsHtml}`;
+                dayDiv.innerHTML = topHtml + progressBarsHtml;
                 dayDiv.onclick = () => {
                     selectedDate = new Date(year, month, i);
                     renderCalendar();
@@ -593,12 +838,14 @@
             
             const overallProgress = calculateOverallProgress(dateStr);
             const progressText = document.getElementById('daily-progress-text');
-            progressText.innerText = getTotalHabitCount() === 0 ? '등록된 습관이 없습니다.' : `오늘의 달성률: ${overallProgress}%`;
+            progressText.innerText = getTotalHabitCount(dateStr) === 0 ? '이날 등록된 습관이 없습니다.' : `오늘의 달성률: ${overallProgress}%`;
             
             const container = document.getElementById('daily-habits-container');
             const emptyMsg = document.getElementById('empty-habits-msg');
 
-            if (habits.length === 0) {
+            const activeHabits = habits.filter(h => isHabitActiveOnDate(h, dateStr));
+
+            if (activeHabits.length === 0) {
                 emptyMsg.style.display = 'flex';
                 Array.from(container.children).forEach(child => { if (child.id !== 'empty-habits-msg') child.remove(); });
                 return;
@@ -607,7 +854,7 @@
             emptyMsg.style.display = 'none';
 
             const grouped = {};
-            habits.forEach(h => {
+            activeHabits.forEach(h => {
                 if (!grouped[h.time]) grouped[h.time] = [];
                 grouped[h.time].push(h);
             });
@@ -636,20 +883,31 @@
                 `;
 
                 grouped[time].forEach(parent => {
+                    let isNextFound = false;
+
                     const isParentCompleted = completedIds.includes(parent.id);
                     const bgClass = isParentCompleted ? 'bg-green-50/40 border-green-200' : 'bg-white border-slate-200 shadow-sm';
-                    const textClass = isParentCompleted ? 'text-slate-400 line-through' : 'text-slate-800';
                     const hasSubs = parent.subHabits && parent.subHabits.length > 0;
                     
                     const pIndex = habits.findIndex(h => h.id === parent.id);
                     const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
+                    const freqText = getFreqText(parent.frequency);
+                    const freqBadge = freqText ? `<span class="ml-2 text-xs font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${freqText}</span>` : '';
+
+                    let textClass = 'text-slate-800 text-lg font-semibold';
+                    if (!isParentCompleted && !isNextFound) {
+                        textClass = 'text-slate-900 text-xl font-extrabold';
+                        isNextFound = true;
+                    } else if (isParentCompleted) {
+                        textClass = 'text-slate-500 text-lg font-semibold';
+                    }
 
                     html += `
                         <div class="rounded-xl border ${bgClass} transition-all duration-300 overflow-hidden relative">
                             <div class="absolute left-0 top-0 bottom-0 w-1" style="background-color: ${barColor}"></div>
                             
                             <label class="flex items-center p-3 pl-4 cursor-pointer hover:bg-slate-50/50 select-none group">
-                                <div class="relative flex items-center justify-center w-6 h-6 mr-3">
+                                <div class="relative flex items-center justify-center w-6 h-6 mr-3 shrink-0">
                                     <input type="checkbox" class="checkbox-custom absolute opacity-0 w-full h-full cursor-pointer" 
                                         ${isParentCompleted ? 'checked' : ''} 
                                         onchange="toggleRecord('${parent.id}', '${dateStr}')">
@@ -657,22 +915,30 @@
                                         <svg class="w-3 h-3 text-white opacity-0 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                     </div>
                                 </div>
-                                <span class="${textClass} font-semibold flex-1 transition-colors text-lg">${parent.name}</span>
-                                ${hasSubs ? `<button type="button" onclick="event.preventDefault(); toggleExpand('${parent.id}')" class="p-2 text-slate-400 hover:text-slate-600 focus:outline-none"><i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'}"></i></button>` : ''}
+                                <div class="flex items-center flex-1 min-w-0">
+                                    <span class="${textClass} transition-all duration-300 truncate">${parent.name}</span>
+                                    ${freqBadge}
+                                </div>
+                                ${hasSubs ? `<button type="button" onclick="event.preventDefault(); toggleExpand('${parent.id}')" class="p-2 text-slate-400 hover:text-slate-600 focus:outline-none shrink-0"><i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'}"></i></button>` : ''}
                             </label>
                     `;
-
-                    // 데일리 트래커 창에서는 하위 습관 추가 입력창 코드가 완전히 제거됨
 
                     if (hasSubs && parent.isExpanded) {
                         html += `<div class="bg-slate-50/50 border-t border-slate-100 py-1 pl-1">`;
                         parent.subHabits.forEach(sub => {
                             const isSubCompleted = completedIds.includes(sub.id);
-                            const subTextClass = isSubCompleted ? 'text-slate-400 line-through' : 'text-slate-700';
+                            
+                            let subTextClass = 'text-slate-700 text-base font-normal';
+                            if (!isSubCompleted && !isNextFound) {
+                                subTextClass = 'text-slate-900 text-lg font-bold';
+                                isNextFound = true;
+                            } else if (isSubCompleted) {
+                                subTextClass = 'text-slate-400 text-base font-normal';
+                            }
                             
                             html += `
                                 <label class="flex items-center p-2.5 pl-12 cursor-pointer hover:bg-slate-100/50 select-none group">
-                                    <div class="relative flex items-center justify-center w-5 h-5 mr-3">
+                                    <div class="relative flex items-center justify-center w-5 h-5 mr-3 shrink-0">
                                         <input type="checkbox" class="checkbox-custom absolute opacity-0 w-full h-full cursor-pointer" 
                                             ${isSubCompleted ? 'checked' : ''} 
                                             onchange="toggleRecord('${sub.id}', '${dateStr}')">
@@ -680,7 +946,7 @@
                                             <svg class="w-2.5 h-2.5 text-white opacity-0 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                         </div>
                                     </div>
-                                    <span class="${subTextClass} text-base transition-colors flex-1">${sub.name}</span>
+                                    <span class="${subTextClass} flex-1 transition-all duration-300 truncate">${sub.name}</span>
                                 </label>
                             `;
                         });
