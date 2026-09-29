@@ -39,6 +39,41 @@
             border: 2px solid #3b82f6;
         }
 
+        /* 퍼센트별 도장 공통 스타일 */
+        .stamp-base {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            border-radius: 50%;
+            width: 3.2rem;
+            height: 3.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-align: center;
+            line-height: 1.1;
+            pointer-events: none;
+            z-index: 20;
+            background-color: rgba(255, 255, 255, 0.4);
+            animation: stampAnimation 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes stampAnimation {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(1.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) rotate(-20deg) scale(1); opacity: 1; }
+        }
+
+        /* 퍼센트별 도장 개별 색상 및 보정 */
+        .stamp-100 { color: rgba(239, 68, 68, 0.9); border: 3px double rgba(239, 68, 68, 0.9); }
+        .stamp-90  { color: rgba(249, 115, 22, 0.9); border: 3px double rgba(249, 115, 22, 0.9); }
+        .stamp-80  { color: rgba(132, 204, 22, 0.9); border: 3px double rgba(132, 204, 22, 0.9); }
+        .stamp-70  { color: rgba(59, 130, 246, 0.9); border: 3px double rgba(59, 130, 246, 0.9); }
+        .stamp-60  { color: rgba(168, 85, 247, 0.9); border: 3px double rgba(168, 85, 247, 0.9); }
+        .stamp-0   { color: rgba(100, 116, 139, 0.9); border: 3px double rgba(100, 116, 139, 0.9); font-size: 0.55rem; }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
@@ -167,8 +202,8 @@
                             <input type="number" id="new-habit-freq-value" placeholder="주기(숫자)" min="1" value="1" class="hidden flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">
                         </div>
 
-                        <!-- 시작일 / 종료일 (주기 설정 시 나타남) -->
-                        <div id="periodic-date-inputs" class="hidden flex gap-2">
+                        <!-- 시작일 / 종료일 (이제 매일 습관도 설정 가능) -->
+                        <div id="periodic-date-inputs" class="flex gap-2 mt-1">
                             <div class="flex-1">
                                 <label class="block text-[10px] text-slate-500 mb-0.5 ml-1">시작일</label>
                                 <input type="date" id="new-habit-start-date" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white text-slate-700">
@@ -196,7 +231,7 @@
         </div>
     </div>
 
-    <!-- Edit Modal (z-index 70으로 올려 다른 모달 위로 배치) -->
+    <!-- Edit Modal -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
             <h3 class="text-lg font-bold text-slate-800 mb-4">습관 수정</h3>
@@ -204,7 +239,7 @@
             <label class="block text-xs text-slate-500 mb-1 ml-1">습관 이름</label>
             <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 text-base">
             
-            <!-- 주기적 습관 날짜 수정 영역 -->
+            <!-- 날짜 수정 영역 (이제 매일 습관도 수정 가능) -->
             <div id="edit-periodic-dates" class="hidden mb-6">
                 <div class="flex gap-2">
                     <div class="flex-1">
@@ -288,6 +323,7 @@
             document.getElementById('new-habit-start-date').value = formatDateToYYYYMMDD(new Date());
             
             updateTimeSelects();
+            checkFreqType(); // 초기 폼 상태 설정
             renderCalendar();
             renderManagedHabits();
             updateDailyView();
@@ -314,31 +350,33 @@
         function checkFreqType() {
             const typeSelect = document.getElementById('new-habit-freq-type');
             const valueInput = document.getElementById('new-habit-freq-value');
-            const dateInputs = document.getElementById('periodic-date-inputs');
             
+            // 날짜 입력(시작일/종료일) 영역은 이제 항상 표시됨 (HTML에서 hidden 클래스 제거)
             if (typeSelect.value !== 'daily') {
                 valueInput.classList.remove('hidden');
-                dateInputs.classList.remove('hidden');
             } else {
                 valueInput.classList.add('hidden');
-                dateInputs.classList.add('hidden');
             }
         }
 
         function isHabitActiveOnDate(habit, dateStr) {
-            if (!habit.frequency || habit.frequency.type === 'daily') return true;
-            if (!habit.startDate) return true;
-
-            const start = parseDateStr(habit.startDate);
             const target = parseDateStr(dateStr);
             
-            if (target < start) return false;
+            // 모든 습관(매일 포함)에 대해 시작일/종료일 검사
+            if (habit.startDate) {
+                const start = parseDateStr(habit.startDate);
+                if (target < start) return false;
+            }
             
             if (habit.endDate) {
                 const end = parseDateStr(habit.endDate);
                 if (target > end) return false;
             }
 
+            // 시작일/종료일 조건을 통과하고 '매일' 습관이면 활성화
+            if (!habit.frequency || habit.frequency.type === 'daily') return true;
+
+            const start = parseDateStr(habit.startDate || formatDateToYYYYMMDD(new Date()));
             const diffTime = target.getTime() - start.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
@@ -400,8 +438,8 @@
                 time: time,
                 isExpanded: true,
                 subHabits: [],
-                startDate: freqType !== 'daily' ? startDate : formatDateToYYYYMMDD(new Date()),
-                endDate: freqType !== 'daily' ? endDate : null,
+                startDate: startDate, // 주기 습관이든 매일 습관이든 무조건 저장
+                endDate: endDate,
                 frequency: { type: freqType, value: freqValue }
             });
             
@@ -489,7 +527,6 @@
             updateDailyView();
         }
 
-        // 모달 열기 시 데이터 바인딩
         function openEditModal(id, parentId = null, currentName) {
             editTarget = { id, parentId };
             const nameInput = document.getElementById('edit-habit-input');
@@ -499,10 +536,10 @@
 
             nameInput.value = currentName;
 
-            // 최상위 습관이고, 주기적 습관인 경우에만 날짜 수정 영역 표시
+            // 하위 습관이 아닌 모든 최상위 습관(매일 포함)에 대해 날짜 수정 가능
             if (!parentId) {
                 const parent = habits.find(h => h.id === id);
-                if (parent && parent.frequency && parent.frequency.type !== 'daily') {
+                if (parent) {
                     datesContainer.classList.remove('hidden');
                     startInput.value = parent.startDate || '';
                     endInput.value = parent.endDate || '';
@@ -522,7 +559,6 @@
             editTarget = { id: null, parentId: null };
         }
 
-        // 모달에서 저장 클릭 시 데이터 갱신
         function saveEditHabit() {
             const newName = document.getElementById('edit-habit-input').value.trim();
             if (!newName) return;
@@ -538,13 +574,11 @@
                 if (parent) {
                     parent.name = newName;
                     
-                    // 주기적 습관일 경우 시작일/종료일 업데이트
-                    if (parent.frequency && parent.frequency.type !== 'daily') {
-                        const newStart = document.getElementById('edit-habit-start-date').value;
-                        const newEnd = document.getElementById('edit-habit-end-date').value;
-                        parent.startDate = newStart || parent.startDate; // 값이 비어있으면 기존 값 유지
-                        parent.endDate = newEnd || null;
-                    }
+                    // 매일 습관을 포함한 모든 부모 습관의 시작일/종료일 업데이트
+                    const newStart = document.getElementById('edit-habit-start-date').value;
+                    const newEnd = document.getElementById('edit-habit-end-date').value;
+                    parent.startDate = newStart || parent.startDate; 
+                    parent.endDate = newEnd || null;
                 }
             }
 
@@ -554,7 +588,6 @@
             updateDailyView();
             renderCalendar();
             
-            // 주기 모달창이 띄워져 있는 상태라면 함께 갱신
             if (!document.getElementById('periodic-modal').classList.contains('hidden')) {
                 openPeriodicModal();
             }
@@ -607,7 +640,6 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1">
-                                <!-- 주기 모달에서도 수정이 가능하도록 펜 아이콘 추가 -->
                                 <button onclick="openEditModal('${habit.id}', null, '${habit.name.replace(/'/g, "\\'")}')" class="p-2 text-slate-400 hover:text-blue-500 transition rounded ml-2">
                                     <i class="fas fa-pen"></i>
                                 </button>
@@ -741,6 +773,11 @@
             const todayStr = formatDateToYYYYMMDD(new Date());
             const selectedStr = formatDateToYYYYMMDD(selectedDate);
 
+            const todayEnd = new Date();
+            todayEnd.setHours(23, 59, 59, 999);
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+
             for (let i = 0; i < firstDayIndex; i++) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'calendar-day empty';
@@ -768,13 +805,49 @@
                 }
 
                 const hasPeriodicHabit = habits.some(h => h.frequency && h.frequency.type !== 'daily' && isHabitActiveOnDate(h, dateStr));
-                
                 const dotHtml = hasPeriodicHabit ? `<div class="absolute top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-500 rounded-full"></div>` : '';
 
+                const overallProgress = calculateOverallProgress(dateStr);
+                const totalCount = getTotalHabitCount(dateStr);
+                
+                let stampHtml = '';
+                
+                if (totalCount > 0 && (dateObj <= todayEnd || records[dateStr])) {
+                    let stampText = '';
+                    let stampClass = '';
+
+                    if (overallProgress === 100) {
+                        stampText = '참<br>잘했어요';
+                        stampClass = 'stamp-100';
+                    } else if (overallProgress >= 90) {
+                        stampText = '더<br>힘내요';
+                        stampClass = 'stamp-90';
+                    } else if (overallProgress >= 80) {
+                        stampText = '할 수<br>있어';
+                        stampClass = 'stamp-80';
+                    } else if (overallProgress >= 70) {
+                        stampText = '화이팅';
+                        stampClass = 'stamp-70';
+                    } else if (overallProgress >= 60) {
+                        stampText = '괜찮아';
+                        stampClass = 'stamp-60';
+                    } else {
+                        if (overallProgress > 0 || dateObj < todayStart) {
+                            stampText = '오늘도<br>애썼어';
+                            stampClass = 'stamp-0';
+                        }
+                    }
+
+                    if (stampText !== '') {
+                        stampHtml = `<div class="stamp-base ${stampClass}">${stampText}</div>`;
+                    }
+                }
+
                 const topHtml = `
-                    <div class="day-box w-full aspect-square bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center transition-all duration-200 relative">
+                    <div class="day-box w-full aspect-square bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center transition-all duration-200 relative overflow-hidden">
                         ${dotHtml}
                         <span class="${textClass} text-sm font-medium z-10 ${hasPeriodicHabit ? 'mt-2' : ''}">${i}</span>
+                        ${stampHtml}
                     </div>
                 `;
 
