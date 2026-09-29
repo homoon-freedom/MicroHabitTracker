@@ -113,17 +113,24 @@
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight"><i class="fas fa-layer-group text-blue-500 mr-2"></i>계층형 작은 습관 트래커</h1>
                 <p class="text-slate-500 mt-2">상위 습관을 달성하고 하위 습관을 이어나가 보세요.</p>
             </div>
-            <div class="mt-4 md:mt-0 px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-2">
-                <i class="far fa-calendar-check text-blue-500"></i>
-                <span id="today-display" class="font-medium text-slate-700"></span>
+            <!-- Header Buttons -->
+            <div class="mt-4 md:mt-0 flex flex-wrap items-center justify-center gap-2">
+                <button onclick="toggleHabitManager()" id="toggle-manager-btn" class="px-4 py-2 bg-slate-800 text-white rounded-full shadow-sm hover:bg-slate-700 transition flex items-center gap-2 text-sm font-medium">
+                    <i id="toggle-manager-icon" class="fas fa-cog"></i>
+                    <span id="toggle-manager-text">습관 관리 열기</span>
+                </button>
+                <div class="px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-2">
+                    <i class="far fa-calendar-check text-blue-500"></i>
+                    <span id="today-display" class="font-medium text-slate-700"></span>
+                </div>
             </div>
         </header>
 
         <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 transition-all duration-300">
             
-            <!-- Left Column: Calendar -->
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[720px]">
+            <!-- Left Column: Calendar (기본 6칸 차지) -->
+            <div id="col-calendar" class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[720px] transition-all duration-300">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
                     <div class="flex gap-2">
@@ -152,8 +159,8 @@
                 <div id="calendar-days" class="calendar-grid flex-1 content-start gap-y-4"></div>
             </div>
 
-            <!-- Middle Column: Daily Tracking -->
-            <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[720px] overflow-hidden">
+            <!-- Middle Column: Daily Tracking (기본 6칸 차지) -->
+            <div id="col-tracking" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[720px] overflow-hidden transition-all duration-300">
                 <div class="p-6 bg-slate-50 border-b border-slate-100">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
                         <i class="fas fa-tasks text-blue-500"></i>
@@ -165,18 +172,18 @@
                 <div class="p-6 overflow-y-auto flex-1 bg-white" id="daily-habits-container">
                     <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
                         <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
-                        <p>등록된 습관이 없습니다.<br>우측에서 새로운 습관을 추가해보세요!</p>
+                        <p>등록된 습관이 없습니다.<br>우측 상단의 '습관 관리 열기'를 눌러 새로운 습관을 추가해보세요!</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Habit Settings -->
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[720px]">
+            <!-- Right Column: Habit Settings (기본적으로 숨김 상태) -->
+            <div id="col-manager" class="hidden lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex-col h-[720px] transition-all duration-300">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
                         <i class="fas fa-cog text-slate-400"></i>습관 관리
                     </h2>
-                    <button onclick="openPeriodicModal()" class="text-sm px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition font-medium">
+                    <button onclick="openPeriodicModal()" class="text-sm px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition font-medium whitespace-nowrap">
                         <i class="fas fa-list-ul mr-1"></i>주기 습관 모아보기
                     </button>
                 </div>
@@ -202,7 +209,7 @@
                             <input type="number" id="new-habit-freq-value" placeholder="주기(숫자)" min="1" value="1" class="hidden flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">
                         </div>
 
-                        <!-- 시작일 / 종료일 (이제 매일 습관도 설정 가능) -->
+                        <!-- 시작일 / 종료일 -->
                         <div id="periodic-date-inputs" class="flex gap-2 mt-1">
                             <div class="flex-1">
                                 <label class="block text-[10px] text-slate-500 mb-0.5 ml-1">시작일</label>
@@ -239,7 +246,7 @@
             <label class="block text-xs text-slate-500 mb-1 ml-1">습관 이름</label>
             <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 text-base">
             
-            <!-- 날짜 수정 영역 (이제 매일 습관도 수정 가능) -->
+            <!-- 날짜 수정 영역 -->
             <div id="edit-periodic-dates" class="hidden mb-6">
                 <div class="flex gap-2">
                     <div class="flex-1">
@@ -281,6 +288,7 @@
         let currentMonthDate = new Date();
         let selectedDate = new Date(); 
         let editTarget = { id: null, parentId: null };
+        let isManagerVisible = false; // 습관 관리 패널 표시 여부
 
         const HABIT_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
         const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50'];
@@ -323,10 +331,41 @@
             document.getElementById('new-habit-start-date').value = formatDateToYYYYMMDD(new Date());
             
             updateTimeSelects();
-            checkFreqType(); // 초기 폼 상태 설정
+            checkFreqType(); 
             renderCalendar();
             renderManagedHabits();
             updateDailyView();
+        }
+
+        // 습관 관리 영역 보이기/숨기기 토글 함수
+        function toggleHabitManager() {
+            isManagerVisible = !isManagerVisible;
+            
+            const colCalendar = document.getElementById('col-calendar');
+            const colTracking = document.getElementById('col-tracking');
+            const colManager = document.getElementById('col-manager');
+            const toggleIcon = document.getElementById('toggle-manager-icon');
+            const toggleText = document.getElementById('toggle-manager-text');
+
+            if (isManagerVisible) {
+                // 열기: 화면을 3등분(4-4-4)하여 모두 표시
+                colCalendar.classList.replace('lg:col-span-6', 'lg:col-span-4');
+                colTracking.classList.replace('lg:col-span-6', 'lg:col-span-4');
+                colManager.classList.remove('hidden');
+                colManager.classList.add('flex');
+                
+                toggleText.innerText = '습관 관리 닫기';
+                toggleIcon.className = 'fas fa-times';
+            } else {
+                // 닫기: 화면을 2등분(6-6)하여 크게 표시
+                colCalendar.classList.replace('lg:col-span-4', 'lg:col-span-6');
+                colTracking.classList.replace('lg:col-span-4', 'lg:col-span-6');
+                colManager.classList.add('hidden');
+                colManager.classList.remove('flex');
+                
+                toggleText.innerText = '습관 관리 열기';
+                toggleIcon.className = 'fas fa-cog';
+            }
         }
 
         function updateTimeSelects() {
@@ -351,7 +390,6 @@
             const typeSelect = document.getElementById('new-habit-freq-type');
             const valueInput = document.getElementById('new-habit-freq-value');
             
-            // 날짜 입력(시작일/종료일) 영역은 이제 항상 표시됨 (HTML에서 hidden 클래스 제거)
             if (typeSelect.value !== 'daily') {
                 valueInput.classList.remove('hidden');
             } else {
@@ -362,7 +400,6 @@
         function isHabitActiveOnDate(habit, dateStr) {
             const target = parseDateStr(dateStr);
             
-            // 모든 습관(매일 포함)에 대해 시작일/종료일 검사
             if (habit.startDate) {
                 const start = parseDateStr(habit.startDate);
                 if (target < start) return false;
@@ -373,7 +410,6 @@
                 if (target > end) return false;
             }
 
-            // 시작일/종료일 조건을 통과하고 '매일' 습관이면 활성화
             if (!habit.frequency || habit.frequency.type === 'daily') return true;
 
             const start = parseDateStr(habit.startDate || formatDateToYYYYMMDD(new Date()));
@@ -438,7 +474,7 @@
                 time: time,
                 isExpanded: true,
                 subHabits: [],
-                startDate: startDate, // 주기 습관이든 매일 습관이든 무조건 저장
+                startDate: startDate,
                 endDate: endDate,
                 frequency: { type: freqType, value: freqValue }
             });
@@ -536,7 +572,6 @@
 
             nameInput.value = currentName;
 
-            // 하위 습관이 아닌 모든 최상위 습관(매일 포함)에 대해 날짜 수정 가능
             if (!parentId) {
                 const parent = habits.find(h => h.id === id);
                 if (parent) {
@@ -574,7 +609,6 @@
                 if (parent) {
                     parent.name = newName;
                     
-                    // 매일 습관을 포함한 모든 부모 습관의 시작일/종료일 업데이트
                     const newStart = document.getElementById('edit-habit-start-date').value;
                     const newEnd = document.getElementById('edit-habit-end-date').value;
                     parent.startDate = newStart || parent.startDate; 
