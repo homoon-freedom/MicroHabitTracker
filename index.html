@@ -285,6 +285,28 @@
         </div>
     </div>
 
+    <!-- Postpone Modal (미루기 기능 모달) -->
+    <div id="postpone-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[80] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-calendar-plus text-blue-500"></i> 습관 일정 미루기
+            </h3>
+            
+            <p class="text-sm text-slate-600 mb-4">
+                <span id="postpone-habit-name" class="font-bold text-slate-800"></span> 습관을 언제로 미루시겠습니까?<br>
+                <span class="text-xs text-slate-400 block mt-1">선택하신 날짜 기준으로 다음 주기가 새롭게 세팅됩니다.<br>(기존 일정: <span id="postpone-old-date" class="font-semibold"></span>)</span>
+            </p>
+            
+            <label class="block text-xs text-slate-500 mb-1 ml-1">변경할 기준일</label>
+            <input type="date" id="postpone-new-date" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6 text-base bg-white text-slate-700">
+            
+            <div class="flex justify-end gap-2">
+                <button onclick="closePostponeModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
+                <button onclick="savePostpone()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium">확인</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 오전, 오후가 포함된 기본 시간대 배열
         let customTimes = JSON.parse(localStorage.getItem('customTimes'));
@@ -309,6 +331,7 @@
         let currentMonthDate = new Date();
         let selectedDate = new Date(); 
         let editTarget = { id: null, parentId: null };
+        let postponeTarget = { id: null, oldDate: null };
         let isManagerVisible = false;
 
         const HABIT_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
@@ -425,7 +448,28 @@
 
             if (!habit.frequency || habit.frequency.type === 'daily') return true;
 
-            const start = parseDateStr(habit.startDate || formatDateToYYYYMMDD(new Date()));
+            // 미루기(Snooze) 적용 확인 로직
+            let baseDateStr = habit.startDate || formatDateToYYYYMMDD(new Date());
+            
+            if (habit.anchors && habit.anchors.length > 0) {
+                let applicableAnchor = null;
+                for (let i = 0; i < habit.anchors.length; i++) {
+                    if (habit.anchors[i].effectiveFrom <= dateStr) {
+                        applicableAnchor = habit.anchors[i];
+                    }
+                }
+                
+                if (applicableAnchor) {
+                    baseDateStr = applicableAnchor.baseDate;
+                    
+                    // 미루기 처리로 인해, 기존 목표일이 미뤄진 새 기준일보다 이전이 된 경우 활성화되지 않음
+                    if (dateStr < applicableAnchor.baseDate) {
+                        return false;
+                    }
+                }
+            }
+
+            const start = parseDateStr(baseDateStr);
             const diffTime = target.getTime() - start.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
@@ -435,6 +479,7 @@
                 return diffDays % (habit.frequency.value * 7) === 0;
             } else if (habit.frequency.type === 'months') {
                 const monthDiff = (target.getFullYear() - start.getFullYear()) * 12 + (target.getMonth() - start.getMonth());
+                if (monthDiff < 0) return false;
                 if (monthDiff % habit.frequency.value !== 0) return false;
                 
                 const startDay = start.getDate();
@@ -489,6 +534,7 @@
                 subHabits: [],
                 startDate: startDate,
                 endDate: endDate,
+                anchors: [], // 미루기 데이터 저장 배열
                 frequency: { type: freqType, value: freqValue }
             });
             
@@ -638,6 +684,53 @@
             if (!document.getElementById('periodic-modal').classList.contains('hidden')) {
                 openPeriodicModal();
             }
+        }
+
+        // Postpone (미루기) 기능 
+        function openPostponeModal(id, oldDate) {
+            postponeTarget = { id, oldDate };
+            const habit = habits.find(h => h.id === id);
+            
+            document.getElementById('postpone-habit-name').innerText = habit.name;
+            document.getElementById('postpone-old-date').innerText = oldDate;
+            
+            const nextDate = new Date(parseDateStr(oldDate));
+            nextDate.setDate(nextDate.getDate() + 1);
+            
+            const minDateStr = formatDateToYYYYMMDD(nextDate);
+            document.getElementById('postpone-new-date').min = minDateStr;
+            document.getElementById('postpone-new-date').value = minDateStr;
+
+            document.getElementById('postpone-modal').classList.remove('hidden');
+        }
+
+        function closePostponeModal() {
+            document.getElementById('postpone-modal').classList.add('hidden');
+            postponeTarget = { id: null, oldDate: null };
+        }
+
+        function savePostpone() {
+            const newDate = document.getElementById('postpone-new-date').value;
+            if (!newDate) return;
+            
+            const habit = habits.find(h => h.id === postponeTarget.id);
+            if (!habit) return;
+
+            if (!habit.anchors) habit.anchors = [];
+            
+            const existingAnchorIndex = habit.anchors.findIndex(a => a.effectiveFrom === postponeTarget.oldDate);
+            if (existingAnchorIndex > -1) {
+                habit.anchors[existingAnchorIndex].baseDate = newDate;
+            } else {
+                habit.anchors.push({ effectiveFrom: postponeTarget.oldDate, baseDate: newDate });
+            }
+            
+            habit.anchors.sort((a, b) => a.effectiveFrom.localeCompare(b.effectiveFrom));
+
+            saveData();
+            closePostponeModal();
+            updateDailyView();
+            renderCalendar();
         }
 
         function toggleExpand(id) {
@@ -1006,6 +1099,7 @@
                         const isParentCompleted = completedIds.includes(parent.id);
                         const bgClass = isParentCompleted ? 'bg-green-50/40 border-green-200' : 'bg-white border-slate-200 shadow-sm';
                         const hasSubs = parent.subHabits && parent.subHabits.length > 0;
+                        const isPeriodic = parent.frequency && parent.frequency.type !== 'daily';
                         
                         const pIndex = habits.findIndex(h => h.id === parent.id);
                         const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
@@ -1037,7 +1131,8 @@
                                         <span class="${textClass} transition-all duration-300 truncate">${parent.name}</span>
                                         ${freqBadge}
                                     </div>
-                                    ${hasSubs ? `<button type="button" onclick="event.preventDefault(); toggleExpand('${parent.id}')" class="p-2 text-slate-400 hover:text-slate-600 focus:outline-none shrink-0"><i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'}"></i></button>` : ''}
+                                    ${(isPeriodic && !isParentCompleted) ? `<button type="button" onclick="event.preventDefault(); event.stopPropagation(); openPostponeModal('${parent.id}', '${dateStr}')" class="p-2 text-blue-400 hover:text-blue-600 transition focus:outline-none shrink-0" title="일정 미루기"><i class="fas fa-calendar-plus"></i></button>` : ''}
+                                    ${hasSubs ? `<button type="button" onclick="event.preventDefault(); event.stopPropagation(); toggleExpand('${parent.id}')" class="p-2 text-slate-400 hover:text-slate-600 focus:outline-none shrink-0"><i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'}"></i></button>` : ''}
                                 </label>
                         `;
 
@@ -1083,7 +1178,7 @@
             updateCalendarBottomSummary(dateStr, activeHabits);
         }
 
-        function updateCalendarBottomSummary(dateStr, activeHabits) {
+function updateCalendarBottomSummary(dateStr, activeHabits) {
             const container = document.getElementById('calendar-bottom-summary');
             
             if (activeHabits.length === 0) {
@@ -1091,10 +1186,31 @@
                 return;
             }
 
+            // --- 추가된 정렬 로직 ---
+            const sortedHabits = [...activeHabits].sort((a, b) => {
+                const aIsPeriodic = a.frequency && a.frequency.type !== 'daily';
+                const bIsPeriodic = b.frequency && b.frequency.type !== 'daily';
+
+                // 1. 주기적 습관은 무조건 맨 뒤로 배치
+                if (aIsPeriodic && !bIsPeriodic) return 1;
+                if (!aIsPeriodic && bIsPeriodic) return -1;
+
+                // 2. 시간대별 정렬 (아침, 오전, 점심, 오후, 저녁, 직접입력 순)
+                let aTimeIdx = customTimes.indexOf(a.time);
+                let bTimeIdx = customTimes.indexOf(b.time);
+
+                // 목록에 없는 예외 시간대 처리
+                if (aTimeIdx === -1) aTimeIdx = 9999;
+                if (bTimeIdx === -1) bTimeIdx = 9999;
+
+                return aTimeIdx - bTimeIdx;
+            });
+
             let html = `<h3 class="text-sm font-bold text-slate-700 mb-2 shrink-0"><i class="fas fa-list-check mr-2 text-blue-500"></i>습관 요약 리스트</h3>`;
             html += `<div class="overflow-y-auto flex-1 pr-1 flex flex-col gap-1.5 custom-scrollbar pb-2">`;
             
-            activeHabits.forEach(habit => {
+            // activeHabits 대신 정렬된 sortedHabits를 순회
+            sortedHabits.forEach(habit => {
                 const isPeriodic = habit.frequency && habit.frequency.type !== 'daily';
                 const pIndex = habits.findIndex(h => h.id === habit.id);
                 const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
