@@ -39,7 +39,6 @@
             border: 2px solid #3b82f6;
         }
 
-        /* 퍼센트별 도장 공통 스타일 */
         .stamp-base {
             position: absolute;
             top: 50%;
@@ -66,7 +65,6 @@
             100% { transform: translate(-50%, -50%) rotate(-20deg) scale(1); opacity: 1; }
         }
 
-        /* 퍼센트별 도장 개별 색상 */
         .stamp-100 { color: rgba(239, 68, 68, 0.9); border: 3px double rgba(239, 68, 68, 0.9); }
         .stamp-90  { color: rgba(249, 115, 22, 0.9); border: 3px double rgba(249, 115, 22, 0.9); }
         .stamp-80  { color: rgba(132, 204, 22, 0.9); border: 3px double rgba(132, 204, 22, 0.9); }
@@ -74,28 +72,13 @@
         .stamp-60  { color: rgba(168, 85, 247, 0.9); border: 3px double rgba(168, 85, 247, 0.9); }
         .stamp-0   { color: rgba(100, 116, 139, 0.9); border: 3px double rgba(100, 116, 139, 0.9); font-size: 0.55rem; }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .checkbox-custom:checked + div {
-            background-color: #10b981;
-            border-color: #10b981;
-        }
-        .checkbox-custom:checked + div svg {
-            opacity: 1;
-        }
+        .checkbox-custom:checked + div { background-color: #10b981; border-color: #10b981; }
+        .checkbox-custom:checked + div svg { opacity: 1; }
         
         input, select {
             appearance: none;
@@ -107,13 +90,11 @@
 <body class="text-slate-800 antialiased min-h-screen p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
         <header class="mb-8 text-center md:text-left flex flex-col md:flex-row md:items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight"><i class="fas fa-layer-group text-blue-500 mr-2"></i>계층형 작은 습관 트래커</h1>
                 <p class="text-slate-500 mt-2">상위 습관을 달성하고 하위 습관을 이어나가 보세요.</p>
             </div>
-            <!-- Header Buttons -->
             <div class="mt-4 md:mt-0 flex flex-wrap items-center justify-center gap-2">
                 <button onclick="toggleHabitManager()" id="toggle-manager-btn" class="px-4 py-2 bg-slate-800 text-white rounded-full shadow-sm hover:bg-slate-700 transition flex items-center gap-2 text-sm font-medium">
                     <i id="toggle-manager-icon" class="fas fa-cog"></i>
@@ -126,22 +107,19 @@
             </div>
         </header>
 
-        <!-- Main Content Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 transition-all duration-300">
             
-            <!-- Top Column: Habit Settings (Moved Above Calendar) -->
             <div id="col-manager" class="hidden lg:col-span-12 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex-col h-[1200px] transition-all duration-300">
                 <div class="flex items-center justify-between mb-6 shrink-0">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
                         <i class="fas fa-cog text-slate-400"></i>습관 관리
                     </h2>
                     <button onclick="openPeriodicModal()" class="text-sm px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition font-medium whitespace-nowrap">
-                        <i class="fas fa-list-ul mr-1"></i>주기 습관 모아보기
+                        <i class="fas fa-list-ul mr-1"></i>주기/평일 습관 모아보기
                     </button>
                 </div>
                 
                 <div class="flex flex-col lg:flex-row gap-6 h-full min-h-0">
-                    <!-- Add New Habit Form -->
                     <div class="lg:w-1/3 bg-slate-50 p-4 rounded-xl border border-slate-100 shrink-0 h-fit">
                         <div class="flex flex-col gap-2">
                             <div class="flex gap-2">
@@ -153,6 +131,7 @@
                             <div class="flex gap-2">
                                 <select id="new-habit-freq-type" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base bg-white text-slate-700" onchange="checkFreqType()">
                                     <option value="daily">매일</option>
+                                    <option value="weekdays">평일 (월~금)</option>
                                     <option value="days">N일 주기</option>
                                     <option value="weeks">N주 주기</option>
                                     <option value="months">N개월 주기</option>
@@ -180,14 +159,10 @@
                         </div>
                     </div>
 
-                    <!-- Managed Habits List -->
-                    <div class="flex-1 overflow-y-auto pr-2" id="managed-habits-list">
-                        <!-- Managed habits will be generated by JS -->
-                    </div>
+                    <div class="flex-1 overflow-y-auto pr-2" id="managed-habits-list"></div>
                 </div>
             </div>
 
-            <!-- Left Column: Calendar -->
             <div id="col-calendar" class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[800px] transition-all duration-300">
                 <div class="flex items-center justify-between mb-6 shrink-0">
                     <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
@@ -216,13 +191,9 @@
 
                 <div id="calendar-days" class="calendar-grid content-start gap-y-4 mb-4 shrink-0"></div>
 
-                <!-- 달력 하단 요약 리스트 -->
-                <div id="calendar-bottom-summary" class="flex-1 flex flex-col min-h-0 border-t border-slate-100 pt-4 mt-auto">
-                    <!-- JS로 렌더링 됨 -->
-                </div>
+                <div id="calendar-bottom-summary" class="flex-1 flex flex-col min-h-0 border-t border-slate-100 pt-4 mt-auto"></div>
             </div>
 
-            <!-- Middle Column: Daily Tracking -->
             <div id="col-tracking" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[800px] overflow-hidden transition-all duration-300">
                 <div class="p-6 bg-slate-50 border-b border-slate-100 shrink-0">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
@@ -251,7 +222,22 @@
             <label class="block text-xs text-slate-500 mb-1 ml-1">습관 이름</label>
             <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 text-base">
             
-            <!-- 날짜 수정 영역 -->
+            <!-- 습관 주기 수정 영역 (최상위 습관일때만 보임) -->
+            <div id="edit-frequency-section" class="hidden mb-4 border-b border-slate-100 pb-4">
+                <label class="block text-xs text-slate-500 mb-1 ml-1">습관 주기</label>
+                <div class="flex gap-2">
+                    <select id="edit-habit-freq-type" class="flex-1 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm bg-white text-slate-700" onchange="checkEditFreqType()">
+                        <option value="daily">매일</option>
+                        <option value="weekdays">평일 (월~금)</option>
+                        <option value="days">N일 주기</option>
+                        <option value="weeks">N주 주기</option>
+                        <option value="months">N개월 주기</option>
+                    </select>
+                    <input type="number" id="edit-habit-freq-value" placeholder="주기" min="1" class="hidden w-20 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
+                </div>
+            </div>
+
+            <!-- 날짜 수정 영역 (최상위 습관일때만 보임) -->
             <div id="edit-periodic-dates" class="hidden mb-6">
                 <div class="flex gap-2">
                     <div class="flex-1">
@@ -276,30 +262,25 @@
     <div id="periodic-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[60] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-xl shadow-xl border border-slate-100 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
-                <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-calendar-alt text-blue-500 mr-2"></i>주기적 습관 목록</h3>
+                <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-calendar-alt text-blue-500 mr-2"></i>주기적/평일 습관 목록</h3>
                 <button onclick="closePeriodicModal()" class="text-slate-400 hover:text-slate-600 p-2 rounded-lg transition"><i class="fas fa-times text-lg"></i></button>
             </div>
-            <div id="periodic-modal-list" class="overflow-y-auto flex-1 space-y-3 pr-2">
-                <!-- Generated by JS -->
-            </div>
+            <div id="periodic-modal-list" class="overflow-y-auto flex-1 space-y-3 pr-2"></div>
         </div>
     </div>
 
-    <!-- Postpone Modal (미루기 기능 모달) -->
+    <!-- Postpone Modal -->
     <div id="postpone-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[80] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
             <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <i class="fas fa-calendar-plus text-blue-500"></i> 습관 일정 미루기
             </h3>
-            
             <p class="text-sm text-slate-600 mb-4">
                 <span id="postpone-habit-name" class="font-bold text-slate-800"></span> 습관을 언제로 미루시겠습니까?<br>
                 <span class="text-xs text-slate-400 block mt-1">선택하신 날짜 기준으로 다음 주기가 새롭게 세팅됩니다.<br>(기존 일정: <span id="postpone-old-date" class="font-semibold"></span>)</span>
             </p>
-            
             <label class="block text-xs text-slate-500 mb-1 ml-1">변경할 기준일</label>
             <input type="date" id="postpone-new-date" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6 text-base bg-white text-slate-700">
-            
             <div class="flex justify-end gap-2">
                 <button onclick="closePostponeModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
                 <button onclick="savePostpone()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium">확인</button>
@@ -308,12 +289,29 @@
     </div>
 
     <script>
-        // 오전, 오후가 포함된 기본 시간대 배열
+        // 대한민국 법정 공휴일 데이터 (2026 ~ 2027 예시)
+        const PUBLIC_HOLIDAYS = [
+            '2026-01-01', // 신정
+            '2026-02-16', '2026-02-17', '2026-02-18', // 설날 연휴
+            '2026-03-01', // 삼일절
+            '2026-05-05', // 어린이날
+            '2026-05-24', '2026-05-25', // 부처님오신날 & 대체공휴일(가정)
+            '2026-06-06', // 현충일
+            '2026-08-15', // 광복절
+            '2026-09-24', '2026-09-25', '2026-09-26', // 추석 연휴
+            '2026-10-03', // 개천절
+            '2026-10-09', // 한글날
+            '2026-12-25', // 기독탄신일(성탄절)
+            // 2027
+            '2027-01-01', '2027-02-06', '2027-02-07', '2027-02-08', '2027-03-01',
+            '2027-05-05', '2027-05-13', '2027-06-06', '2027-08-15', '2027-09-14',
+            '2027-09-15', '2027-09-16', '2027-10-03', '2027-10-09', '2027-12-25'
+        ];
+
         let customTimes = JSON.parse(localStorage.getItem('customTimes'));
         if (!customTimes || customTimes.length === 0) {
             customTimes = ['아침', '오전', '점심', '오후', '저녁', '자기전', '수시'];
         } else {
-            // 기존 데이터가 있을 경우 '오전', '오후' 자동 삽입 (단순 순서 맞춤)
             if (!customTimes.includes('오전')) {
                 const idx = customTimes.indexOf('아침');
                 customTimes.splice(idx !== -1 ? idx + 1 : 1, 0, '오전');
@@ -383,22 +381,18 @@
 
         function toggleHabitManager() {
             isManagerVisible = !isManagerVisible;
-            
             const colManager = document.getElementById('col-manager');
             const toggleIcon = document.getElementById('toggle-manager-icon');
             const toggleText = document.getElementById('toggle-manager-text');
 
             if (isManagerVisible) {
-                // 상단에 띄워줍니다
                 colManager.classList.remove('hidden');
                 colManager.classList.add('flex');
-                
                 toggleText.innerText = '습관 관리 닫기';
                 toggleIcon.className = 'fas fa-times';
             } else {
                 colManager.classList.add('hidden');
                 colManager.classList.remove('flex');
-                
                 toggleText.innerText = '습관 관리 열기';
                 toggleIcon.className = 'fas fa-cog';
             }
@@ -425,8 +419,17 @@
         function checkFreqType() {
             const typeSelect = document.getElementById('new-habit-freq-type');
             const valueInput = document.getElementById('new-habit-freq-value');
-            
-            if (typeSelect.value !== 'daily') {
+            if (typeSelect.value !== 'daily' && typeSelect.value !== 'weekdays') {
+                valueInput.classList.remove('hidden');
+            } else {
+                valueInput.classList.add('hidden');
+            }
+        }
+        
+        function checkEditFreqType() {
+            const typeSelect = document.getElementById('edit-habit-freq-type');
+            const valueInput = document.getElementById('edit-habit-freq-value');
+            if (typeSelect.value !== 'daily' && typeSelect.value !== 'weekdays') {
                 valueInput.classList.remove('hidden');
             } else {
                 valueInput.classList.add('hidden');
@@ -446,9 +449,16 @@
                 if (target > end) return false;
             }
 
+            if (habit.frequency && habit.frequency.type === 'weekdays') {
+                const dayOfWeek = target.getDay();
+                if (dayOfWeek === 0 || dayOfWeek === 6 || PUBLIC_HOLIDAYS.includes(dateStr)) {
+                    return false;
+                }
+                return true;
+            }
+
             if (!habit.frequency || habit.frequency.type === 'daily') return true;
 
-            // 미루기(Snooze) 적용 확인 로직
             let baseDateStr = habit.startDate || formatDateToYYYYMMDD(new Date());
             
             if (habit.anchors && habit.anchors.length > 0) {
@@ -458,14 +468,9 @@
                         applicableAnchor = habit.anchors[i];
                     }
                 }
-                
                 if (applicableAnchor) {
                     baseDateStr = applicableAnchor.baseDate;
-                    
-                    // 미루기 처리로 인해, 기존 목표일이 미뤄진 새 기준일보다 이전이 된 경우 활성화되지 않음
-                    if (dateStr < applicableAnchor.baseDate) {
-                        return false;
-                    }
+                    if (dateStr < applicableAnchor.baseDate) return false;
                 }
             }
 
@@ -486,9 +491,7 @@
                 const targetDay = target.getDate();
                 const daysInTargetMonth = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
                 
-                if (startDay > daysInTargetMonth) {
-                    return targetDay === daysInTargetMonth;
-                }
+                if (startDay > daysInTargetMonth) return targetDay === daysInTargetMonth;
                 return targetDay === startDay;
             }
             return true;
@@ -534,7 +537,7 @@
                 subHabits: [],
                 startDate: startDate,
                 endDate: endDate,
-                anchors: [], // 미루기 데이터 저장 배열
+                anchors: [],
                 frequency: { type: freqType, value: freqValue }
             });
             
@@ -559,7 +562,6 @@
         function addSubHabit(parentId) {
             const inputEl = document.getElementById(`new-sub-${parentId}`);
             const name = inputEl ? inputEl.value.trim() : "";
-
             if (!name) return;
 
             const parent = habits.find(h => h.id === parentId);
@@ -579,9 +581,7 @@
         function deleteHabit(id, isSub, parentId = null) {
             if (isSub && parentId) {
                 const parent = habits.find(h => h.id === parentId);
-                if (parent) {
-                    parent.subHabits = parent.subHabits.filter(s => s.id !== id);
-                }
+                if (parent) parent.subHabits = parent.subHabits.filter(s => s.id !== id);
             } else {
                 habits = habits.filter(h => h.id !== id);
             }
@@ -625,7 +625,11 @@
         function openEditModal(id, parentId = null, currentName) {
             editTarget = { id, parentId };
             const nameInput = document.getElementById('edit-habit-input');
+            const freqSection = document.getElementById('edit-frequency-section');
             const datesContainer = document.getElementById('edit-periodic-dates');
+            
+            const freqType = document.getElementById('edit-habit-freq-type');
+            const freqValue = document.getElementById('edit-habit-freq-value');
             const startInput = document.getElementById('edit-habit-start-date');
             const endInput = document.getElementById('edit-habit-end-date');
 
@@ -634,13 +638,26 @@
             if (!parentId) {
                 const parent = habits.find(h => h.id === id);
                 if (parent) {
+                    freqSection.classList.remove('hidden');
                     datesContainer.classList.remove('hidden');
+                    
                     startInput.value = parent.startDate || '';
                     endInput.value = parent.endDate || '';
+                    
+                    if (parent.frequency) {
+                        freqType.value = parent.frequency.type || 'daily';
+                        freqValue.value = parent.frequency.value || 1;
+                    } else {
+                        freqType.value = 'daily';
+                        freqValue.value = 1;
+                    }
+                    checkEditFreqType();
                 } else {
+                    freqSection.classList.add('hidden');
                     datesContainer.classList.add('hidden');
                 }
             } else {
+                freqSection.classList.add('hidden');
                 datesContainer.classList.add('hidden');
             }
 
@@ -668,10 +685,18 @@
                 if (parent) {
                     parent.name = newName;
                     
+                    // 시작/종료일 저장
                     const newStart = document.getElementById('edit-habit-start-date').value;
                     const newEnd = document.getElementById('edit-habit-end-date').value;
                     parent.startDate = newStart || parent.startDate; 
                     parent.endDate = newEnd || null;
+                    
+                    // 주기 저장
+                    const newFreqType = document.getElementById('edit-habit-freq-type').value;
+                    let newFreqValue = parseInt(document.getElementById('edit-habit-freq-value').value);
+                    if (isNaN(newFreqValue) || newFreqValue < 1) newFreqValue = 1;
+                    
+                    parent.frequency = { type: newFreqType, value: newFreqValue };
                 }
             }
 
@@ -686,7 +711,6 @@
             }
         }
 
-        // Postpone (미루기) 기능 
         function openPostponeModal(id, oldDate) {
             postponeTarget = { id, oldDate };
             const habit = habits.find(h => h.id === id);
@@ -715,7 +739,6 @@
             
             const habit = habits.find(h => h.id === postponeTarget.id);
             if (!habit) return;
-
             if (!habit.anchors) habit.anchors = [];
             
             const existingAnchorIndex = habit.anchors.findIndex(a => a.effectiveFrom === postponeTarget.oldDate);
@@ -724,7 +747,6 @@
             } else {
                 habit.anchors.push({ effectiveFrom: postponeTarget.oldDate, baseDate: newDate });
             }
-            
             habit.anchors.sort((a, b) => a.effectiveFrom.localeCompare(b.effectiveFrom));
 
             saveData();
@@ -745,6 +767,7 @@
 
         function getFreqText(freq) {
             if (!freq || freq.type === 'daily') return '';
+            if (freq.type === 'weekdays') return '평일';
             if (freq.type === 'days') return `${freq.value}일 주기`;
             if (freq.type === 'weeks') return `${freq.value}주 주기`;
             if (freq.type === 'months') return `${freq.value}개월 주기`;
@@ -758,7 +781,7 @@
             const periodicHabits = habits.filter(h => h.frequency && h.frequency.type !== 'daily');
             
             if (periodicHabits.length === 0) {
-                listContainer.innerHTML = '<div class="text-center py-8 text-slate-400">등록된 주기적 습관이 없습니다.</div>';
+                listContainer.innerHTML = '<div class="text-center py-8 text-slate-400">등록된 주기/평일 습관이 없습니다.</div>';
             } else {
                 let html = '';
                 periodicHabits.forEach((habit, index) => {
@@ -792,7 +815,6 @@
                 });
                 listContainer.innerHTML = html;
             }
-            
             modal.classList.remove('hidden');
         }
 
@@ -899,7 +921,7 @@
             updateDailyView();
         }
 
-function renderCalendar() {
+        function renderCalendar() {
             const year = currentMonthDate.getFullYear();
             const month = currentMonthDate.getMonth();
             
@@ -940,11 +962,11 @@ function renderCalendar() {
                 if (dateStr === selectedStr) {
                     textClass = "text-white";
                 } else {
-                    if(dayOfWeek === 0) textClass = "text-red-500";
-                    if(dayOfWeek === 6) textClass = "text-blue-500";
+                    if(dayOfWeek === 0 || PUBLIC_HOLIDAYS.includes(dateStr)) textClass = "text-red-500";
+                    else if(dayOfWeek === 6) textClass = "text-blue-500";
                 }
 
-                const hasPeriodicHabit = habits.some(h => h.frequency && h.frequency.type !== 'daily' && isHabitActiveOnDate(h, dateStr));
+                const hasPeriodicHabit = habits.some(h => h.frequency && h.frequency.type !== 'daily' && h.frequency.type !== 'weekdays' && isHabitActiveOnDate(h, dateStr));
                 const dotHtml = hasPeriodicHabit ? `<div class="absolute top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-500 rounded-full"></div>` : '';
 
                 const overallProgress = calculateOverallProgress(dateStr);
@@ -956,31 +978,14 @@ function renderCalendar() {
                     let stampText = '';
                     let stampClass = '';
 
-                    if (overallProgress === 100) {
-                        stampText = '참<br>잘했어요';
-                        stampClass = 'stamp-100';
-                    } else if (overallProgress >= 90) {
-                        stampText = '더<br>힘내요';
-                        stampClass = 'stamp-90';
-                    } else if (overallProgress >= 80) {
-                        stampText = '할 수<br>있어';
-                        stampClass = 'stamp-80';
-                    } else if (overallProgress >= 70) {
-                        stampText = '화이팅';
-                        stampClass = 'stamp-70';
-                    } else if (overallProgress >= 60) {
-                        stampText = '괜찮아';
-                        stampClass = 'stamp-60';
-                    } else {
-                        if (overallProgress > 0 || dateObj < todayStart) {
-                            stampText = '오늘도<br>애썼어';
-                            stampClass = 'stamp-0';
-                        }
-                    }
+                    if (overallProgress === 100) { stampText = '참<br>잘했어요'; stampClass = 'stamp-100'; } 
+                    else if (overallProgress >= 90) { stampText = '더<br>힘내요'; stampClass = 'stamp-90'; } 
+                    else if (overallProgress >= 80) { stampText = '할 수<br>있어'; stampClass = 'stamp-80'; } 
+                    else if (overallProgress >= 70) { stampText = '화이팅'; stampClass = 'stamp-70'; } 
+                    else if (overallProgress >= 60) { stampText = '괜찮아'; stampClass = 'stamp-60'; } 
+                    else { if (overallProgress > 0 || dateObj < todayStart) { stampText = '오늘도<br>애썼어'; stampClass = 'stamp-0'; } }
 
-                    if (stampText !== '') {
-                        stampHtml = `<div class="stamp-base ${stampClass}">${stampText}</div>`;
-                    }
+                    if (stampText !== '') stampHtml = `<div class="stamp-base ${stampClass}">${stampText}</div>`;
                 }
 
                 const topHtml = `
@@ -991,9 +996,7 @@ function renderCalendar() {
                     </div>
                 `;
 
-                // --- 수정된 부분: 개별 바그래프 대신 전체 달성률을 나타내는 8px 두께의 단일 바 그래프 생성 ---
                 let progressBarsHtml = `<div class="w-full flex flex-col items-center mt-1.5 px-0.5">`;
-                
                 if (totalCount > 0) {
                     progressBarsHtml += `
                         <div class="w-full bg-slate-200/60 rounded-full overflow-hidden shrink-0" style="height: 8px;">
@@ -1001,9 +1004,7 @@ function renderCalendar() {
                         </div>
                     `;
                 }
-                
                 progressBarsHtml += `</div>`;
-                // ---------------------------------------------------------------------------------
 
                 dayDiv.innerHTML = topHtml + progressBarsHtml;
                 dayDiv.onclick = () => {
@@ -1014,6 +1015,7 @@ function renderCalendar() {
                 daysContainer.appendChild(dayDiv);
             }
         }
+
         function toggleRecord(id, dateStr) {
             if (!records[dateStr]) records[dateStr] = [];
             const index = records[dateStr].indexOf(id);
@@ -1021,7 +1023,6 @@ function renderCalendar() {
             else records[dateStr].push(id);
 
             if (records[dateStr].length === 0) delete records[dateStr];
-
             saveData();
             updateDailyView();
             renderCalendar(); 
@@ -1081,7 +1082,7 @@ function renderCalendar() {
                         const isParentCompleted = completedIds.includes(parent.id);
                         const bgClass = isParentCompleted ? 'bg-green-50/40 border-green-200' : 'bg-white border-slate-200 shadow-sm';
                         const hasSubs = parent.subHabits && parent.subHabits.length > 0;
-                        const isPeriodic = parent.frequency && parent.frequency.type !== 'daily';
+                        const isPeriodic = parent.frequency && parent.frequency.type !== 'daily' && parent.frequency.type !== 'weekdays';
                         
                         const pIndex = habits.findIndex(h => h.id === parent.id);
                         const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
@@ -1122,7 +1123,6 @@ function renderCalendar() {
                             html += `<div class="bg-slate-50/50 border-t border-slate-100 py-1 pl-1">`;
                             parent.subHabits.forEach(sub => {
                                 const isSubCompleted = completedIds.includes(sub.id);
-                                
                                 let subTextClass = 'text-slate-700 text-base font-normal';
                                 if (!isSubCompleted && !isNextFound) {
                                     subTextClass = 'text-slate-900 text-lg font-bold';
@@ -1147,20 +1147,17 @@ function renderCalendar() {
                             });
                             html += `</div>`;
                         }
-
                         html += `</div>`;
                     });
-
                     html += `</div>`;
                     section.innerHTML = html;
                     container.appendChild(section);
                 });
             }
-
             updateCalendarBottomSummary(dateStr, activeHabits);
         }
 
-function updateCalendarBottomSummary(dateStr, activeHabits) {
+        function updateCalendarBottomSummary(dateStr, activeHabits) {
             const container = document.getElementById('calendar-bottom-summary');
             
             if (activeHabits.length === 0) {
@@ -1168,20 +1165,16 @@ function updateCalendarBottomSummary(dateStr, activeHabits) {
                 return;
             }
 
-            // --- 추가된 정렬 로직 ---
             const sortedHabits = [...activeHabits].sort((a, b) => {
                 const aIsPeriodic = a.frequency && a.frequency.type !== 'daily';
                 const bIsPeriodic = b.frequency && b.frequency.type !== 'daily';
 
-                // 1. 주기적 습관은 무조건 맨 뒤로 배치
                 if (aIsPeriodic && !bIsPeriodic) return 1;
                 if (!aIsPeriodic && bIsPeriodic) return -1;
 
-                // 2. 시간대별 정렬 (아침, 오전, 점심, 오후, 저녁, 직접입력 순)
                 let aTimeIdx = customTimes.indexOf(a.time);
                 let bTimeIdx = customTimes.indexOf(b.time);
 
-                // 목록에 없는 예외 시간대 처리
                 if (aTimeIdx === -1) aTimeIdx = 9999;
                 if (bTimeIdx === -1) bTimeIdx = 9999;
 
@@ -1191,15 +1184,22 @@ function updateCalendarBottomSummary(dateStr, activeHabits) {
             let html = `<h3 class="text-sm font-bold text-slate-700 mb-2 shrink-0"><i class="fas fa-list-check mr-2 text-blue-500"></i>습관 요약 리스트</h3>`;
             html += `<div class="overflow-y-auto flex-1 pr-1 flex flex-col gap-1.5 custom-scrollbar pb-2">`;
             
-            // activeHabits 대신 정렬된 sortedHabits를 순회
             sortedHabits.forEach(habit => {
-                const isPeriodic = habit.frequency && habit.frequency.type !== 'daily';
+                let badgeText = '매일';
+                let badgeClass = 'bg-slate-100 text-slate-500 border-slate-200';
+                
+                if (habit.frequency && habit.frequency.type === 'weekdays') {
+                    badgeText = '평일';
+                    badgeClass = 'bg-blue-50 text-blue-500 border-blue-100';
+                } else if (habit.frequency && habit.frequency.type !== 'daily') {
+                    badgeText = '주기적';
+                    badgeClass = 'bg-red-50 text-red-500 border-red-100';
+                }
+                
                 const pIndex = habits.findIndex(h => h.id === habit.id);
                 const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
                 
-                const badge = isPeriodic 
-                    ? `<span class="text-[10px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded border border-red-100 ml-auto whitespace-nowrap">주기적</span>` 
-                    : `<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 ml-auto whitespace-nowrap">매일</span>`;
+                const badge = `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap ${badgeClass}">${badgeText}</span>`;
                 
                 html += `
                     <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 shrink-0">
