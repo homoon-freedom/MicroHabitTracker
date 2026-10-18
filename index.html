@@ -208,7 +208,7 @@
                     
                     <div class="mt-4">
                         <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1"><i class="fas fa-quote-left text-slate-300 mr-1"></i>오늘 아침, 힘이 되는 글귀</label>
-                        <input type="text" id="daily-quote" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm text-slate-700 font-medium" oninput="saveDailyText('quote')">
+                        <textarea id="daily-quote" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." rows="1" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm text-slate-700 font-medium resize-none overflow-hidden" oninput="saveDailyText('quote'); autoResize(this)"></textarea>
                     </div>
                 </div>
                 
@@ -225,7 +225,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
                         <i class="fas fa-heart text-pink-500"></i>감사하기
                     </label>
-                    <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="2" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none text-slate-700" oninput="saveDailyText('gratitude')"></textarea>
+                    <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="1" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none overflow-hidden text-slate-700" oninput="saveDailyText('gratitude'); autoResize(this)"></textarea>
                 </div>
 
             </div>
@@ -233,7 +233,7 @@
         </div>
     </div>
 
-    <!-- Edit Modal (생략하지 않음) -->
+    <!-- Edit Modal -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
             <h3 class="text-lg font-bold text-slate-800 mb-4">습관 수정</h3>
@@ -306,7 +306,6 @@
     </div>
 
     <script>
-        // 대한민국 법정 공휴일 데이터 (2026 ~ 2027 예시)
         const PUBLIC_HOLIDAYS = [
             '2026-01-01', '2026-02-16', '2026-02-17', '2026-02-18', '2026-03-01',
             '2026-05-05', '2026-05-24', '2026-05-25', '2026-06-06', '2026-08-15',
@@ -334,7 +333,6 @@
         
         let habits = JSON.parse(localStorage.getItem('habits')) || [];
         let records = JSON.parse(localStorage.getItem('records')) || {};
-        // 새롭게 추가된 데이터 영역 (글귀, 감사일기)
         let dailyQuotes = JSON.parse(localStorage.getItem('dailyQuotes')) || {};
         let dailyGratitudes = JSON.parse(localStorage.getItem('dailyGratitudes')) || {};
         
@@ -346,6 +344,12 @@
 
         const HABIT_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
         const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50'];
+
+        // 텍스트 영역 높이 자동 조절 함수
+        function autoResize(element) {
+            element.style.height = 'auto'; // 리셋 후 계산
+            element.style.height = element.scrollHeight + 'px';
+        }
 
         function getTimeColor(timeStr) {
             const index = customTimes.indexOf(timeStr);
@@ -382,7 +386,6 @@
             localStorage.setItem('dailyGratitudes', JSON.stringify(dailyGratitudes));
         }
 
-        // 텍스트 저장 로직 (글귀 및 감사하기)
         function saveDailyText(type) {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             if (type === 'quote') {
@@ -1059,9 +1062,15 @@
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
             
-            // 날짜별 글귀, 감사일기 바인딩
-            document.getElementById('daily-quote').value = dailyQuotes[dateStr] || '';
-            document.getElementById('daily-gratitude').value = dailyGratitudes[dateStr] || '';
+            const quoteEl = document.getElementById('daily-quote');
+            const gratitudeEl = document.getElementById('daily-gratitude');
+            
+            quoteEl.value = dailyQuotes[dateStr] || '';
+            gratitudeEl.value = dailyGratitudes[dateStr] || '';
+            
+            // 데이터 로드 후 높이 재조정
+            autoResize(quoteEl);
+            autoResize(gratitudeEl);
 
             const overallProgress = calculateOverallProgress(dateStr);
             const progressText = document.getElementById('daily-progress-text');
