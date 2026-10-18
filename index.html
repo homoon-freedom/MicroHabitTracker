@@ -196,7 +196,7 @@
 
             <div id="col-tracking" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[800px] overflow-hidden transition-all duration-300">
                 
-                <!-- 상단 헤더 & 힘이 되는 글귀 입력 영역 -->
+                <!-- 상단 헤더 & 힘이 되는 글귀 읽기 영역 -->
                 <div class="p-6 bg-slate-50 border-b border-slate-100 shrink-0">
                     <div class="flex items-center justify-between mb-2">
                         <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
@@ -207,8 +207,11 @@
                     </div>
                     
                     <div class="mt-4">
-                        <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1"><i class="fas fa-quote-left text-slate-300 mr-1"></i>오늘 아침, 힘이 되는 글귀</label>
-                        <textarea id="daily-quote" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." rows="1" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm text-slate-700 font-medium resize-none overflow-hidden" oninput="saveDailyText('quote'); autoResize(this)"></textarea>
+                        <div class="flex items-center justify-between mb-1.5 px-1">
+                            <label class="block text-xs font-bold text-slate-500"><i class="fas fa-quote-left text-slate-300 mr-1"></i>오늘 아침, 힘이 되는 글귀</label>
+                            <button onclick="openQuoteModal()" class="text-xs text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
+                        </div>
+                        <div id="daily-quote-display" onclick="openQuoteModal()" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-base text-slate-700 font-medium shadow-sm cursor-pointer hover:bg-slate-50 transition min-h-[3.5rem] whitespace-pre-wrap leading-relaxed"></div>
                     </div>
                 </div>
                 
@@ -233,7 +236,23 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
+    <!-- Quote Input Modal -->
+    <div id="quote-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-quote-left text-blue-500"></i>힘이 되는 글귀 입력
+            </h3>
+            <p class="text-xs text-slate-500 mb-3 ml-1">입력하신 문구는 새로운 문구를 작성하기 전까지 이후 날짜에도 계속 표시됩니다.</p>
+            <textarea id="quote-modal-textarea" rows="4" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-sm resize-none text-slate-700"></textarea>
+            
+            <div class="flex justify-end gap-2 mt-4">
+                <button onclick="closeQuoteModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
+                <button onclick="saveQuoteModal()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Habit Modal -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
             <h3 class="text-lg font-bold text-slate-800 mb-4">습관 수정</h3>
@@ -345,10 +364,49 @@
         const HABIT_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
         const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50'];
 
-        // 텍스트 영역 높이 자동 조절 함수
+        // 텍스트 영역 높이 자동 조절 함수 (감사하기 용)
         function autoResize(element) {
-            element.style.height = 'auto'; // 리셋 후 계산
+            element.style.height = 'auto';
             element.style.height = element.scrollHeight + 'px';
+        }
+
+        // 해당 날짜에 적용될 유효한 글귀를 찾는 함수 (이전 날짜부터 상속)
+        function getEffectiveQuote(targetDateStr) {
+            const dates = Object.keys(dailyQuotes).sort();
+            let effectiveQuote = '';
+            for (let i = 0; i < dates.length; i++) {
+                if (dates[i] <= targetDateStr) {
+                    effectiveQuote = dailyQuotes[dates[i]];
+                } else {
+                    break;
+                }
+            }
+            return effectiveQuote;
+        }
+
+        function openQuoteModal() {
+            const dateStr = formatDateToYYYYMMDD(selectedDate);
+            const currentQuote = getEffectiveQuote(dateStr);
+            document.getElementById('quote-modal-textarea').value = currentQuote;
+            document.getElementById('quote-modal').classList.remove('hidden');
+        }
+
+        function closeQuoteModal() {
+            document.getElementById('quote-modal').classList.add('hidden');
+        }
+
+        function saveQuoteModal() {
+            const dateStr = formatDateToYYYYMMDD(selectedDate);
+            const val = document.getElementById('quote-modal-textarea').value.trim();
+            
+            if (val === '') {
+                delete dailyQuotes[dateStr];
+            } else {
+                dailyQuotes[dateStr] = val;
+            }
+            saveData();
+            closeQuoteModal();
+            updateDailyView();
         }
 
         function getTimeColor(timeStr) {
@@ -388,11 +446,7 @@
 
         function saveDailyText(type) {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
-            if (type === 'quote') {
-                const val = document.getElementById('daily-quote').value;
-                if (val.trim() === '') delete dailyQuotes[dateStr];
-                else dailyQuotes[dateStr] = val;
-            } else if (type === 'gratitude') {
+            if (type === 'gratitude') {
                 const val = document.getElementById('daily-gratitude').value;
                 if (val.trim() === '') delete dailyGratitudes[dateStr];
                 else dailyGratitudes[dateStr] = val;
@@ -1062,14 +1116,23 @@
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
             
-            const quoteEl = document.getElementById('daily-quote');
+            // 글귀 바인딩 (이전 날짜에서 상속된 값 포함)
+            const quoteDisplayEl = document.getElementById('daily-quote-display');
+            const effectiveQuote = getEffectiveQuote(dateStr);
+            
+            if (effectiveQuote) {
+                quoteDisplayEl.innerText = effectiveQuote;
+                quoteDisplayEl.classList.remove('text-slate-400');
+                quoteDisplayEl.classList.add('text-slate-700');
+            } else {
+                quoteDisplayEl.innerText = '오늘의 글귀를 입력해주세요.';
+                quoteDisplayEl.classList.remove('text-slate-700');
+                quoteDisplayEl.classList.add('text-slate-400');
+            }
+
+            // 감사일기 바인딩
             const gratitudeEl = document.getElementById('daily-gratitude');
-            
-            quoteEl.value = dailyQuotes[dateStr] || '';
             gratitudeEl.value = dailyGratitudes[dateStr] || '';
-            
-            // 데이터 로드 후 높이 재조정
-            autoResize(quoteEl);
             autoResize(gratitudeEl);
 
             const overallProgress = calculateOverallProgress(dateStr);
