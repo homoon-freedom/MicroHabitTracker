@@ -80,7 +80,7 @@
         .checkbox-custom:checked + div { background-color: #10b981; border-color: #10b981; }
         .checkbox-custom:checked + div svg { opacity: 1; }
         
-        input, select {
+        input, select, textarea {
             appearance: none;
             -webkit-appearance: none;
             border-radius: 0.5rem;
@@ -195,26 +195,45 @@
             </div>
 
             <div id="col-tracking" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[800px] overflow-hidden transition-all duration-300">
+                
+                <!-- 상단 헤더 & 힘이 되는 글귀 입력 영역 -->
                 <div class="p-6 bg-slate-50 border-b border-slate-100 shrink-0">
-                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
-                        <i class="fas fa-tasks text-blue-500"></i>
-                        <span id="selected-date-title"></span>
-                    </h2>
-                    <p class="text-sm text-slate-500 mt-1" id="daily-progress-text">완료율: 0%</p>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-tasks text-blue-500"></i>
+                            <span id="selected-date-title"></span>
+                        </h2>
+                        <p class="text-sm font-medium text-slate-500" id="daily-progress-text">완료율: 0%</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1"><i class="fas fa-quote-left text-slate-300 mr-1"></i>오늘 아침, 힘이 되는 글귀</label>
+                        <input type="text" id="daily-quote" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm text-slate-700 font-medium" oninput="saveDailyText('quote')">
+                    </div>
                 </div>
                 
+                <!-- 일일 습관 체크리스트 영역 -->
                 <div class="p-6 overflow-y-auto flex-1 bg-white" id="daily-habits-container">
                     <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
                         <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
                         <p>등록된 습관이 없습니다.<br>상단의 '습관 관리 열기'를 눌러 새로운 습관을 추가해보세요!</p>
                     </div>
                 </div>
+
+                <!-- 하단 감사하기 입력 영역 -->
+                <div class="p-5 bg-slate-50 border-t border-slate-100 shrink-0">
+                    <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
+                        <i class="fas fa-heart text-pink-500"></i>감사하기
+                    </label>
+                    <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="2" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none text-slate-700" oninput="saveDailyText('gratitude')"></textarea>
+                </div>
+
             </div>
 
         </div>
     </div>
 
-    <!-- Edit Modal -->
+    <!-- Edit Modal (생략하지 않음) -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
             <h3 class="text-lg font-bold text-slate-800 mb-4">습관 수정</h3>
@@ -222,7 +241,6 @@
             <label class="block text-xs text-slate-500 mb-1 ml-1">습관 이름</label>
             <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 text-base">
             
-            <!-- 습관 주기 수정 영역 (최상위 습관일때만 보임) -->
             <div id="edit-frequency-section" class="hidden mb-4 border-b border-slate-100 pb-4">
                 <label class="block text-xs text-slate-500 mb-1 ml-1">습관 주기</label>
                 <div class="flex gap-2">
@@ -237,7 +255,6 @@
                 </div>
             </div>
 
-            <!-- 날짜 수정 영역 (최상위 습관일때만 보임) -->
             <div id="edit-periodic-dates" class="hidden mb-6">
                 <div class="flex gap-2">
                     <div class="flex-1">
@@ -291,21 +308,13 @@
     <script>
         // 대한민국 법정 공휴일 데이터 (2026 ~ 2027 예시)
         const PUBLIC_HOLIDAYS = [
-            '2026-01-01', // 신정
-            '2026-02-16', '2026-02-17', '2026-02-18', // 설날 연휴
-            '2026-03-01', // 삼일절
-            '2026-05-05', // 어린이날
-            '2026-05-24', '2026-05-25', // 부처님오신날 & 대체공휴일(가정)
-            '2026-06-06', // 현충일
-            '2026-08-15', // 광복절
-            '2026-09-24', '2026-09-25', '2026-09-26', // 추석 연휴
-            '2026-10-03', // 개천절
-            '2026-10-09', // 한글날
-            '2026-12-25', // 기독탄신일(성탄절)
-            // 2027
-            '2027-01-01', '2027-02-06', '2027-02-07', '2027-02-08', '2027-03-01',
-            '2027-05-05', '2027-05-13', '2027-06-06', '2027-08-15', '2027-09-14',
-            '2027-09-15', '2027-09-16', '2027-10-03', '2027-10-09', '2027-12-25'
+            '2026-01-01', '2026-02-16', '2026-02-17', '2026-02-18', '2026-03-01',
+            '2026-05-05', '2026-05-24', '2026-05-25', '2026-06-06', '2026-08-15',
+            '2026-09-24', '2026-09-25', '2026-09-26', '2026-10-03', '2026-10-09',
+            '2026-12-25', '2027-01-01', '2027-02-06', '2027-02-07', '2027-02-08',
+            '2027-03-01', '2027-05-05', '2027-05-13', '2027-06-06', '2027-08-15',
+            '2027-09-14', '2027-09-15', '2027-09-16', '2027-10-03', '2027-10-09',
+            '2027-12-25'
         ];
 
         let customTimes = JSON.parse(localStorage.getItem('customTimes'));
@@ -325,6 +334,9 @@
         
         let habits = JSON.parse(localStorage.getItem('habits')) || [];
         let records = JSON.parse(localStorage.getItem('records')) || {};
+        // 새롭게 추가된 데이터 영역 (글귀, 감사일기)
+        let dailyQuotes = JSON.parse(localStorage.getItem('dailyQuotes')) || {};
+        let dailyGratitudes = JSON.parse(localStorage.getItem('dailyGratitudes')) || {};
         
         let currentMonthDate = new Date();
         let selectedDate = new Date(); 
@@ -366,6 +378,23 @@
             localStorage.setItem('customTimes', JSON.stringify(customTimes));
             localStorage.setItem('habits', JSON.stringify(habits));
             localStorage.setItem('records', JSON.stringify(records));
+            localStorage.setItem('dailyQuotes', JSON.stringify(dailyQuotes));
+            localStorage.setItem('dailyGratitudes', JSON.stringify(dailyGratitudes));
+        }
+
+        // 텍스트 저장 로직 (글귀 및 감사하기)
+        function saveDailyText(type) {
+            const dateStr = formatDateToYYYYMMDD(selectedDate);
+            if (type === 'quote') {
+                const val = document.getElementById('daily-quote').value;
+                if (val.trim() === '') delete dailyQuotes[dateStr];
+                else dailyQuotes[dateStr] = val;
+            } else if (type === 'gratitude') {
+                const val = document.getElementById('daily-gratitude').value;
+                if (val.trim() === '') delete dailyGratitudes[dateStr];
+                else dailyGratitudes[dateStr] = val;
+            }
+            saveData();
         }
 
         function init() {
@@ -685,13 +714,11 @@
                 if (parent) {
                     parent.name = newName;
                     
-                    // 시작/종료일 저장
                     const newStart = document.getElementById('edit-habit-start-date').value;
                     const newEnd = document.getElementById('edit-habit-end-date').value;
                     parent.startDate = newStart || parent.startDate; 
                     parent.endDate = newEnd || null;
                     
-                    // 주기 저장
                     const newFreqType = document.getElementById('edit-habit-freq-type').value;
                     let newFreqValue = parseInt(document.getElementById('edit-habit-freq-value').value);
                     if (isNaN(newFreqValue) || newFreqValue < 1) newFreqValue = 1;
@@ -1032,6 +1059,10 @@
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
             
+            // 날짜별 글귀, 감사일기 바인딩
+            document.getElementById('daily-quote').value = dailyQuotes[dateStr] || '';
+            document.getElementById('daily-gratitude').value = dailyGratitudes[dateStr] || '';
+
             const overallProgress = calculateOverallProgress(dateStr);
             const progressText = document.getElementById('daily-progress-text');
             progressText.innerText = getTotalHabitCount(dateStr) === 0 ? '이날 등록된 습관이 없습니다.' : `오늘의 달성률: ${overallProgress}%`;
