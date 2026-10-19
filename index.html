@@ -1192,12 +1192,13 @@
                         const freqText = getFreqText(parent.frequency);
                         const freqBadge = freqText ? `<span class="ml-2 text-xs font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${freqText}</span>` : '';
 
-                        let textClass = 'text-slate-800 text-lg font-semibold';
+                        // 텍스트 클래스 조정 (한 단계씩 낮춤)
+                        let textClass = 'text-slate-800 text-base font-semibold';
                         if (!isParentCompleted && !isNextFound) {
-                            textClass = 'text-slate-900 text-xl font-extrabold';
+                            textClass = 'text-slate-900 text-lg font-extrabold';
                             isNextFound = true;
                         } else if (isParentCompleted) {
-                            textClass = 'text-slate-500 text-lg font-semibold';
+                            textClass = 'text-slate-500 text-base font-semibold';
                         }
 
                         html += `
@@ -1226,12 +1227,13 @@
                             html += `<div class="bg-slate-50/50 border-t border-slate-100 py-1 pl-1">`;
                             parent.subHabits.forEach(sub => {
                                 const isSubCompleted = completedIds.includes(sub.id);
-                                let subTextClass = 'text-slate-700 text-base font-normal';
+                                // 하위 습관 텍스트 클래스 조정 (한 단계씩 낮춤)
+                                let subTextClass = 'text-slate-700 text-sm font-normal';
                                 if (!isSubCompleted && !isNextFound) {
-                                    subTextClass = 'text-slate-900 text-lg font-bold';
+                                    subTextClass = 'text-slate-900 text-base font-bold';
                                     isNextFound = true;
                                 } else if (isSubCompleted) {
-                                    subTextClass = 'text-slate-400 text-base font-normal';
+                                    subTextClass = 'text-slate-400 text-sm font-normal';
                                 }
                                 
                                 html += `
