@@ -163,37 +163,6 @@
                 </div>
             </div>
 
-            <div id="col-calendar" class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[800px] transition-all duration-300">
-                <div class="flex items-center justify-between mb-6 shrink-0">
-                    <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
-                    <div class="flex gap-2">
-                        <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">
-                            오늘
-                        </button>
-                        <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="calendar-grid mb-2 shrink-0">
-                    <div class="text-center text-xs font-semibold text-red-400">일</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">월</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">화</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">수</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">목</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">금</div>
-                    <div class="text-center text-xs font-semibold text-blue-400">토</div>
-                </div>
-
-                <div id="calendar-days" class="calendar-grid content-start gap-y-4 mb-4 shrink-0"></div>
-
-                <div id="calendar-bottom-summary" class="flex-1 flex flex-col min-h-0 border-t border-slate-100 pt-4 mt-auto"></div>
-            </div>
-
             <!-- 높이를 800px에서 1600px로 2배 증가 -->
             <div id="col-tracking" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[1200px] overflow-hidden transition-all duration-300">
                 
@@ -239,6 +208,37 @@
                     <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="1" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none overflow-hidden text-slate-700" oninput="saveDailyText('gratitude'); autoResize(this)"></textarea>
                 </div>
 
+            </div>
+
+            <div id="col-calendar" class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[800px] transition-all duration-300">
+                <div class="flex items-center justify-between mb-6 shrink-0">
+                    <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
+                    <div class="flex gap-2">
+                        <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">
+                            오늘
+                        </button>
+                        <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid mb-2 shrink-0">
+                    <div class="text-center text-xs font-semibold text-red-400">일</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">월</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">화</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">수</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">목</div>
+                    <div class="text-center text-xs font-semibold text-slate-500">금</div>
+                    <div class="text-center text-xs font-semibold text-blue-400">토</div>
+                </div>
+
+                <div id="calendar-days" class="calendar-grid content-start gap-y-4 mb-4 shrink-0"></div>
+
+                <div id="calendar-bottom-summary" class="flex-1 flex flex-col min-h-0 border-t border-slate-100 pt-4 mt-auto"></div>
             </div>
 
         </div>
