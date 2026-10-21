@@ -100,10 +100,11 @@
                     <i id="toggle-manager-icon" class="fas fa-cog"></i>
                     <span id="toggle-manager-text">습관 관리 열기</span>
                 </button>
-                <div class="px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-2">
+                <!-- 날짜 표시 버튼: 클릭 시 달력 모달창 열림 -->
+                <button onclick="openCalendarModal()" class="px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
                     <i class="far fa-calendar-check text-blue-500"></i>
                     <span id="today-display" class="font-medium text-slate-700"></span>
-                </div>
+                </button>
             </div>
         </header>
 
@@ -163,8 +164,8 @@
                 </div>
             </div>
 
-            <!-- 수정된 col-tracking 영역: 감사하기 창이 아래로 커지도록 구조 변경 -->
-            <div id="col-tracking" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden transition-all duration-300">
+            <!-- 메인 화면을 중앙으로 정렬 (달력이 모달로 빠졌으므로 너비 전체 사용) -->
+            <div id="col-tracking" class="lg:col-span-12 max-w-3xl w-full mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden transition-all duration-300">
                 
                 <!-- 상단 고정 영역 (헤더 + 습관 리스트): 이 부분의 높이를 고정하여 하단 창이 밀려나도록 함 -->
                 <div class="flex flex-col h-[1050px]">
@@ -195,7 +196,7 @@
                     </div>
                     
                     <!-- 일일 습관 체크리스트 영역 -->
-                    <div class="p-6 overflow-y-auto flex-1 bg-white" id="daily-habits-container">
+                    <div class="p-6 overflow-y-auto flex-1 bg-white custom-scrollbar" id="daily-habits-container">
                         <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
                             <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
                             <p>등록된 습관이 없습니다.<br>상단의 '습관 관리 열기'를 눌러 새로운 습관을 추가해보세요!</p>
@@ -213,38 +214,44 @@
 
             </div>
 
-            <!-- 달력 및 습관 요약 리스트 영역 -->
-            <div id="col-calendar" class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[800px] transition-all duration-300">
-                <div class="flex items-center justify-between mb-6 shrink-0">
-                    <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
-                    <div class="flex gap-2">
-                        <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">
-                            오늘
-                        </button>
-                        <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
+        </div>
+    </div>
+
+    <!-- 달력 모달창 (기존 메인 화면에서 모달로 이동) -->
+    <div id="calendar-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[90] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100 flex flex-col h-[85vh] max-h-[850px] transition-all duration-300 relative">
+            <div class="flex items-center justify-between mb-6 shrink-0">
+                <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
+                <div class="flex gap-2 items-center">
+                    <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">
+                        오늘
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="w-px h-4 bg-slate-200 mx-1"></div>
+                    <button onclick="closeCalendarModal()" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-400 hover:text-slate-600">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
                 </div>
-
-                <div class="calendar-grid mb-2 shrink-0">
-                    <div class="text-center text-xs font-semibold text-red-400">일</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">월</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">화</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">수</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">목</div>
-                    <div class="text-center text-xs font-semibold text-slate-500">금</div>
-                    <div class="text-center text-xs font-semibold text-blue-400">토</div>
-                </div>
-
-                <div id="calendar-days" class="calendar-grid content-start gap-y-4 mb-4 shrink-0"></div>
-
-                <div id="calendar-bottom-summary" class="flex-1 flex flex-col min-h-0 border-t border-slate-100 pt-4 mt-auto"></div>
             </div>
 
+            <div class="calendar-grid mb-2 shrink-0">
+                <div class="text-center text-xs font-semibold text-red-400">일</div>
+                <div class="text-center text-xs font-semibold text-slate-500">월</div>
+                <div class="text-center text-xs font-semibold text-slate-500">화</div>
+                <div class="text-center text-xs font-semibold text-slate-500">수</div>
+                <div class="text-center text-xs font-semibold text-slate-500">목</div>
+                <div class="text-center text-xs font-semibold text-slate-500">금</div>
+                <div class="text-center text-xs font-semibold text-blue-400">토</div>
+            </div>
+
+            <div id="calendar-days" class="calendar-grid content-start gap-y-4 mb-4 shrink-0"></div>
+
+            <div id="calendar-bottom-summary" class="flex-1 flex flex-col min-h-0 border-t border-slate-100 pt-4 mt-auto"></div>
         </div>
     </div>
 
@@ -394,7 +401,6 @@
         let dailyQuotes = JSON.parse(localStorage.getItem('dailyQuotes')) || {};
         let dailyGratitudes = JSON.parse(localStorage.getItem('dailyGratitudes')) || {};
         
-        // 새로 추가된 주요일정 데이터 저장 변수
         let dailySchedules = JSON.parse(localStorage.getItem('dailySchedules')) || {};
         
         let currentMonthDate = new Date();
@@ -406,13 +412,11 @@
         const HABIT_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
         const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50'];
 
-        // 텍스트 영역 높이 자동 조절 함수 (감사하기 용)
         function autoResize(element) {
             element.style.height = 'auto';
             element.style.height = element.scrollHeight + 'px';
         }
 
-        // 해당 날짜에 적용될 유효한 글귀를 찾는 함수 (이전 날짜부터 상속)
         function getEffectiveQuote(targetDateStr) {
             const dates = Object.keys(dailyQuotes).sort();
             let effectiveQuote = '';
@@ -424,6 +428,16 @@
                 }
             }
             return effectiveQuote;
+        }
+
+        /* --- 달력 모달 관련 함수들 --- */
+        function openCalendarModal() {
+            document.getElementById('calendar-modal').classList.remove('hidden');
+            renderCalendar(); // 모달 열 때 최신 상태 렌더링
+        }
+        
+        function closeCalendarModal() {
+            document.getElementById('calendar-modal').classList.add('hidden');
         }
 
         /* --- 주요일정 관련 함수들 --- */
@@ -439,10 +453,7 @@
             }
             
             document.getElementById('schedule-textarea').value = currentSchedule;
-            
-            // 모달을 열 때는 항상 읽기 모드로 시작
             toggleScheduleEditMode(false);
-            
             document.getElementById('schedule-modal').classList.remove('hidden');
         }
 
@@ -474,12 +485,10 @@
                 dailySchedules[dateStr] = val;
             }
             saveData();
-            
-            // 저장 후 읽기 모드로 바로 보여줌
             openScheduleModal(); 
         }
-        /* -------------------------- */
 
+        /* --- 기타 모달 및 유틸 함수들 --- */
         function openQuoteModal() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             const currentQuote = getEffectiveQuote(dateStr);
@@ -538,7 +547,6 @@
             localStorage.setItem('records', JSON.stringify(records));
             localStorage.setItem('dailyQuotes', JSON.stringify(dailyQuotes));
             localStorage.setItem('dailyGratitudes', JSON.stringify(dailyGratitudes));
-            // 일정 데이터 저장 추가
             localStorage.setItem('dailySchedules', JSON.stringify(dailySchedules));
         }
 
@@ -1189,10 +1197,13 @@
                 progressBarsHtml += `</div>`;
 
                 dayDiv.innerHTML = topHtml + progressBarsHtml;
+                
+                // 달력에서 날짜 클릭 시 해당 날짜 표시 및 모달 닫기
                 dayDiv.onclick = () => {
                     selectedDate = new Date(year, month, i);
                     renderCalendar();
                     updateDailyView();
+                    closeCalendarModal(); // UX 개선: 날짜 선택 후 모달을 자동으로 닫음
                 };
                 daysContainer.appendChild(dayDiv);
             }
@@ -1213,8 +1224,10 @@
         function updateDailyView() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
+            // 메인 화면 상단의 날짜 버튼 텍스트도 같이 업데이트
+            document.getElementById('today-display').innerText = formatDisplayDate(selectedDate);
             
-            // 글귀 바인딩 (이전 날짜에서 상속된 값 포함)
+            // 글귀 바인딩
             const quoteDisplayEl = document.getElementById('daily-quote-display');
             const effectiveQuote = getEffectiveQuote(dateStr);
             
@@ -1290,7 +1303,6 @@
                         const freqText = getFreqText(parent.frequency);
                         const freqBadge = freqText ? `<span class="ml-2 text-xs font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${freqText}</span>` : '';
 
-                        // 텍스트 클래스 조정
                         let textClass = 'text-slate-800 text-base font-semibold';
                         if (!isParentCompleted && !isNextFound) {
                             textClass = 'text-slate-900 text-lg font-extrabold';
@@ -1325,7 +1337,6 @@
                             html += `<div class="bg-slate-50/50 border-t border-slate-100 py-1 pl-1">`;
                             parent.subHabits.forEach(sub => {
                                 const isSubCompleted = completedIds.includes(sub.id);
-                                // 하위 습관 텍스트 클래스 조정
                                 let subTextClass = 'text-slate-700 text-sm font-normal';
                                 if (!isSubCompleted && !isNextFound) {
                                     subTextClass = 'text-slate-900 text-base font-bold';
