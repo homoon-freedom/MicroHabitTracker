@@ -163,40 +163,43 @@
                 </div>
             </div>
 
-            <!-- 높이를 800px에서 1600px로 2배 증가 -->
-            <div id="col-tracking" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[1200px] overflow-hidden transition-all duration-300">
+            <!-- 수정된 col-tracking 영역: 감사하기 창이 아래로 커지도록 구조 변경 -->
+            <div id="col-tracking" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden transition-all duration-300">
                 
-                <!-- 상단 헤더 & 힘이 되는 글귀 읽기 영역 -->
-                <div class="p-6 bg-slate-50 border-b border-slate-100 shrink-0">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
-                            <i class="fas fa-tasks text-blue-500"></i>
-                            <span id="selected-date-title"></span>
-                        </h2>
+                <!-- 상단 고정 영역 (헤더 + 습관 리스트): 이 부분의 높이를 고정하여 하단 창이 밀려나도록 함 -->
+                <div class="flex flex-col h-[1050px]">
+                    <!-- 상단 헤더 & 힘이 되는 글귀 읽기 영역 -->
+                    <div class="p-6 bg-slate-50 border-b border-slate-100 shrink-0">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                                <i class="fas fa-tasks text-blue-500"></i>
+                                <span id="selected-date-title"></span>
+                            </h2>
+                            
+                            <!-- 주요일정 버튼 영역 -->
+                            <div class="flex items-center gap-3">
+                                <button onclick="openScheduleModal()" class="text-xs px-2.5 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition font-bold flex items-center gap-1.5 shadow-sm border border-indigo-100">
+                                    <i class="far fa-calendar-check"></i>주요일정
+                                </button>
+                                <p class="text-sm font-medium text-slate-500" id="daily-progress-text">완료율: 0%</p>
+                            </div>
+                        </div>
                         
-                        <!-- 추가된 주요일정 버튼 영역 -->
-                        <div class="flex items-center gap-3">
-                            <button onclick="openScheduleModal()" class="text-xs px-2.5 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition font-bold flex items-center gap-1.5 shadow-sm border border-indigo-100">
-                                <i class="far fa-calendar-check"></i>주요일정
-                            </button>
-                            <p class="text-sm font-medium text-slate-500" id="daily-progress-text">완료율: 0%</p>
+                        <div class="mt-4">
+                            <div class="flex items-center justify-between mb-1.5 px-2">
+                                <label class="block text-xs font-bold text-slate-500"><i class="fas fa-quote-left text-slate-300 mr-1"></i>오늘 아침, 힘이 되는 글귀</label>
+                                <button onclick="openQuoteModal()" class="text-xs text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
+                            </div>
+                            <div id="daily-quote-display" onclick="openQuoteModal()" class="w-full px-2 py-2 text-base text-slate-700 font-medium cursor-pointer hover:bg-slate-200/50 rounded-lg transition min-h-[3rem] whitespace-pre-wrap leading-relaxed"></div>
                         </div>
                     </div>
                     
-                    <div class="mt-4">
-                        <div class="flex items-center justify-between mb-1.5 px-2">
-                            <label class="block text-xs font-bold text-slate-500"><i class="fas fa-quote-left text-slate-300 mr-1"></i>오늘 아침, 힘이 되는 글귀</label>
-                            <button onclick="openQuoteModal()" class="text-xs text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
+                    <!-- 일일 습관 체크리스트 영역 -->
+                    <div class="p-6 overflow-y-auto flex-1 bg-white" id="daily-habits-container">
+                        <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
+                            <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
+                            <p>등록된 습관이 없습니다.<br>상단의 '습관 관리 열기'를 눌러 새로운 습관을 추가해보세요!</p>
                         </div>
-                        <div id="daily-quote-display" onclick="openQuoteModal()" class="w-full px-2 py-2 text-base text-slate-700 font-medium cursor-pointer hover:bg-slate-200/50 rounded-lg transition min-h-[3rem] whitespace-pre-wrap leading-relaxed"></div>
-                    </div>
-                </div>
-                
-                <!-- 일일 습관 체크리스트 영역 -->
-                <div class="p-6 overflow-y-auto flex-1 bg-white" id="daily-habits-container">
-                    <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
-                        <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
-                        <p>등록된 습관이 없습니다.<br>상단의 '습관 관리 열기'를 눌러 새로운 습관을 추가해보세요!</p>
                     </div>
                 </div>
 
@@ -210,6 +213,7 @@
 
             </div>
 
+            <!-- 달력 및 습관 요약 리스트 영역 -->
             <div id="col-calendar" class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[800px] transition-all duration-300">
                 <div class="flex items-center justify-between mb-6 shrink-0">
                     <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
