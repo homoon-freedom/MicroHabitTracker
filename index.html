@@ -168,7 +168,7 @@
             <div id="col-tracking" class="lg:col-span-12 max-w-3xl w-full mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden transition-all duration-300">
                 
                 <!-- 상단 고정 영역 (헤더 + 습관 리스트): 이 부분의 높이를 고정하여 하단 창이 밀려나도록 함 -->
-                <div class="flex flex-col h-[1050px]">
+                <div class="flex flex-col min-h-[1050px]">
                     <!-- 상단 헤더 & 힘이 되는 글귀 읽기 영역 -->
                     <div class="p-6 bg-slate-50 border-b border-slate-100 shrink-0">
                         <div class="flex items-center justify-between mb-2">
@@ -196,7 +196,7 @@
                     </div>
                     
                     <!-- 일일 습관 체크리스트 영역 -->
-                    <div class="p-6 overflow-y-auto flex-1 bg-white custom-scrollbar" id="daily-habits-container">
+                    <div class="p-6 overflow-y-auto flex-1 bg-white custom-scrollbar min-h-[800px]" id="daily-habits-container">
                         <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
                             <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
                             <p>등록된 습관이 없습니다.<br>상단의 '습관 관리 열기'를 눌러 새로운 습관을 추가해보세요!</p>
