@@ -1252,7 +1252,7 @@
 
             const overallProgress = calculateOverallProgress(dateStr);
             const progressText = document.getElementById('daily-progress-text');
-            progressText.innerText = getTotalHabitCount(dateStr) === 0 ? '이날 등록된 습관이 없습니다.' : `달성률:${overallProgress}%`;
+            progressText.innerText = getTotalHabitCount(dateStr) === 0 ? '이날 등록된 습관이 없습니다.' : `(달성률:${overallProgress}%)`;
             
             const container = document.getElementById('daily-habits-container');
             const emptyMsg = document.getElementById('empty-habits-msg');
