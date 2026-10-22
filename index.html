@@ -171,20 +171,21 @@
                 <div class="flex flex-col min-h-[1050px]">
                     <!-- 상단 헤더 & 힘이 되는 글귀 읽기 영역 -->
                     <div class="p-6 bg-slate-50 border-b border-slate-100 shrink-0">
-                        <div class="flex items-center justify-between mb-2">
-                            <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
-                                <i class="fas fa-tasks text-blue-500"></i>
-                                <span id="selected-date-title"></span>
-                            </h2>
-                            
-                            <!-- 주요일정 버튼 영역 -->
-                            <div class="flex items-center gap-3">
-                                <button onclick="openScheduleModal()" class="text-xs px-2.5 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition font-bold flex items-center gap-1.5 shadow-sm border border-indigo-100">
-                                    <i class="far fa-calendar-check"></i>메모
-                                </button>
-                                <p class="text-sm font-medium text-slate-500" id="daily-progress-text">완료율: 0%</p>
-                            </div>
-                        </div>
+<div class="flex items-center justify-between mb-2 gap-2">
+    <!-- whitespace-nowrap 추가로 날짜 줄바꿈 방지 -->
+    <h2 class="text-base font-medium text-slate-700 flex items-center gap-1 whitespace-nowrap shrink-0">
+        <i class="fas fa-tasks text-blue-500"></i>
+        <span id="selected-date-title"></span>
+    </h2>
+    
+    <!-- shrink-0 추가로 우측 영역 찌그러짐 방지 -->
+    <div class="flex items-center gap-2 shrink-0">
+        <button onclick="openScheduleModal()" class="text-xs px-2.5 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition font-bold flex items-center gap-1.5 shadow-sm border border-indigo-100 whitespace-nowrap">
+            <i class="far fa-calendar-check"></i>메모
+        </button>
+        <p class="text-sm font-medium text-slate-500 whitespace-nowrap" id="daily-progress-text">달성률: 0%</p>
+    </div>
+</div>
                         
                         <div class="mt-4">
                             <div class="flex items-center justify-between mb-1.5 px-2">
