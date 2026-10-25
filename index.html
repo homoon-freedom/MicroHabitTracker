@@ -210,7 +210,7 @@
         </div>
     </div>
 
-    <!-- 모달창 영역들은 기존과 동일하게 유지됩니다 -->
+    <!-- 모달창 영역 -->
     <div id="calendar-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[90] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100 flex flex-col h-[85vh] max-h-[950px] transition-all duration-300 relative">
             <div class="flex items-center justify-between mb-6 shrink-0">
@@ -858,9 +858,6 @@
             saveData(); updateDailyView(); renderCalendar(); 
         }
 
-        // ==========================================
-        //  수정된 updateDailyView 함수 영역 시작
-        // ==========================================
         function updateDailyView() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
@@ -909,7 +906,6 @@
                     return ia - ib;
                 });
 
-                // ★ 추가된 로직: 현재 화면에 렌더링되는 모든 습관들의 순서를 구하고 마지막으로 체크된 항목의 인덱스 찾기
                 let flatItems = [];
                 sortedTimes.forEach(time => {
                     grouped[time].forEach(parent => {
@@ -930,7 +926,7 @@
                     }
                 });
 
-                let currentIndex = 0; // 렌더링하면서 현재 인덱스를 추적
+                let currentIndex = 0;
 
                 sortedTimes.forEach(time => {
                     const section = document.createElement('div');
@@ -956,13 +952,10 @@
                         const freqText = getFreqText(parent.frequency);
                         const freqBadge = freqText ? `<span class="ml-2 text-xs font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${freqText}</span>` : '';
 
-                        // ★ 로직 변경: 마지막으로 체크한 항목을 기준으로 텍스트 스타일 지정
-                        let textClass = 'text-slate-800 text-base font-semibold'; // 기본 미완료 상태 (평범)
+                        let textClass = 'text-slate-800 text-base font-semibold';
                         if (isParentCompleted || (!isParentCompleted && currentIndex < lastCheckedIndex)) {
-                            // 이미 체크했거나, 체크 못하고 넘어간 건너뛴 항목 -> 연하게 처리
                             textClass = 'text-slate-500 text-base font-semibold';
                         } else if (currentIndex === lastCheckedIndex + 1) {
-                            // 마지막 체크 항목의 바로 다음 목표 -> 굵게 강조 (양치질처럼)
                             textClass = 'text-slate-900 text-lg font-extrabold';
                         }
                         currentIndex++;
@@ -994,12 +987,11 @@
                             parent.subHabits.forEach(sub => {
                                 const isSubCompleted = completedIds.includes(sub.id);
                                 
-                                // ★ 서브 습관에도 동일한 텍스트 강조 로직 적용
-                                let subTextClass = 'text-slate-700 text-sm font-normal'; // 기본
+                                let subTextClass = 'text-slate-700 text-base font-normal';
                                 if (isSubCompleted || (!isSubCompleted && currentIndex < lastCheckedIndex)) {
-                                    subTextClass = 'text-slate-400 text-sm font-normal'; // 완료 및 스킵됨 -> 연하게
+                                    subTextClass = 'text-slate-400 text-base font-normal';
                                 } else if (currentIndex === lastCheckedIndex + 1) {
-                                    subTextClass = 'text-slate-900 text-base font-bold'; // 다음 타겟 -> 강조
+                                    subTextClass = 'text-slate-900 text-lg font-bold';
                                 }
                                 currentIndex++;
                                 
@@ -1028,9 +1020,6 @@
             }
             updateCalendarBottomSummary(dateStr, activeHabits);
         }
-        // ==========================================
-        //  수정된 updateDailyView 함수 영역 끝
-        // ==========================================
 
         function updateCalendarBottomSummary(dateStr, activeHabits) {
             const container = document.getElementById('calendar-bottom-summary');
