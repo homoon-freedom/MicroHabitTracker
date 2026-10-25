@@ -100,7 +100,6 @@
                     <i id="toggle-manager-icon" class="fas fa-cog"></i>
                     <span id="toggle-manager-text">습관 관리 열기</span>
                 </button>
-                <!-- 날짜 표시 버튼: 클릭 시 달력 모달창 열림 -->
                 <button onclick="openCalendarModal()" class="px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
                     <i class="far fa-calendar-check text-blue-500"></i>
                     <span id="today-display" class="font-medium text-slate-700"></span>
@@ -164,31 +163,23 @@
                 </div>
             </div>
 
-            <!-- 메인 화면을 중앙으로 정렬 (달력이 모달로 빠졌으므로 너비 전체 사용) -->
             <div id="col-tracking" class="lg:col-span-12 max-w-3xl w-full mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden transition-all duration-300">
                 
-                <!-- 상단 고정 영역 (헤더 + 습관 리스트): 이 부분의 높이를 고정하여 하단 창이 밀려나도록 함 -->
                 <div class="flex flex-col h-fit">
-                    <!-- 상단 헤더 & 힘이 되는 글귀 읽기 영역 -->
                     <div class="p-6 bg-slate-50 border-b border-slate-100 shrink-0">
-<div class="flex items-center justify-between mb-2 gap-2">
-    <!-- 1. 날짜 (글씨 크기: text-base -> text-lg로 확대) -->
-    <h2 class="text-lg font-medium text-slate-700 flex items-center gap-1 whitespace-nowrap shrink-0">
-        <i class="fas fa-tasks text-blue-500"></i>
-        <span id="selected-date-title"></span>
-    </h2>
-    
-    <!-- 우측 영역 (달성률 -> 메모 순서로 배치) -->
-    <div class="flex items-center gap-3 shrink-0">
-        <!-- 2. 달성률 (글씨 크기: text-sm -> text-base로 확대) -->
-        <p class="text-base font-medium text-slate-500 whitespace-nowrap" id="daily-progress-text">(달성률:0%)</p>
-        
-        <!-- 3. 메모 버튼 (글씨 크기: text-xs -> text-sm으로 확대) -->
-        <button onclick="openScheduleModal()" class="text-sm px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition font-bold flex items-center gap-1.5 shadow-sm border border-indigo-100 whitespace-nowrap">
-            <i class="far fa-calendar-check"></i>메모
-        </button>
-    </div>
-</div>
+                        <div class="flex items-center justify-between mb-2 gap-2">
+                            <h2 class="text-lg font-medium text-slate-700 flex items-center gap-1 whitespace-nowrap shrink-0">
+                                <i class="fas fa-tasks text-blue-500"></i>
+                                <span id="selected-date-title"></span>
+                            </h2>
+                            
+                            <div class="flex items-center gap-3 shrink-0">
+                                <p class="text-base font-medium text-slate-500 whitespace-nowrap" id="daily-progress-text">(달성률:0%)</p>
+                                <button onclick="openScheduleModal()" class="text-sm px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition font-bold flex items-center gap-1.5 shadow-sm border border-indigo-100 whitespace-nowrap">
+                                    <i class="far fa-calendar-check"></i>메모
+                                </button>
+                            </div>
+                        </div>
                         
                         <div class="mt-4">
                             <div class="flex items-center justify-between mb-1.5 px-2">
@@ -199,7 +190,6 @@
                         </div>
                     </div>
                     
-                    <!-- 일일 습관 체크리스트 영역 -->
                     <div class="p-6 flex-1 bg-white" id="daily-habits-container">
                         <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
                             <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
@@ -208,7 +198,6 @@
                     </div>
                 </div>
 
-                <!-- 하단 감사하기 입력 영역 -->
                 <div class="p-5 bg-slate-50 border-t border-slate-100 shrink-0">
                     <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
                         <i class="fas fa-heart text-pink-500"></i>감사하기
@@ -221,28 +210,19 @@
         </div>
     </div>
 
-    <!-- 달력 모달창 (기존 메인 화면에서 모달로 이동) -->
+    <!-- 모달창 영역들은 기존과 동일하게 유지됩니다 -->
     <div id="calendar-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[90] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100 flex flex-col h-[85vh] max-h-[950px] transition-all duration-300 relative">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <h2 class="text-xl font-semibold text-slate-800" id="current-month-year"></h2>
                 <div class="flex gap-2 items-center">
-                    <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">
-                        오늘
-                    </button>
-                    <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                    <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600"><i class="fas fa-chevron-left"></i></button>
+                    <button onclick="goToToday()" class="px-3 py-1 text-sm rounded-full bg-slate-100 hover:bg-slate-200 transition text-slate-700 font-medium">오늘</button>
+                    <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600"><i class="fas fa-chevron-right"></i></button>
                     <div class="w-px h-4 bg-slate-200 mx-1"></div>
-                    <button onclick="closeCalendarModal()" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-400 hover:text-slate-600">
-                        <i class="fas fa-times text-lg"></i>
-                    </button>
+                    <button onclick="closeCalendarModal()" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-400 hover:text-slate-600"><i class="fas fa-times text-lg"></i></button>
                 </div>
             </div>
-
             <div class="calendar-grid mb-2 shrink-0">
                 <div class="text-center text-xs font-semibold text-red-400">일</div>
                 <div class="text-center text-xs font-semibold text-slate-500">월</div>
@@ -252,21 +232,14 @@
                 <div class="text-center text-xs font-semibold text-slate-500">금</div>
                 <div class="text-center text-xs font-semibold text-blue-400">토</div>
             </div>
-
             <div id="calendar-days" class="calendar-grid content-start gap-y-4 mb-4 shrink-0"></div>
-
             <div id="calendar-bottom-summary" class="flex-1 flex flex-col min-h-0 border-t border-slate-100 pt-4 mt-auto"></div>
         </div>
     </div>
 
-    <!-- 오늘 주요일정 모달창 -->
     <div id="schedule-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i class="fas fa-calendar-day text-indigo-500"></i>오늘의 주요일정
-            </h3>
-            
-            <!-- 읽기 모드 영역 -->
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-calendar-day text-indigo-500"></i>오늘의 주요일정</h3>
             <div id="schedule-read-mode" class="block">
                 <div id="schedule-display" class="w-full min-h-[6rem] px-4 py-3 bg-slate-50 rounded-xl text-base text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-100"></div>
                 <div class="flex justify-end gap-2 mt-4">
@@ -274,8 +247,6 @@
                     <button onclick="toggleScheduleEditMode(true)" class="px-4 py-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition font-medium border border-indigo-100">수정</button>
                 </div>
             </div>
-
-            <!-- 편집(수정) 모드 영역 -->
             <div id="schedule-edit-mode" class="hidden">
                 <textarea id="schedule-textarea" rows="5" placeholder="오늘 잊지 말아야 할 중요한 일정이나 할 일을 메모해보세요." class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-base focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition shadow-sm resize-none text-slate-700"></textarea>
                 <div class="flex justify-end gap-2 mt-4">
@@ -286,15 +257,11 @@
         </div>
     </div>
 
-    <!-- Quote Input Modal -->
     <div id="quote-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i class="fas fa-quote-left text-blue-500"></i>힘이 되는 글귀 입력
-            </h3>
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-quote-left text-blue-500"></i>힘이 되는 글귀 입력</h3>
             <p class="text-xs text-slate-500 mb-3 ml-1">입력하신 문구는 새로운 문구를 작성하기 전까지 이후 날짜에도 계속 표시됩니다.</p>
             <textarea id="quote-modal-textarea" rows="12" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-sm resize-none text-slate-700 overflow-y-auto custom-scrollbar"></textarea>
-            
             <div class="flex justify-end gap-2 mt-4">
                 <button onclick="closeQuoteModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
                 <button onclick="saveQuoteModal()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium">저장</button>
@@ -302,14 +269,11 @@
         </div>
     </div>
 
-    <!-- Edit Habit Modal -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
             <h3 class="text-lg font-bold text-slate-800 mb-4">습관 수정</h3>
-            
             <label class="block text-xs text-slate-500 mb-1 ml-1">습관 이름</label>
             <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 text-base">
-            
             <div id="edit-frequency-section" class="hidden mb-4 border-b border-slate-100 pb-4">
                 <label class="block text-xs text-slate-500 mb-1 ml-1">습관 주기</label>
                 <div class="flex gap-2">
@@ -323,7 +287,6 @@
                     <input type="number" id="edit-habit-freq-value" placeholder="주기" min="1" class="hidden w-20 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
                 </div>
             </div>
-
             <div id="edit-periodic-dates" class="hidden mb-6">
                 <div class="flex gap-2">
                     <div class="flex-1">
@@ -336,7 +299,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="flex justify-end gap-2 mt-2">
                 <button onclick="closeEditModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
                 <button onclick="saveEditHabit()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium">저장</button>
@@ -344,7 +306,6 @@
         </div>
     </div>
 
-    <!-- Periodic Habits List Modal -->
     <div id="periodic-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[60] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-xl shadow-xl border border-slate-100 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
@@ -355,12 +316,9 @@
         </div>
     </div>
 
-    <!-- Postpone Modal -->
     <div id="postpone-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[80] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <i class="fas fa-calendar-plus text-blue-500"></i> 습관 일정 미루기
-            </h3>
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-calendar-plus text-blue-500"></i> 습관 일정 미루기</h3>
             <p class="text-sm text-slate-600 mb-4">
                 <span id="postpone-habit-name" class="font-bold text-slate-800"></span> 습관을 언제로 미루시겠습니까?<br>
                 <span class="text-xs text-slate-400 block mt-1">선택하신 날짜 기준으로 다음 주기가 새롭게 세팅됩니다.<br>(기존 일정: <span id="postpone-old-date" class="font-semibold"></span>)</span>
@@ -404,7 +362,6 @@
         let records = JSON.parse(localStorage.getItem('records')) || {};
         let dailyQuotes = JSON.parse(localStorage.getItem('dailyQuotes')) || {};
         let dailyGratitudes = JSON.parse(localStorage.getItem('dailyGratitudes')) || {};
-        
         let dailySchedules = JSON.parse(localStorage.getItem('dailySchedules')) || {};
         
         let currentMonthDate = new Date();
@@ -416,106 +373,55 @@
         const HABIT_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
         const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50'];
 
-        function autoResize(element) {
-            element.style.height = 'auto';
-            element.style.height = element.scrollHeight + 'px';
-        }
-
+        function autoResize(element) { element.style.height = 'auto'; element.style.height = element.scrollHeight + 'px'; }
         function getEffectiveQuote(targetDateStr) {
             const dates = Object.keys(dailyQuotes).sort();
             let effectiveQuote = '';
             for (let i = 0; i < dates.length; i++) {
-                if (dates[i] <= targetDateStr) {
-                    effectiveQuote = dailyQuotes[dates[i]];
-                } else {
-                    break;
-                }
+                if (dates[i] <= targetDateStr) effectiveQuote = dailyQuotes[dates[i]];
+                else break;
             }
             return effectiveQuote;
         }
 
-        /* --- 달력 모달 관련 함수들 --- */
-        function openCalendarModal() {
-            document.getElementById('calendar-modal').classList.remove('hidden');
-            renderCalendar(); // 모달 열 때 최신 상태 렌더링
-        }
-        
-        function closeCalendarModal() {
-            document.getElementById('calendar-modal').classList.add('hidden');
-        }
-
-        /* --- 주요일정 관련 함수들 --- */
+        function openCalendarModal() { document.getElementById('calendar-modal').classList.remove('hidden'); renderCalendar(); }
+        function closeCalendarModal() { document.getElementById('calendar-modal').classList.add('hidden'); }
         function openScheduleModal() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             const currentSchedule = dailySchedules[dateStr] || '';
-            
             const displayEl = document.getElementById('schedule-display');
-            if (currentSchedule.trim() === '') {
-                displayEl.innerHTML = '<span class="text-slate-400">등록된 일정이 없습니다. 하단의 수정 버튼을 눌러 추가해보세요.</span>';
-            } else {
-                displayEl.innerText = currentSchedule;
-            }
-            
+            if (currentSchedule.trim() === '') displayEl.innerHTML = '<span class="text-slate-400">등록된 일정이 없습니다. 하단의 수정 버튼을 눌러 추가해보세요.</span>';
+            else displayEl.innerText = currentSchedule;
             document.getElementById('schedule-textarea').value = currentSchedule;
             toggleScheduleEditMode(false);
             document.getElementById('schedule-modal').classList.remove('hidden');
         }
-
-        function closeScheduleModal() {
-            document.getElementById('schedule-modal').classList.add('hidden');
-        }
-
+        function closeScheduleModal() { document.getElementById('schedule-modal').classList.add('hidden'); }
         function toggleScheduleEditMode(isEdit) {
             const readMode = document.getElementById('schedule-read-mode');
             const editMode = document.getElementById('schedule-edit-mode');
-            
-            if (isEdit) {
-                readMode.classList.add('hidden');
-                editMode.classList.remove('hidden');
-                document.getElementById('schedule-textarea').focus();
-            } else {
-                readMode.classList.remove('hidden');
-                editMode.classList.add('hidden');
-            }
+            if (isEdit) { readMode.classList.add('hidden'); editMode.classList.remove('hidden'); document.getElementById('schedule-textarea').focus(); } 
+            else { readMode.classList.remove('hidden'); editMode.classList.add('hidden'); }
         }
-
         function saveScheduleModal() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             const val = document.getElementById('schedule-textarea').value.trim();
-            
-            if (val === '') {
-                delete dailySchedules[dateStr];
-            } else {
-                dailySchedules[dateStr] = val;
-            }
-            saveData();
-            openScheduleModal(); 
+            if (val === '') delete dailySchedules[dateStr];
+            else dailySchedules[dateStr] = val;
+            saveData(); openScheduleModal(); 
         }
 
-        /* --- 기타 모달 및 유틸 함수들 --- */
         function openQuoteModal() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
-            const currentQuote = getEffectiveQuote(dateStr);
-            document.getElementById('quote-modal-textarea').value = currentQuote;
+            document.getElementById('quote-modal-textarea').value = getEffectiveQuote(dateStr);
             document.getElementById('quote-modal').classList.remove('hidden');
         }
-
-        function closeQuoteModal() {
-            document.getElementById('quote-modal').classList.add('hidden');
-        }
-
+        function closeQuoteModal() { document.getElementById('quote-modal').classList.add('hidden'); }
         function saveQuoteModal() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             const val = document.getElementById('quote-modal-textarea').value.trim();
-            
-            if (val === '') {
-                delete dailyQuotes[dateStr];
-            } else {
-                dailyQuotes[dateStr] = val;
-            }
-            saveData();
-            closeQuoteModal();
-            updateDailyView();
+            if (val === '') delete dailyQuotes[dateStr]; else dailyQuotes[dateStr] = val;
+            saveData(); closeQuoteModal(); updateDailyView();
         }
 
         function getTimeColor(timeStr) {
@@ -523,43 +429,23 @@
             if (index === -1) return 'text-slate-500 bg-slate-100';
             return TIME_COLORS[index % TIME_COLORS.length];
         }
-
         function formatDateToYYYYMMDD(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
+            const year = date.getFullYear(); const month = String(date.getMonth() + 1).padStart(2, '0'); const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
-
-        function formatDisplayDate(date) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
-            return date.toLocaleDateString('ko-KR', options);
-        }
-        
-        function parseDateStr(str) {
-            const [y, m, d] = str.split('-');
-            return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-        }
-
-        function generateId() {
-            return Math.random().toString(36).substr(2, 9);
-        }
-
+        function formatDisplayDate(date) { return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' }); }
+        function parseDateStr(str) { const [y, m, d] = str.split('-'); return new Date(parseInt(y), parseInt(m) - 1, parseInt(d)); }
+        function generateId() { return Math.random().toString(36).substr(2, 9); }
         function saveData() {
-            localStorage.setItem('customTimes', JSON.stringify(customTimes));
-            localStorage.setItem('habits', JSON.stringify(habits));
-            localStorage.setItem('records', JSON.stringify(records));
-            localStorage.setItem('dailyQuotes', JSON.stringify(dailyQuotes));
-            localStorage.setItem('dailyGratitudes', JSON.stringify(dailyGratitudes));
-            localStorage.setItem('dailySchedules', JSON.stringify(dailySchedules));
+            localStorage.setItem('customTimes', JSON.stringify(customTimes)); localStorage.setItem('habits', JSON.stringify(habits));
+            localStorage.setItem('records', JSON.stringify(records)); localStorage.setItem('dailyQuotes', JSON.stringify(dailyQuotes));
+            localStorage.setItem('dailyGratitudes', JSON.stringify(dailyGratitudes)); localStorage.setItem('dailySchedules', JSON.stringify(dailySchedules));
         }
-
         function saveDailyText(type) {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             if (type === 'gratitude') {
                 const val = document.getElementById('daily-gratitude').value;
-                if (val.trim() === '') delete dailyGratitudes[dateStr];
-                else dailyGratitudes[dateStr] = val;
+                if (val.trim() === '') delete dailyGratitudes[dateStr]; else dailyGratitudes[dateStr] = val;
             }
             saveData();
         }
@@ -567,12 +453,7 @@
         function init() {
             document.getElementById('today-display').innerText = formatDisplayDate(new Date());
             document.getElementById('new-habit-start-date').value = formatDateToYYYYMMDD(new Date());
-            
-            updateTimeSelects();
-            checkFreqType(); 
-            renderCalendar();
-            renderManagedHabits();
-            updateDailyView();
+            updateTimeSelects(); checkFreqType(); renderCalendar(); renderManagedHabits(); updateDailyView();
         }
 
         function toggleHabitManager() {
@@ -580,17 +461,12 @@
             const colManager = document.getElementById('col-manager');
             const toggleIcon = document.getElementById('toggle-manager-icon');
             const toggleText = document.getElementById('toggle-manager-text');
-
             if (isManagerVisible) {
-                colManager.classList.remove('hidden');
-                colManager.classList.add('flex');
-                toggleText.innerText = '습관 관리 닫기';
-                toggleIcon.className = 'fas fa-times';
+                colManager.classList.remove('hidden'); colManager.classList.add('flex');
+                toggleText.innerText = '습관 관리 닫기'; toggleIcon.className = 'fas fa-times';
             } else {
-                colManager.classList.add('hidden');
-                colManager.classList.remove('flex');
-                toggleText.innerText = '습관 관리 열기';
-                toggleIcon.className = 'fas fa-cog';
+                colManager.classList.add('hidden'); colManager.classList.remove('flex');
+                toggleText.innerText = '습관 관리 열기'; toggleIcon.className = 'fas fa-cog';
             }
         }
 
@@ -599,94 +475,53 @@
             select.innerHTML = customTimes.map(t => `<option value="${t}">${t}</option>`).join('');
             select.innerHTML += `<option value="custom">+ 직접 입력</option>`;
         }
-
         function checkCustomTime() {
-            const select = document.getElementById('new-habit-time');
-            const input = document.getElementById('custom-time-input');
-            if (select.value === 'custom') {
-                input.classList.remove('hidden');
-                input.focus();
-            } else {
-                input.classList.add('hidden');
-                input.value = '';
-            }
+            const select = document.getElementById('new-habit-time'); const input = document.getElementById('custom-time-input');
+            if (select.value === 'custom') { input.classList.remove('hidden'); input.focus(); } else { input.classList.add('hidden'); input.value = ''; }
         }
-
         function checkFreqType() {
-            const typeSelect = document.getElementById('new-habit-freq-type');
-            const valueInput = document.getElementById('new-habit-freq-value');
-            if (typeSelect.value !== 'daily' && typeSelect.value !== 'weekdays') {
-                valueInput.classList.remove('hidden');
-            } else {
-                valueInput.classList.add('hidden');
-            }
+            const typeSelect = document.getElementById('new-habit-freq-type'); const valueInput = document.getElementById('new-habit-freq-value');
+            if (typeSelect.value !== 'daily' && typeSelect.value !== 'weekdays') valueInput.classList.remove('hidden'); else valueInput.classList.add('hidden');
         }
-        
         function checkEditFreqType() {
-            const typeSelect = document.getElementById('edit-habit-freq-type');
-            const valueInput = document.getElementById('edit-habit-freq-value');
-            if (typeSelect.value !== 'daily' && typeSelect.value !== 'weekdays') {
-                valueInput.classList.remove('hidden');
-            } else {
-                valueInput.classList.add('hidden');
-            }
+            const typeSelect = document.getElementById('edit-habit-freq-type'); const valueInput = document.getElementById('edit-habit-freq-value');
+            if (typeSelect.value !== 'daily' && typeSelect.value !== 'weekdays') valueInput.classList.remove('hidden'); else valueInput.classList.add('hidden');
         }
 
         function isHabitActiveOnDate(habit, dateStr) {
             const target = parseDateStr(dateStr);
-            
-            if (habit.startDate) {
-                const start = parseDateStr(habit.startDate);
-                if (target < start) return false;
-            }
-            
-            if (habit.endDate) {
-                const end = parseDateStr(habit.endDate);
-                if (target > end) return false;
-            }
-
+            if (habit.startDate && target < parseDateStr(habit.startDate)) return false;
+            if (habit.endDate && target > parseDateStr(habit.endDate)) return false;
             if (habit.frequency && habit.frequency.type === 'weekdays') {
                 const dayOfWeek = target.getDay();
-                if (dayOfWeek === 0 || dayOfWeek === 6 || PUBLIC_HOLIDAYS.includes(dateStr)) {
-                    return false;
-                }
+                if (dayOfWeek === 0 || dayOfWeek === 6 || PUBLIC_HOLIDAYS.includes(dateStr)) return false;
                 return true;
             }
-
             if (!habit.frequency || habit.frequency.type === 'daily') return true;
 
             let baseDateStr = habit.startDate || formatDateToYYYYMMDD(new Date());
-            
             if (habit.anchors && habit.anchors.length > 0) {
                 let applicableAnchor = null;
                 for (let i = 0; i < habit.anchors.length; i++) {
-                    if (habit.anchors[i].effectiveFrom <= dateStr) {
-                        applicableAnchor = habit.anchors[i];
-                    }
+                    if (habit.anchors[i].effectiveFrom <= dateStr) applicableAnchor = habit.anchors[i];
                 }
                 if (applicableAnchor) {
                     baseDateStr = applicableAnchor.baseDate;
                     if (dateStr < applicableAnchor.baseDate) return false;
                 }
             }
-
             const start = parseDateStr(baseDateStr);
             const diffTime = target.getTime() - start.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-            if (habit.frequency.type === 'days') {
-                return diffDays % habit.frequency.value === 0;
-            } else if (habit.frequency.type === 'weeks') {
-                return diffDays % (habit.frequency.value * 7) === 0;
-            } else if (habit.frequency.type === 'months') {
+            if (habit.frequency.type === 'days') return diffDays % habit.frequency.value === 0;
+            else if (habit.frequency.type === 'weeks') return diffDays % (habit.frequency.value * 7) === 0;
+            else if (habit.frequency.type === 'months') {
                 const monthDiff = (target.getFullYear() - start.getFullYear()) * 12 + (target.getMonth() - start.getMonth());
-                if (monthDiff < 0) return false;
-                if (monthDiff % habit.frequency.value !== 0) return false;
-                
+                if (monthDiff < 0 || monthDiff % habit.frequency.value !== 0) return false;
                 const startDay = start.getDate();
                 const targetDay = target.getDate();
                 const daysInTargetMonth = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
-                
                 if (startDay > daysInTargetMonth) return targetDay === daysInTargetMonth;
                 return targetDay === startDay;
             }
@@ -694,83 +529,41 @@
         }
 
         function addParentHabit() {
-            const nameInput = document.getElementById('new-habit-name');
-            const timeSelect = document.getElementById('new-habit-time');
-            const customTimeInput = document.getElementById('custom-time-input');
-            const freqType = document.getElementById('new-habit-freq-type').value;
-            const freqValueInput = document.getElementById('new-habit-freq-value');
-            const startDateInput = document.getElementById('new-habit-start-date');
+            const nameInput = document.getElementById('new-habit-name'); const timeSelect = document.getElementById('new-habit-time');
+            const customTimeInput = document.getElementById('custom-time-input'); const freqType = document.getElementById('new-habit-freq-type').value;
+            const freqValueInput = document.getElementById('new-habit-freq-value'); const startDateInput = document.getElementById('new-habit-start-date');
             const endDateInput = document.getElementById('new-habit-end-date');
             
-            const name = nameInput.value.trim();
-            let time = timeSelect.value;
-            let freqValue = parseInt(freqValueInput.value);
-
+            const name = nameInput.value.trim(); let time = timeSelect.value; let freqValue = parseInt(freqValueInput.value);
             if (time === 'custom') {
                 time = customTimeInput.value.trim();
-                if (time && !customTimes.includes(time)) {
-                    customTimes.push(time);
-                    updateTimeSelects();
-                }
+                if (time && !customTimes.includes(time)) { customTimes.push(time); updateTimeSelects(); }
             }
-
             if (!name || !time) {
-                nameInput.classList.add('border-red-500');
-                setTimeout(() => nameInput.classList.remove('border-red-500'), 1000);
-                return;
+                nameInput.classList.add('border-red-500'); setTimeout(() => nameInput.classList.remove('border-red-500'), 1000); return;
             }
-
             if (isNaN(freqValue) || freqValue < 1) freqValue = 1;
+            let startDate = startDateInput.value || formatDateToYYYYMMDD(new Date()); let endDate = endDateInput.value || null;
 
-            let startDate = startDateInput.value || formatDateToYYYYMMDD(new Date());
-            let endDate = endDateInput.value || null;
-
-            habits.push({
-                id: generateId(),
-                name: name,
-                time: time,
-                isExpanded: true,
-                subHabits: [],
-                startDate: startDate,
-                endDate: endDate,
-                anchors: [],
-                frequency: { type: freqType, value: freqValue }
-            });
-            
+            habits.push({ id: generateId(), name: name, time: time, isExpanded: true, subHabits: [], startDate: startDate, endDate: endDate, anchors: [], frequency: { type: freqType, value: freqValue } });
             saveData();
             
-            nameInput.value = '';
-            freqValueInput.value = '1';
-            endDateInput.value = '';
-            document.getElementById('new-habit-freq-type').value = 'daily';
-            checkFreqType();
+            nameInput.value = ''; freqValueInput.value = '1'; endDateInput.value = '';
+            document.getElementById('new-habit-freq-type').value = 'daily'; checkFreqType();
+            if(timeSelect.value === 'custom') { timeSelect.value = time; checkCustomTime(); }
             
-            if(timeSelect.value === 'custom') {
-                timeSelect.value = time;
-                checkCustomTime();
-            }
-            
-            renderManagedHabits();
-            updateDailyView();
-            renderCalendar();
+            renderManagedHabits(); updateDailyView(); renderCalendar();
         }
 
         function addSubHabit(parentId) {
-            const inputEl = document.getElementById(`new-sub-${parentId}`);
-            const name = inputEl ? inputEl.value.trim() : "";
+            const inputEl = document.getElementById(`new-sub-${parentId}`); const name = inputEl ? inputEl.value.trim() : "";
             if (!name) return;
-
             const parent = habits.find(h => h.id === parentId);
             if (parent) {
                 if (!parent.subHabits) parent.subHabits = [];
-                parent.subHabits.push({ id: generateId(), name: name });
-                parent.isExpanded = true;
-                saveData();
+                parent.subHabits.push({ id: generateId(), name: name }); parent.isExpanded = true; saveData();
                 if(inputEl) inputEl.value = '';
-                
-                renderManagedHabits();
-                updateDailyView();
-                renderCalendar();
+                renderManagedHabits(); updateDailyView(); renderCalendar();
             }
         }
 
@@ -778,185 +571,99 @@
             if (isSub && parentId) {
                 const parent = habits.find(h => h.id === parentId);
                 if (parent) parent.subHabits = parent.subHabits.filter(s => s.id !== id);
-            } else {
-                habits = habits.filter(h => h.id !== id);
-            }
+            } else { habits = habits.filter(h => h.id !== id); }
             
             for (let date in records) {
                 records[date] = records[date].filter(recordId => recordId !== id);
                 if (records[date].length === 0) delete records[date];
             }
-            
-            saveData();
-            renderManagedHabits();
-            updateDailyView();
-            renderCalendar();
-            if (!document.getElementById('periodic-modal').classList.contains('hidden')) {
-                openPeriodicModal();
-            }
+            saveData(); renderManagedHabits(); updateDailyView(); renderCalendar();
+            if (!document.getElementById('periodic-modal').classList.contains('hidden')) openPeriodicModal();
         }
 
         function moveSubHabit(parentId, subId, direction) {
             const parent = habits.find(h => h.id === parentId);
             if (!parent || !parent.subHabits) return;
-            
             const idx = parent.subHabits.findIndex(s => s.id === subId);
             if (idx === -1) return;
-            
             if (direction === 'up' && idx > 0) {
-                const temp = parent.subHabits[idx];
-                parent.subHabits[idx] = parent.subHabits[idx - 1];
-                parent.subHabits[idx - 1] = temp;
+                const temp = parent.subHabits[idx]; parent.subHabits[idx] = parent.subHabits[idx - 1]; parent.subHabits[idx - 1] = temp;
             } else if (direction === 'down' && idx < parent.subHabits.length - 1) {
-                const temp = parent.subHabits[idx];
-                parent.subHabits[idx] = parent.subHabits[idx + 1];
-                parent.subHabits[idx + 1] = temp;
+                const temp = parent.subHabits[idx]; parent.subHabits[idx] = parent.subHabits[idx + 1]; parent.subHabits[idx + 1] = temp;
             }
-            
-            saveData();
-            renderManagedHabits();
-            updateDailyView();
+            saveData(); renderManagedHabits(); updateDailyView();
         }
 
         function openEditModal(id, parentId = null, currentName) {
             editTarget = { id, parentId };
-            const nameInput = document.getElementById('edit-habit-input');
-            const freqSection = document.getElementById('edit-frequency-section');
-            const datesContainer = document.getElementById('edit-periodic-dates');
-            
-            const freqType = document.getElementById('edit-habit-freq-type');
-            const freqValue = document.getElementById('edit-habit-freq-value');
-            const startInput = document.getElementById('edit-habit-start-date');
+            const nameInput = document.getElementById('edit-habit-input'); const freqSection = document.getElementById('edit-frequency-section');
+            const datesContainer = document.getElementById('edit-periodic-dates'); const freqType = document.getElementById('edit-habit-freq-type');
+            const freqValue = document.getElementById('edit-habit-freq-value'); const startInput = document.getElementById('edit-habit-start-date');
             const endInput = document.getElementById('edit-habit-end-date');
 
             nameInput.value = currentName;
-
             if (!parentId) {
                 const parent = habits.find(h => h.id === id);
                 if (parent) {
-                    freqSection.classList.remove('hidden');
-                    datesContainer.classList.remove('hidden');
-                    
-                    startInput.value = parent.startDate || '';
-                    endInput.value = parent.endDate || '';
-                    
-                    if (parent.frequency) {
-                        freqType.value = parent.frequency.type || 'daily';
-                        freqValue.value = parent.frequency.value || 1;
-                    } else {
-                        freqType.value = 'daily';
-                        freqValue.value = 1;
-                    }
+                    freqSection.classList.remove('hidden'); datesContainer.classList.remove('hidden');
+                    startInput.value = parent.startDate || ''; endInput.value = parent.endDate || '';
+                    if (parent.frequency) { freqType.value = parent.frequency.type || 'daily'; freqValue.value = parent.frequency.value || 1; }
+                    else { freqType.value = 'daily'; freqValue.value = 1; }
                     checkEditFreqType();
-                } else {
-                    freqSection.classList.add('hidden');
-                    datesContainer.classList.add('hidden');
-                }
-            } else {
-                freqSection.classList.add('hidden');
-                datesContainer.classList.add('hidden');
-            }
-
-            document.getElementById('edit-modal').classList.remove('hidden');
-            nameInput.focus();
+                } else { freqSection.classList.add('hidden'); datesContainer.classList.add('hidden'); }
+            } else { freqSection.classList.add('hidden'); datesContainer.classList.add('hidden'); }
+            document.getElementById('edit-modal').classList.remove('hidden'); nameInput.focus();
         }
-
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-            editTarget = { id: null, parentId: null };
-        }
+        function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); editTarget = { id: null, parentId: null }; }
 
         function saveEditHabit() {
             const newName = document.getElementById('edit-habit-input').value.trim();
             if (!newName) return;
-
             if (editTarget.parentId) {
                 const parent = habits.find(h => h.id === editTarget.parentId);
-                if (parent) {
-                    const sub = parent.subHabits.find(s => s.id === editTarget.id);
-                    if (sub) sub.name = newName;
-                }
+                if (parent) { const sub = parent.subHabits.find(s => s.id === editTarget.id); if (sub) sub.name = newName; }
             } else {
                 const parent = habits.find(h => h.id === editTarget.id);
                 if (parent) {
                     parent.name = newName;
-                    
-                    const newStart = document.getElementById('edit-habit-start-date').value;
-                    const newEnd = document.getElementById('edit-habit-end-date').value;
-                    parent.startDate = newStart || parent.startDate; 
-                    parent.endDate = newEnd || null;
-                    
+                    parent.startDate = document.getElementById('edit-habit-start-date').value || parent.startDate; 
+                    parent.endDate = document.getElementById('edit-habit-end-date').value || null;
                     const newFreqType = document.getElementById('edit-habit-freq-type').value;
                     let newFreqValue = parseInt(document.getElementById('edit-habit-freq-value').value);
                     if (isNaN(newFreqValue) || newFreqValue < 1) newFreqValue = 1;
-                    
                     parent.frequency = { type: newFreqType, value: newFreqValue };
                 }
             }
-
-            saveData();
-            closeEditModal();
-            renderManagedHabits();
-            updateDailyView();
-            renderCalendar();
-            
-            if (!document.getElementById('periodic-modal').classList.contains('hidden')) {
-                openPeriodicModal();
-            }
+            saveData(); closeEditModal(); renderManagedHabits(); updateDailyView(); renderCalendar();
+            if (!document.getElementById('periodic-modal').classList.contains('hidden')) openPeriodicModal();
         }
 
         function openPostponeModal(id, oldDate) {
-            postponeTarget = { id, oldDate };
-            const habit = habits.find(h => h.id === id);
-            
-            document.getElementById('postpone-habit-name').innerText = habit.name;
-            document.getElementById('postpone-old-date').innerText = oldDate;
-            
-            const nextDate = new Date(parseDateStr(oldDate));
-            nextDate.setDate(nextDate.getDate() + 1);
-            
+            postponeTarget = { id, oldDate }; const habit = habits.find(h => h.id === id);
+            document.getElementById('postpone-habit-name').innerText = habit.name; document.getElementById('postpone-old-date').innerText = oldDate;
+            const nextDate = new Date(parseDateStr(oldDate)); nextDate.setDate(nextDate.getDate() + 1);
             const minDateStr = formatDateToYYYYMMDD(nextDate);
-            document.getElementById('postpone-new-date').min = minDateStr;
-            document.getElementById('postpone-new-date').value = minDateStr;
-
+            document.getElementById('postpone-new-date').min = minDateStr; document.getElementById('postpone-new-date').value = minDateStr;
             document.getElementById('postpone-modal').classList.remove('hidden');
         }
-
-        function closePostponeModal() {
-            document.getElementById('postpone-modal').classList.add('hidden');
-            postponeTarget = { id: null, oldDate: null };
-        }
+        function closePostponeModal() { document.getElementById('postpone-modal').classList.add('hidden'); postponeTarget = { id: null, oldDate: null }; }
 
         function savePostpone() {
             const newDate = document.getElementById('postpone-new-date').value;
             if (!newDate) return;
-            
             const habit = habits.find(h => h.id === postponeTarget.id);
             if (!habit) return;
             if (!habit.anchors) habit.anchors = [];
-            
             const existingAnchorIndex = habit.anchors.findIndex(a => a.effectiveFrom === postponeTarget.oldDate);
-            if (existingAnchorIndex > -1) {
-                habit.anchors[existingAnchorIndex].baseDate = newDate;
-            } else {
-                habit.anchors.push({ effectiveFrom: postponeTarget.oldDate, baseDate: newDate });
-            }
+            if (existingAnchorIndex > -1) habit.anchors[existingAnchorIndex].baseDate = newDate;
+            else habit.anchors.push({ effectiveFrom: postponeTarget.oldDate, baseDate: newDate });
             habit.anchors.sort((a, b) => a.effectiveFrom.localeCompare(b.effectiveFrom));
-
-            saveData();
-            closePostponeModal();
-            updateDailyView();
-            renderCalendar();
+            saveData(); closePostponeModal(); updateDailyView(); renderCalendar();
         }
 
         function toggleExpand(id) {
             const parent = habits.find(h => h.id === id);
-            if (parent) {
-                parent.isExpanded = !parent.isExpanded;
-                saveData();
-                renderManagedHabits();
-                updateDailyView();
-            }
+            if (parent) { parent.isExpanded = !parent.isExpanded; saveData(); renderManagedHabits(); updateDailyView(); }
         }
 
         function getFreqText(freq) {
@@ -964,25 +671,18 @@
             if (freq.type === 'weekdays') return '평일';
             if (freq.type === 'days') return `${freq.value}일 주기`;
             if (freq.type === 'weeks') return `${freq.value}주 주기`;
-            if (freq.type === 'months') return `${freq.value}개월 주기`;
-            return '';
+            if (freq.type === 'months') return `${freq.value}개월 주기`; return '';
         }
 
         function openPeriodicModal() {
-            const modal = document.getElementById('periodic-modal');
-            const listContainer = document.getElementById('periodic-modal-list');
-            
+            const modal = document.getElementById('periodic-modal'); const listContainer = document.getElementById('periodic-modal-list');
             const periodicHabits = habits.filter(h => h.frequency && h.frequency.type !== 'daily');
-            
-            if (periodicHabits.length === 0) {
-                listContainer.innerHTML = '<div class="text-center py-8 text-slate-400">등록된 주기/평일 습관이 없습니다.</div>';
-            } else {
+            if (periodicHabits.length === 0) listContainer.innerHTML = '<div class="text-center py-8 text-slate-400">등록된 주기/평일 습관이 없습니다.</div>';
+            else {
                 let html = '';
                 periodicHabits.forEach((habit, index) => {
                     const barColor = HABIT_COLORS[habits.findIndex(h => h.id === habit.id) % HABIT_COLORS.length];
-                    const freqText = getFreqText(habit.frequency);
-                    const endDateText = habit.endDate ? habit.endDate : '종료일 없음';
-                    
+                    const freqText = getFreqText(habit.frequency); const endDateText = habit.endDate ? habit.endDate : '종료일 없음';
                     html += `
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between">
                             <div class="flex-1 min-w-0">
@@ -997,12 +697,8 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1">
-                                <button onclick="openEditModal('${habit.id}', null, '${habit.name.replace(/'/g, "\\'")}')" class="p-2 text-slate-400 hover:text-blue-500 transition rounded ml-2">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                                <button onclick="deleteHabit('${habit.id}', false)" class="p-2 text-slate-400 hover:text-red-500 transition rounded">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <button onclick="openEditModal('${habit.id}', null, '${habit.name.replace(/'/g, "\\'")}')" class="p-2 text-slate-400 hover:text-blue-500 transition rounded ml-2"><i class="fas fa-pen"></i></button>
+                                <button onclick="deleteHabit('${habit.id}', false)" class="p-2 text-slate-400 hover:text-red-500 transition rounded"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </div>
                     `;
@@ -1011,25 +707,15 @@
             }
             modal.classList.remove('hidden');
         }
-
-        function closePeriodicModal() {
-            document.getElementById('periodic-modal').classList.add('hidden');
-        }
+        function closePeriodicModal() { document.getElementById('periodic-modal').classList.add('hidden'); }
 
         function renderManagedHabits() {
-            const container = document.getElementById('managed-habits-list');
-            container.innerHTML = '';
-
-            if (habits.length === 0) {
-                container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">등록된 습관이 없습니다.</p>';
-                return;
-            }
+            const container = document.getElementById('managed-habits-list'); container.innerHTML = '';
+            if (habits.length === 0) { container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">등록된 습관이 없습니다.</p>'; return; }
 
             habits.forEach((parent, index) => {
-                const timeColorClass = getTimeColor(parent.time);
-                const hasSubs = parent.subHabits && parent.subHabits.length > 0;
-                const barColor = HABIT_COLORS[index % HABIT_COLORS.length];
-                const freqText = getFreqText(parent.frequency);
+                const timeColorClass = getTimeColor(parent.time); const hasSubs = parent.subHabits && parent.subHabits.length > 0;
+                const barColor = HABIT_COLORS[index % HABIT_COLORS.length]; const freqText = getFreqText(parent.frequency);
                 const freqBadge = freqText ? `<span class="text-[10px] font-medium bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded shrink-0">${freqText}</span>` : '';
                 
                 let html = `
@@ -1037,8 +723,7 @@
                         <div class="flex items-center justify-between p-3 bg-slate-50 border-b border-slate-100 group">
                             <div class="flex items-center gap-3 overflow-hidden flex-1 cursor-pointer" onclick="toggleExpand('${parent.id}')">
                                 <span class="text-xs font-semibold px-2 py-1 rounded-md ${timeColorClass} whitespace-nowrap relative pl-4 shrink-0">
-                                    <span class="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full" style="background-color: ${barColor}"></span>
-                                    ${parent.time}
+                                    <span class="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full" style="background-color: ${barColor}"></span>${parent.time}
                                 </span>
                                 <span class="text-base font-semibold text-slate-800 truncate" title="${parent.name}">${parent.name}</span>
                                 ${freqBadge}
@@ -1049,7 +734,6 @@
                                 <button onclick="deleteHabit('${parent.id}', false)" class="p-1.5 text-slate-400 hover:text-red-500 transition rounded"><i class="fas fa-trash-alt text-sm"></i></button>
                             </div>
                         </div>
-                        
                         <div class="${parent.isExpanded ? 'block' : 'hidden'} p-3 space-y-2 bg-white">
                 `;
 
@@ -1071,7 +755,6 @@
                         `;
                     });
                 }
-
                 html += `
                             <div class="flex flex-row items-center gap-2 mt-2 pl-4 pr-1">
                                 <i class="fas fa-level-up-alt rotate-90 text-slate-300 text-xs shrink-0"></i>
@@ -1087,75 +770,41 @@
 
         function getTotalHabitCount(dateStr) {
             let count = 0;
-            habits.forEach(p => {
-                if (isHabitActiveOnDate(p, dateStr)) {
-                    count += 1;
-                    if(p.subHabits) count += p.subHabits.length;
-                }
-            });
+            habits.forEach(p => { if (isHabitActiveOnDate(p, dateStr)) { count += 1; if(p.subHabits) count += p.subHabits.length; } });
             return count;
         }
 
         function calculateOverallProgress(dateStr) {
-            const total = getTotalHabitCount(dateStr);
-            if (total === 0) return 0;
+            const total = getTotalHabitCount(dateStr); if (total === 0) return 0;
             const completed = records[dateStr] ? records[dateStr].length : 0;
             return Math.round((completed / total) * 100);
         }
 
-        function changeMonth(delta) {
-            currentMonthDate.setMonth(currentMonthDate.getMonth() + delta);
-            renderCalendar();
-        }
-
-        function goToToday() {
-            currentMonthDate = new Date();
-            selectedDate = new Date();
-            renderCalendar();
-            updateDailyView();
-        }
+        function changeMonth(delta) { currentMonthDate.setMonth(currentMonthDate.getMonth() + delta); renderCalendar(); }
+        function goToToday() { currentMonthDate = new Date(); selectedDate = new Date(); renderCalendar(); updateDailyView(); }
 
         function renderCalendar() {
-            const year = currentMonthDate.getFullYear();
-            const month = currentMonthDate.getMonth();
-            
+            const year = currentMonthDate.getFullYear(); const month = currentMonthDate.getMonth();
             document.getElementById('current-month-year').innerText = `${year}년 ${month + 1}월`;
-            
-            const daysContainer = document.getElementById('calendar-days');
-            daysContainer.innerHTML = '';
-
-            const firstDayIndex = new Date(year, month, 1).getDay();
-            const lastDay = new Date(year, month + 1, 0).getDate();
-            const todayStr = formatDateToYYYYMMDD(new Date());
-            const selectedStr = formatDateToYYYYMMDD(selectedDate);
-
-            const todayEnd = new Date();
-            todayEnd.setHours(23, 59, 59, 999);
-            const todayStart = new Date();
-            todayStart.setHours(0, 0, 0, 0);
+            const daysContainer = document.getElementById('calendar-days'); daysContainer.innerHTML = '';
+            const firstDayIndex = new Date(year, month, 1).getDay(); const lastDay = new Date(year, month + 1, 0).getDate();
+            const todayStr = formatDateToYYYYMMDD(new Date()); const selectedStr = formatDateToYYYYMMDD(selectedDate);
+            const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
+            const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
 
             for (let i = 0; i < firstDayIndex; i++) {
-                const emptyDiv = document.createElement('div');
-                emptyDiv.className = 'calendar-day empty';
-                daysContainer.appendChild(emptyDiv);
+                const emptyDiv = document.createElement('div'); emptyDiv.className = 'calendar-day empty'; daysContainer.appendChild(emptyDiv);
             }
 
             for (let i = 1; i <= lastDay; i++) {
-                const dateObj = new Date(year, month, i);
-                const dateStr = formatDateToYYYYMMDD(dateObj);
-                
-                const dayDiv = document.createElement('div');
-                dayDiv.className = `calendar-day flex flex-col items-center relative`;
-                
+                const dateObj = new Date(year, month, i); const dateStr = formatDateToYYYYMMDD(dateObj);
+                const dayDiv = document.createElement('div'); dayDiv.className = `calendar-day flex flex-col items-center relative`;
                 if (dateStr === todayStr) dayDiv.classList.add('today');
                 if (dateStr === selectedStr) dayDiv.classList.add('selected');
                 
-                const dayOfWeek = dateObj.getDay();
-                let textClass = "text-slate-700";
-                
-                if (dateStr === selectedStr) {
-                    textClass = "text-white";
-                } else {
+                const dayOfWeek = dateObj.getDay(); let textClass = "text-slate-700";
+                if (dateStr === selectedStr) textClass = "text-white";
+                else {
                     if(dayOfWeek === 0 || PUBLIC_HOLIDAYS.includes(dateStr)) textClass = "text-red-500";
                     else if(dayOfWeek === 6) textClass = "text-blue-500";
                 }
@@ -1163,22 +812,17 @@
                 const hasPeriodicHabit = habits.some(h => h.frequency && h.frequency.type !== 'daily' && h.frequency.type !== 'weekdays' && isHabitActiveOnDate(h, dateStr));
                 const dotHtml = hasPeriodicHabit ? `<div class="absolute top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-500 rounded-full"></div>` : '';
 
-                const overallProgress = calculateOverallProgress(dateStr);
-                const totalCount = getTotalHabitCount(dateStr);
-                
+                const overallProgress = calculateOverallProgress(dateStr); const totalCount = getTotalHabitCount(dateStr);
                 let stampHtml = '';
                 
                 if (totalCount > 0 && (dateObj <= todayEnd || records[dateStr])) {
-                    let stampText = '';
-                    let stampClass = '';
-
+                    let stampText = ''; let stampClass = '';
                     if (overallProgress === 100) { stampText = '참<br>잘했어요'; stampClass = 'stamp-100'; } 
                     else if (overallProgress >= 90) { stampText = '더<br>힘내요'; stampClass = 'stamp-90'; } 
                     else if (overallProgress >= 80) { stampText = '할 수<br>있어'; stampClass = 'stamp-80'; } 
                     else if (overallProgress >= 70) { stampText = '화이팅'; stampClass = 'stamp-70'; } 
                     else if (overallProgress >= 60) { stampText = '괜찮아'; stampClass = 'stamp-60'; } 
                     else { if (overallProgress > 0 || dateObj < todayStart) { stampText = '오늘도<br>애썼어'; stampClass = 'stamp-0'; } }
-
                     if (stampText !== '') stampHtml = `<div class="stamp-base ${stampClass}">${stampText}</div>`;
                 }
 
@@ -1201,14 +845,7 @@
                 progressBarsHtml += `</div>`;
 
                 dayDiv.innerHTML = topHtml + progressBarsHtml;
-                
-                // 달력에서 날짜 클릭 시 해당 날짜 표시 및 모달 닫기
-                dayDiv.onclick = () => {
-                    selectedDate = new Date(year, month, i);
-                    renderCalendar();
-                    updateDailyView();
-                    closeCalendarModal(); // UX 개선: 날짜 선택 후 모달을 자동으로 닫음
-                };
+                dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar(); updateDailyView(); closeCalendarModal(); };
                 daysContainer.appendChild(dayDiv);
             }
         }
@@ -1216,36 +853,29 @@
         function toggleRecord(id, dateStr) {
             if (!records[dateStr]) records[dateStr] = [];
             const index = records[dateStr].indexOf(id);
-            if (index > -1) records[dateStr].splice(index, 1);
-            else records[dateStr].push(id);
-
+            if (index > -1) records[dateStr].splice(index, 1); else records[dateStr].push(id);
             if (records[dateStr].length === 0) delete records[dateStr];
-            saveData();
-            updateDailyView();
-            renderCalendar(); 
+            saveData(); updateDailyView(); renderCalendar(); 
         }
 
+        // ==========================================
+        //  수정된 updateDailyView 함수 영역 시작
+        // ==========================================
         function updateDailyView() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
-            // 메인 화면 상단의 날짜 버튼 텍스트도 같이 업데이트
             document.getElementById('today-display').innerText = formatDisplayDate(selectedDate);
             
-            // 글귀 바인딩
             const quoteDisplayEl = document.getElementById('daily-quote-display');
             const effectiveQuote = getEffectiveQuote(dateStr);
-            
             if (effectiveQuote) {
                 quoteDisplayEl.innerText = effectiveQuote;
-                quoteDisplayEl.classList.remove('text-slate-400');
-                quoteDisplayEl.classList.add('text-slate-700');
+                quoteDisplayEl.classList.remove('text-slate-400'); quoteDisplayEl.classList.add('text-slate-700');
             } else {
                 quoteDisplayEl.innerText = '오늘의 글귀를 입력해주세요.';
-                quoteDisplayEl.classList.remove('text-slate-700');
-                quoteDisplayEl.classList.add('text-slate-400');
+                quoteDisplayEl.classList.remove('text-slate-700'); quoteDisplayEl.classList.add('text-slate-400');
             }
 
-            // 감사일기 바인딩
             const gratitudeEl = document.getElementById('daily-gratitude');
             gratitudeEl.value = dailyGratitudes[dateStr] || '';
             autoResize(gratitudeEl);
@@ -1256,7 +886,6 @@
             
             const container = document.getElementById('daily-habits-container');
             const emptyMsg = document.getElementById('empty-habits-msg');
-
             const activeHabits = habits.filter(h => isHabitActiveOnDate(h, dateStr));
 
             if (activeHabits.length === 0) {
@@ -1275,11 +904,33 @@
                 const completedIds = records[dateStr] || [];
 
                 const sortedTimes = Object.keys(grouped).sort((a, b) => {
-                    let ia = customTimes.indexOf(a);
-                    let ib = customTimes.indexOf(b);
+                    let ia = customTimes.indexOf(a); let ib = customTimes.indexOf(b);
                     if(ia === -1) ia = 999; if(ib === -1) ib = 999;
                     return ia - ib;
                 });
+
+                // ★ 추가된 로직: 현재 화면에 렌더링되는 모든 습관들의 순서를 구하고 마지막으로 체크된 항목의 인덱스 찾기
+                let flatItems = [];
+                sortedTimes.forEach(time => {
+                    grouped[time].forEach(parent => {
+                        flatItems.push(parent.id);
+                        const hasSubs = parent.subHabits && parent.subHabits.length > 0;
+                        if (hasSubs && parent.isExpanded) {
+                            parent.subHabits.forEach(sub => {
+                                flatItems.push(sub.id);
+                            });
+                        }
+                    });
+                });
+
+                let lastCheckedIndex = -1;
+                flatItems.forEach((id, index) => {
+                    if (completedIds.includes(id)) {
+                        lastCheckedIndex = index;
+                    }
+                });
+
+                let currentIndex = 0; // 렌더링하면서 현재 인덱스를 추적
 
                 sortedTimes.forEach(time => {
                     const section = document.createElement('div');
@@ -1295,8 +946,6 @@
                     `;
 
                     grouped[time].forEach(parent => {
-                        let isNextFound = false;
-
                         const isParentCompleted = completedIds.includes(parent.id);
                         const bgClass = isParentCompleted ? 'bg-green-50/40 border-green-200' : 'bg-white border-slate-200 shadow-sm';
                         const hasSubs = parent.subHabits && parent.subHabits.length > 0;
@@ -1307,13 +956,16 @@
                         const freqText = getFreqText(parent.frequency);
                         const freqBadge = freqText ? `<span class="ml-2 text-xs font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${freqText}</span>` : '';
 
-                        let textClass = 'text-slate-800 text-base font-semibold';
-                        if (!isParentCompleted && !isNextFound) {
-                            textClass = 'text-slate-900 text-lg font-extrabold';
-                            isNextFound = true;
-                        } else if (isParentCompleted) {
+                        // ★ 로직 변경: 마지막으로 체크한 항목을 기준으로 텍스트 스타일 지정
+                        let textClass = 'text-slate-800 text-base font-semibold'; // 기본 미완료 상태 (평범)
+                        if (isParentCompleted || (!isParentCompleted && currentIndex < lastCheckedIndex)) {
+                            // 이미 체크했거나, 체크 못하고 넘어간 건너뛴 항목 -> 연하게 처리
                             textClass = 'text-slate-500 text-base font-semibold';
+                        } else if (currentIndex === lastCheckedIndex + 1) {
+                            // 마지막 체크 항목의 바로 다음 목표 -> 굵게 강조 (양치질처럼)
+                            textClass = 'text-slate-900 text-lg font-extrabold';
                         }
+                        currentIndex++;
 
                         html += `
                             <div class="rounded-xl border ${bgClass} transition-all duration-300 overflow-hidden relative">
@@ -1341,13 +993,15 @@
                             html += `<div class="bg-slate-50/50 border-t border-slate-100 py-1 pl-1">`;
                             parent.subHabits.forEach(sub => {
                                 const isSubCompleted = completedIds.includes(sub.id);
-                                let subTextClass = 'text-slate-700 text-sm font-normal';
-                                if (!isSubCompleted && !isNextFound) {
-                                    subTextClass = 'text-slate-900 text-base font-bold';
-                                    isNextFound = true;
-                                } else if (isSubCompleted) {
-                                    subTextClass = 'text-slate-400 text-sm font-normal';
+                                
+                                // ★ 서브 습관에도 동일한 텍스트 강조 로직 적용
+                                let subTextClass = 'text-slate-700 text-sm font-normal'; // 기본
+                                if (isSubCompleted || (!isSubCompleted && currentIndex < lastCheckedIndex)) {
+                                    subTextClass = 'text-slate-400 text-sm font-normal'; // 완료 및 스킵됨 -> 연하게
+                                } else if (currentIndex === lastCheckedIndex + 1) {
+                                    subTextClass = 'text-slate-900 text-base font-bold'; // 다음 타겟 -> 강조
                                 }
+                                currentIndex++;
                                 
                                 html += `
                                     <label class="flex items-center p-2.5 pl-12 cursor-pointer hover:bg-slate-100/50 select-none group">
@@ -1374,28 +1028,22 @@
             }
             updateCalendarBottomSummary(dateStr, activeHabits);
         }
+        // ==========================================
+        //  수정된 updateDailyView 함수 영역 끝
+        // ==========================================
 
         function updateCalendarBottomSummary(dateStr, activeHabits) {
             const container = document.getElementById('calendar-bottom-summary');
-            
             if (activeHabits.length === 0) {
                 container.innerHTML = '<div class="h-full flex items-center justify-center text-sm text-slate-400">이날 등록된 습관이 없습니다.</div>';
                 return;
             }
 
             const sortedHabits = [...activeHabits].sort((a, b) => {
-                const aIsPeriodic = a.frequency && a.frequency.type !== 'daily';
-                const bIsPeriodic = b.frequency && b.frequency.type !== 'daily';
-
-                if (aIsPeriodic && !bIsPeriodic) return 1;
-                if (!aIsPeriodic && bIsPeriodic) return -1;
-
-                let aTimeIdx = customTimes.indexOf(a.time);
-                let bTimeIdx = customTimes.indexOf(b.time);
-
-                if (aTimeIdx === -1) aTimeIdx = 9999;
-                if (bTimeIdx === -1) bTimeIdx = 9999;
-
+                const aIsPeriodic = a.frequency && a.frequency.type !== 'daily'; const bIsPeriodic = b.frequency && b.frequency.type !== 'daily';
+                if (aIsPeriodic && !bIsPeriodic) return 1; if (!aIsPeriodic && bIsPeriodic) return -1;
+                let aTimeIdx = customTimes.indexOf(a.time); let bTimeIdx = customTimes.indexOf(b.time);
+                if (aTimeIdx === -1) aTimeIdx = 9999; if (bTimeIdx === -1) bTimeIdx = 9999;
                 return aTimeIdx - bTimeIdx;
             });
 
@@ -1403,20 +1051,12 @@
             html += `<div class="overflow-y-auto flex-1 pr-1 flex flex-col gap-1.5 custom-scrollbar pb-2">`;
             
             sortedHabits.forEach(habit => {
-                let badgeText = '매일';
-                let badgeClass = 'bg-slate-100 text-slate-500 border-slate-200';
-                
-                if (habit.frequency && habit.frequency.type === 'weekdays') {
-                    badgeText = '평일';
-                    badgeClass = 'bg-blue-50 text-blue-500 border-blue-100';
-                } else if (habit.frequency && habit.frequency.type !== 'daily') {
-                    badgeText = '주기적';
-                    badgeClass = 'bg-red-50 text-red-500 border-red-100';
-                }
+                let badgeText = '매일'; let badgeClass = 'bg-slate-100 text-slate-500 border-slate-200';
+                if (habit.frequency && habit.frequency.type === 'weekdays') { badgeText = '평일'; badgeClass = 'bg-blue-50 text-blue-500 border-blue-100'; }
+                else if (habit.frequency && habit.frequency.type !== 'daily') { badgeText = '주기적'; badgeClass = 'bg-red-50 text-red-500 border-red-100'; }
                 
                 const pIndex = habits.findIndex(h => h.id === habit.id);
                 const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
-                
                 const badge = `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap ${badgeClass}">${badgeText}</span>`;
                 
                 html += `
