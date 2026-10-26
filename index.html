@@ -200,22 +200,45 @@
 
                 <!-- 감사하기 영역 -->
                 <div class="p-5 bg-slate-50 border-t border-slate-100 shrink-0">
-                    <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                        <i class="fas fa-heart text-pink-500"></i>감사하기
-                    </label>
-                    <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="3" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[5rem]" oninput="saveDailyText('gratitude'); autoResize(this)"></textarea>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                            <i class="fas fa-heart text-pink-500"></i>감사하기
+                        </label>
+                        <button id="gratitude-edit-btn" onclick="toggleInlineEdit('gratitude', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
+                    </div>
+                    <!-- 읽기 모드 -->
+                    <div id="gratitude-read-mode" onclick="toggleInlineEdit('gratitude', true)" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 cursor-pointer hover:bg-slate-200/50 transition min-h-[4rem] whitespace-pre-wrap"></div>
+                    <!-- 편집 모드 -->
+                    <div id="gratitude-edit-mode" class="hidden">
+                        <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="3" class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
+                        <div class="flex justify-end gap-2 mt-3">
+                            <button onclick="toggleInlineEdit('gratitude', false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition text-sm font-medium">취소</button>
+                            <button onclick="saveInlineText('gratitude')" class="px-4 py-2 rounded-lg bg-pink-500 text-white hover:bg-pink-600 transition text-sm font-medium">저장</button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 오늘의 소감 영역 추가 -->
+                <!-- 오늘의 소감 영역 -->
                 <div class="p-5 bg-white border-t border-slate-100 shrink-0">
-                    <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                        <i class="fas fa-comment-dots text-blue-500"></i>오늘의 소감
-                    </label>
-                    <textarea id="daily-thought" placeholder="오늘 하루를 돌아보며 느낀 점이나 소감을 자유롭게 기록해보세요." rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[5rem]" oninput="saveDailyText('thought'); autoResize(this)"></textarea>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                            <i class="fas fa-comment-dots text-blue-500"></i>오늘의 소감
+                        </label>
+                        <button id="thought-edit-btn" onclick="toggleInlineEdit('thought', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
+                    </div>
+                    <!-- 읽기 모드 -->
+                    <div id="thought-read-mode" onclick="toggleInlineEdit('thought', true)" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 cursor-pointer hover:bg-slate-100 transition min-h-[4rem] whitespace-pre-wrap"></div>
+                    <!-- 편집 모드 -->
+                    <div id="thought-edit-mode" class="hidden">
+                        <textarea id="daily-thought" placeholder="오늘 하루를 돌아보며 느낀 점이나 소감을 자유롭게 기록해보세요." rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
+                        <div class="flex justify-end gap-2 mt-3">
+                            <button onclick="toggleInlineEdit('thought', false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition text-sm font-medium">취소</button>
+                            <button onclick="saveInlineText('thought')" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition text-sm font-medium">저장</button>
+                        </div>
+                    </div>
                 </div>
 
             </div>
-
         </div>
     </div>
 
@@ -446,21 +469,58 @@
         function formatDisplayDate(date) { return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' }); }
         function parseDateStr(str) { const [y, m, d] = str.split('-'); return new Date(parseInt(y), parseInt(m) - 1, parseInt(d)); }
         function generateId() { return Math.random().toString(36).substr(2, 9); }
+        
         function saveData() {
-            localStorage.setItem('customTimes', JSON.stringify(customTimes)); localStorage.setItem('habits', JSON.stringify(habits));
-            localStorage.setItem('records', JSON.stringify(records)); localStorage.setItem('dailyQuotes', JSON.stringify(dailyQuotes));
-            localStorage.setItem('dailyGratitudes', JSON.stringify(dailyGratitudes)); localStorage.setItem('dailyThoughts', JSON.stringify(dailyThoughts)); localStorage.setItem('dailySchedules', JSON.stringify(dailySchedules));
+            localStorage.setItem('customTimes', JSON.stringify(customTimes)); 
+            localStorage.setItem('habits', JSON.stringify(habits));
+            localStorage.setItem('records', JSON.stringify(records)); 
+            localStorage.setItem('dailyQuotes', JSON.stringify(dailyQuotes));
+            localStorage.setItem('dailyGratitudes', JSON.stringify(dailyGratitudes)); 
+            localStorage.setItem('dailyThoughts', JSON.stringify(dailyThoughts)); 
+            localStorage.setItem('dailySchedules', JSON.stringify(dailySchedules));
         }
-        function saveDailyText(type) {
-            const dateStr = formatDateToYYYYMMDD(selectedDate);
-            if (type === 'gratitude') {
-                const val = document.getElementById('daily-gratitude').value;
-                if (val.trim() === '') delete dailyGratitudes[dateStr]; else dailyGratitudes[dateStr] = val;
-            } else if (type === 'thought') {
-                const val = document.getElementById('daily-thought').value;
-                if (val.trim() === '') delete dailyThoughts[dateStr]; else dailyThoughts[dateStr] = val;
+
+        function toggleInlineEdit(type, isEdit) {
+            const readMode = document.getElementById(`${type}-read-mode`);
+            const editMode = document.getElementById(`${type}-edit-mode`);
+            const editBtn = document.getElementById(`${type}-edit-btn`);
+            const textarea = document.getElementById(`daily-${type}`);
+            
+            if (isEdit) {
+                readMode.classList.add('hidden');
+                editMode.classList.remove('hidden');
+                if (editBtn) editBtn.classList.add('hidden');
+                
+                const dateStr = formatDateToYYYYMMDD(selectedDate);
+                const dataObj = type === 'gratitude' ? dailyGratitudes : dailyThoughts;
+                textarea.value = dataObj[dateStr] || '';
+                
+                setTimeout(() => {
+                    autoResize(textarea);
+                    textarea.focus();
+                }, 10);
+            } else {
+                readMode.classList.remove('hidden');
+                editMode.classList.add('hidden');
+                if (editBtn) editBtn.classList.remove('hidden');
             }
+        }
+
+        function saveInlineText(type) {
+            const dateStr = formatDateToYYYYMMDD(selectedDate);
+            const val = document.getElementById(`daily-${type}`).value.trim();
+            
+            if (type === 'gratitude') {
+                if (val === '') delete dailyGratitudes[dateStr]; 
+                else dailyGratitudes[dateStr] = val;
+            } else if (type === 'thought') {
+                if (val === '') delete dailyThoughts[dateStr]; 
+                else dailyThoughts[dateStr] = val;
+            }
+            
             saveData();
+            toggleInlineEdit(type, false);
+            updateDailyView();
         }
 
         function init() {
@@ -876,6 +936,7 @@
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
             document.getElementById('today-display').innerText = formatDisplayDate(selectedDate);
             
+            // 오늘 아침 글귀 갱신
             const quoteDisplayEl = document.getElementById('daily-quote-display');
             const effectiveQuote = getEffectiveQuote(dateStr);
             if (effectiveQuote) {
@@ -886,13 +947,33 @@
                 quoteDisplayEl.classList.remove('text-slate-700'); quoteDisplayEl.classList.add('text-slate-400');
             }
 
-            const gratitudeEl = document.getElementById('daily-gratitude');
-            gratitudeEl.value = dailyGratitudes[dateStr] || '';
-            autoResize(gratitudeEl);
+            // 감사하기 데이터 불러오기 및 읽기 모드 세팅
+            const gratitudeText = dailyGratitudes[dateStr] || '';
+            const gratitudeDisplay = document.getElementById('gratitude-read-mode');
+            if (gratitudeText) {
+                gratitudeDisplay.innerText = gratitudeText;
+                gratitudeDisplay.classList.remove('text-slate-400');
+                gratitudeDisplay.classList.add('text-slate-700');
+            } else {
+                gratitudeDisplay.innerText = '오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요.';
+                gratitudeDisplay.classList.remove('text-slate-700');
+                gratitudeDisplay.classList.add('text-slate-400');
+            }
+            toggleInlineEdit('gratitude', false); // 무조건 읽기 모드로 리셋
 
-            const thoughtEl = document.getElementById('daily-thought');
-            thoughtEl.value = dailyThoughts[dateStr] || '';
-            autoResize(thoughtEl);
+            // 오늘의 소감 데이터 불러오기 및 읽기 모드 세팅
+            const thoughtText = dailyThoughts[dateStr] || '';
+            const thoughtDisplay = document.getElementById('thought-read-mode');
+            if (thoughtText) {
+                thoughtDisplay.innerText = thoughtText;
+                thoughtDisplay.classList.remove('text-slate-400');
+                thoughtDisplay.classList.add('text-slate-700');
+            } else {
+                thoughtDisplay.innerText = '오늘 하루를 돌아보며 느낀 점이나 소감을 자유롭게 기록해보세요.';
+                thoughtDisplay.classList.remove('text-slate-700');
+                thoughtDisplay.classList.add('text-slate-400');
+            }
+            toggleInlineEdit('thought', false); // 무조건 읽기 모드로 리셋
 
             const overallProgress = calculateOverallProgress(dateStr);
             const progressText = document.getElementById('daily-progress-text');
