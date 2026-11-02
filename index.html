@@ -1147,7 +1147,7 @@
                 progressBarsHtml += `</div>`;
 
                 dayDiv.innerHTML = topHtml + progressBarsHtml;
-                dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar(); updateDailyView(); closeCalendarModal(); };
+dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar(); updateDailyView(); };
                 daysContainer.appendChild(dayDiv);
             }
         }
