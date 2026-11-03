@@ -229,18 +229,22 @@
                             
                             <div class="flex items-center gap-3 shrink-0">
                                 <p class="text-base font-medium text-slate-500 whitespace-nowrap" id="daily-progress-text">(달성률:0%)</p>
-                                <button onclick="openScheduleModal()" class="text-sm px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition font-bold flex items-center gap-1.5 shadow-sm border border-indigo-100 whitespace-nowrap">
-                                    <i class="far fa-calendar-check"></i>메모
-                                </button>
                             </div>
                         </div>
                         
                         <div class="mt-4">
                             <div class="flex items-center justify-between mb-1.5 px-2">
                                 <label class="block text-sm font-bold text-slate-500"><i class="fas fa-quote-left text-slate-300 mr-1"></i>오늘 아침, 힘이 되는 글귀</label>
-                                <button onclick="openQuoteModal()" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
+                                <button id="quote-edit-btn" onclick="toggleQuoteEdit(true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                             </div>
-                            <div id="daily-quote-display" onclick="openQuoteModal()" class="w-full px-2 py-2 text-base text-slate-700 font-medium cursor-pointer hover:bg-slate-200/50 rounded-lg transition min-h-[3rem] whitespace-pre-wrap leading-relaxed"></div>
+                            <div id="quote-read-mode" class="w-full px-2 py-2 text-base text-slate-700 font-medium rounded-lg transition min-h-[3rem] whitespace-pre-wrap leading-relaxed"></div>
+                            <div id="quote-edit-mode" class="hidden mt-2">
+                                <textarea id="daily-quote-textarea" rows="4" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-sm resize-none text-slate-700" oninput="autoResize(this)"></textarea>
+                                <div class="flex justify-end gap-2 mt-2">
+                                    <button onclick="toggleQuoteEdit(false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition text-sm font-medium">취소</button>
+                                    <button onclick="saveQuoteInline()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm font-medium">저장</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -260,7 +264,7 @@
                         </label>
                         <button id="gratitude-edit-btn" onclick="toggleInlineEdit('gratitude', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                     </div>
-                    <div id="gratitude-read-mode" onclick="toggleInlineEdit('gratitude', true)" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 cursor-pointer hover:bg-slate-200/50 transition min-h-[4rem] whitespace-pre-wrap"></div>
+                    <div id="gratitude-read-mode" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 transition min-h-[4rem] whitespace-pre-wrap"></div>
                     <div id="gratitude-edit-mode" class="hidden">
                         <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="3" class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
                         <div class="flex justify-end gap-2 mt-3">
@@ -278,12 +282,30 @@
                         </label>
                         <button id="thought-edit-btn" onclick="toggleInlineEdit('thought', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                     </div>
-                    <div id="thought-read-mode" onclick="toggleInlineEdit('thought', true)" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 cursor-pointer hover:bg-slate-100 transition min-h-[4rem] whitespace-pre-wrap"></div>
+                    <div id="thought-read-mode" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 transition min-h-[4rem] whitespace-pre-wrap"></div>
                     <div id="thought-edit-mode" class="hidden">
                         <textarea id="daily-thought" placeholder="오늘 하루를 돌아보며 느낀 점이나 소감을 자유롭게 기록해보세요." rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
                         <div class="flex justify-end gap-2 mt-3">
                             <button onclick="toggleInlineEdit('thought', false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition text-sm font-medium">취소</button>
                             <button onclick="saveInlineText('thought')" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition text-sm font-medium">저장</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 메모 (오늘의 주요일정) 영역 - 감사하기/소감 아래 최하단 배치 -->
+                <div class="p-5 bg-slate-50 border-t border-slate-100 shrink-0">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
+                            <i class="fas fa-calendar-day text-indigo-500"></i>메모 (오늘의 주요일정)
+                        </label>
+                        <button id="schedule-edit-btn" onclick="toggleInlineEdit('schedule', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
+                    </div>
+                    <div id="schedule-read-mode" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 transition min-h-[4rem] whitespace-pre-wrap"></div>
+                    <div id="schedule-edit-mode" class="hidden">
+                        <textarea id="daily-schedule" placeholder="오늘 잊지 말아야 할 중요한 일정이나 할 일을 메모해보세요." rows="3" class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
+                        <div class="flex justify-end gap-2 mt-3">
+                            <button onclick="toggleInlineEdit('schedule', false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition text-sm font-medium">취소</button>
+                            <button onclick="saveInlineText('schedule')" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition text-sm font-medium">저장</button>
                         </div>
                     </div>
                 </div>
@@ -352,38 +374,6 @@
             
             <!-- 상담비 통합 정산 영역 (토글과 무관하게 항상 표시) -->
             <div id="calendar-settlement-summary" class="pt-3 mt-1 shrink-0"></div>
-        </div>
-    </div>
-
-    <div id="schedule-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
-        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-calendar-day text-indigo-500"></i>오늘의 주요일정</h3>
-            <div id="schedule-read-mode" class="block">
-                <div id="schedule-display" class="w-full min-h-[6rem] px-4 py-3 bg-slate-50 rounded-xl text-base text-slate-700 whitespace-pre-wrap leading-relaxed border border-slate-100"></div>
-                <div class="flex justify-end gap-2 mt-4">
-                    <button onclick="closeScheduleModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">닫기</button>
-                    <button onclick="toggleScheduleEditMode(true)" class="px-4 py-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition font-medium border border-indigo-100">수정</button>
-                </div>
-            </div>
-            <div id="schedule-edit-mode" class="hidden">
-                <textarea id="schedule-textarea" rows="5" placeholder="오늘 잊지 말아야 할 중요한 일정이나 할 일을 메모해보세요." class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-base focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition shadow-sm resize-none text-slate-700"></textarea>
-                <div class="flex justify-end gap-2 mt-4">
-                    <button onclick="toggleScheduleEditMode(false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
-                    <button onclick="saveScheduleModal()" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition font-medium">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="quote-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
-        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-quote-left text-blue-500"></i>힘이 되는 글귀 입력</h3>
-            <p class="text-xs text-slate-500 mb-3 ml-1">입력하신 문구는 새로운 문구를 작성하기 전까지 이후 날짜에도 계속 표시됩니다.</p>
-            <textarea id="quote-modal-textarea" rows="12" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-sm resize-none text-slate-700 overflow-y-auto custom-scrollbar"></textarea>
-            <div class="flex justify-end gap-2 mt-4">
-                <button onclick="closeQuoteModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
-                <button onclick="saveQuoteModal()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium">저장</button>
-            </div>
         </div>
     </div>
 
@@ -623,42 +613,40 @@
             }
         }
 
-        function openScheduleModal() {
-            const dateStr = formatDateToYYYYMMDD(selectedDate);
-            const currentSchedule = dailySchedules[dateStr] || '';
-            const displayEl = document.getElementById('schedule-display');
-            if (currentSchedule.trim() === '') displayEl.innerHTML = '<span class="text-slate-400">등록된 메모가 없습니다. 하단의 수정 버튼을 눌러 추가해보세요.</span>';
-            else displayEl.innerText = currentSchedule;
-            document.getElementById('schedule-textarea').value = currentSchedule;
-            toggleScheduleEditMode(false);
-            document.getElementById('schedule-modal').classList.remove('hidden');
-        }
-        function closeScheduleModal() { document.getElementById('schedule-modal').classList.add('hidden'); }
-        function toggleScheduleEditMode(isEdit) {
-            const readMode = document.getElementById('schedule-read-mode');
-            const editMode = document.getElementById('schedule-edit-mode');
-            if (isEdit) { readMode.classList.add('hidden'); editMode.classList.remove('hidden'); document.getElementById('schedule-textarea').focus(); } 
-            else { readMode.classList.remove('hidden'); editMode.classList.add('hidden'); }
-        }
-        function saveScheduleModal() {
-            const dateStr = formatDateToYYYYMMDD(selectedDate);
-            const val = document.getElementById('schedule-textarea').value.trim();
-            if (val === '') delete dailySchedules[dateStr];
-            else dailySchedules[dateStr] = val;
-            saveData(); openScheduleModal(); 
+        function toggleQuoteEdit(isEdit) {
+            const readMode = document.getElementById('quote-read-mode');
+            const editMode = document.getElementById('quote-edit-mode');
+            const editBtn = document.getElementById('quote-edit-btn');
+            const textarea = document.getElementById('daily-quote-textarea');
+            
+            if (isEdit) {
+                readMode.classList.add('hidden');
+                editMode.classList.remove('hidden');
+                if (editBtn) editBtn.classList.add('hidden');
+                
+                const dateStr = formatDateToYYYYMMDD(selectedDate);
+                textarea.value = getEffectiveQuote(dateStr);
+                
+                setTimeout(() => {
+                    autoResize(textarea);
+                    textarea.focus();
+                }, 10);
+            } else {
+                readMode.classList.remove('hidden');
+                editMode.classList.add('hidden');
+                if (editBtn) editBtn.classList.remove('hidden');
+            }
         }
 
-        function openQuoteModal() {
+        function saveQuoteInline() {
             const dateStr = formatDateToYYYYMMDD(selectedDate);
-            document.getElementById('quote-modal-textarea').value = getEffectiveQuote(dateStr);
-            document.getElementById('quote-modal').classList.remove('hidden');
-        }
-        function closeQuoteModal() { document.getElementById('quote-modal').classList.add('hidden'); }
-        function saveQuoteModal() {
-            const dateStr = formatDateToYYYYMMDD(selectedDate);
-            const val = document.getElementById('quote-modal-textarea').value.trim();
-            if (val === '') delete dailyQuotes[dateStr]; else dailyQuotes[dateStr] = val;
-            saveData(); closeQuoteModal(); updateDailyView();
+            const val = document.getElementById('daily-quote-textarea').value.trim();
+            if (val === '') delete dailyQuotes[dateStr]; 
+            else dailyQuotes[dateStr] = val;
+            
+            saveData();
+            toggleQuoteEdit(false);
+            updateDailyView();
         }
 
         function getTimeColor(timeStr) {
@@ -697,7 +685,11 @@
                 if (editBtn) editBtn.classList.add('hidden');
                 
                 const dateStr = formatDateToYYYYMMDD(selectedDate);
-                const dataObj = type === 'gratitude' ? dailyGratitudes : dailyThoughts;
+                let dataObj = {};
+                if (type === 'gratitude') dataObj = dailyGratitudes;
+                else if (type === 'thought') dataObj = dailyThoughts;
+                else if (type === 'schedule') dataObj = dailySchedules;
+
                 textarea.value = dataObj[dateStr] || '';
                 
                 setTimeout(() => {
@@ -721,6 +713,9 @@
             } else if (type === 'thought') {
                 if (val === '') delete dailyThoughts[dateStr]; 
                 else dailyThoughts[dateStr] = val;
+            } else if (type === 'schedule') {
+                if (val === '') delete dailySchedules[dateStr]; 
+                else dailySchedules[dateStr] = val;
             }
             
             saveData();
@@ -1328,16 +1323,20 @@
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
             document.getElementById('today-display').innerText = formatDisplayDate(selectedDate);
             
-            const quoteDisplayEl = document.getElementById('daily-quote-display');
+            // 힘이 되는 글귀 처리
+            const quoteReadEl = document.getElementById('quote-read-mode');
             const effectiveQuote = getEffectiveQuote(dateStr);
             if (effectiveQuote) {
-                quoteDisplayEl.innerText = effectiveQuote;
-                quoteDisplayEl.classList.remove('text-slate-400'); quoteDisplayEl.classList.add('text-slate-700');
+                quoteReadEl.innerText = effectiveQuote;
+                quoteReadEl.classList.remove('text-slate-400'); quoteReadEl.classList.add('text-slate-700', 'bg-slate-50', 'border', 'border-slate-200', 'px-4', 'py-3', 'rounded-xl');
             } else {
-                quoteDisplayEl.innerText = '오늘의 글귀를 입력해주세요.';
-                quoteDisplayEl.classList.remove('text-slate-700'); quoteDisplayEl.classList.add('text-slate-400');
+                quoteReadEl.innerText = '오늘의 힘이 되는 글귀를 입력해주세요.';
+                quoteReadEl.classList.remove('text-slate-700', 'bg-slate-50', 'border', 'border-slate-200', 'px-4', 'py-3'); 
+                quoteReadEl.classList.add('text-slate-400', 'px-2', 'py-2');
             }
+            toggleQuoteEdit(false);
 
+            // 감사하기 처리
             const gratitudeText = dailyGratitudes[dateStr] || '';
             const gratitudeDisplay = document.getElementById('gratitude-read-mode');
             if (gratitudeText) {
@@ -1351,6 +1350,7 @@
             }
             toggleInlineEdit('gratitude', false);
 
+            // 오늘의 소감 처리
             const thoughtText = dailyThoughts[dateStr] || '';
             const thoughtDisplay = document.getElementById('thought-read-mode');
             if (thoughtText) {
@@ -1363,6 +1363,20 @@
                 thoughtDisplay.classList.add('text-slate-400');
             }
             toggleInlineEdit('thought', false);
+
+            // 메모 (오늘의 주요일정) 처리 - 최하단 배치
+            const scheduleText = dailySchedules[dateStr] || '';
+            const scheduleDisplay = document.getElementById('schedule-read-mode');
+            if (scheduleText) {
+                scheduleDisplay.innerText = scheduleText;
+                scheduleDisplay.classList.remove('text-slate-400');
+                scheduleDisplay.classList.add('text-slate-700');
+            } else {
+                scheduleDisplay.innerText = '오늘 잊지 말아야 할 중요한 일정이나 할 일을 메모해보세요.';
+                scheduleDisplay.classList.remove('text-slate-700');
+                scheduleDisplay.classList.add('text-slate-400');
+            }
+            toggleInlineEdit('schedule', false);
 
             const overallProgress = calculateOverallProgress(dateStr);
             const progressText = document.getElementById('daily-progress-text');
@@ -1516,7 +1530,6 @@
         }
 
         function updateCalendarBottomSummary(dateStr, activeHabits) {
-            // 1. 요약 리스트 영역 렌더링 (토글 상태에 따라 보임/숨김)
             const summaryContainer = document.getElementById('calendar-bottom-summary');
             if (activeHabits.length === 0) {
                 summaryContainer.innerHTML = '<div class="h-full flex items-center justify-center text-sm text-slate-400 py-4">이날 등록된 일정이 없습니다.</div>';
@@ -1560,7 +1573,6 @@
                 summaryContainer.innerHTML = html;
             }
 
-            // 2. 상담비 통합 정산 영역 렌더링 (토글 상태와 관계없이 항상 표시)
             const settlementContainer = document.getElementById('calendar-settlement-summary');
             const targetDateObj = parseDateStr(dateStr);
             if (targetDateObj.getDay() === 5) {
