@@ -486,12 +486,12 @@
 
     <div id="postpone-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[80] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-calendar-plus text-blue-500"></i> 일정 미루기</h3>
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-calendar-alt text-blue-500"></i> 일정 조정</h3>
             <p class="text-sm text-slate-600 mb-4">
-                <span id="postpone-habit-name" class="font-bold text-slate-800"></span> 일정을 언제로 미루시겠습니까?<br>
-                <span class="text-xs text-slate-400 block mt-1">선택하신 날짜 기준으로 다음 주기가 새롭게 세팅됩니다.<br>(기존 일정: <span id="postpone-old-date" class="font-semibold"></span>)</span>
+                <span id="postpone-habit-name" class="font-bold text-slate-800"></span> 일정을 어느 날짜로 변경하시겠습니까?<br>
+                <span class="text-xs text-slate-400 block mt-1">이 날짜만 독립적으로 변경되며, 다른 주기적 일정에는 영향을 주지 않습니다.<br>(기존 일정: <span id="postpone-old-date" class="font-semibold"></span>)</span>
             </p>
-            <label class="block text-xs text-slate-500 mb-1 ml-1">변경할 기준일</label>
+            <label class="block text-xs text-slate-500 mb-1 ml-1">변경할 날짜</label>
             <input type="date" id="postpone-new-date" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6 text-base bg-white text-slate-700">
             <div class="flex justify-end gap-2">
                 <button onclick="closePostponeModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition font-medium">취소</button>
@@ -776,6 +776,8 @@
         }
 
         function isHabitActiveOnDate(habit, dateStr) {
+            if (habit.overrides && habit.overrides.includes(dateStr)) return true;
+
             const target = parseDateStr(dateStr);
             if (habit.startDate && target < parseDateStr(habit.startDate)) return false;
             if (habit.endDate && target > parseDateStr(habit.endDate)) return false;
@@ -794,16 +796,6 @@
 
                 if (['days', 'weeks', 'months'].includes(freq.type)) {
                     let baseDateStr = habit.startDate || formatDateToYYYYMMDD(new Date());
-                    if (habit.anchors && habit.anchors.length > 0) {
-                        let applicableAnchor = null;
-                        for (let i = 0; i < habit.anchors.length; i++) {
-                            if (habit.anchors[i].effectiveFrom <= dateStr) applicableAnchor = habit.anchors[i];
-                        }
-                        if (applicableAnchor) {
-                            baseDateStr = applicableAnchor.baseDate;
-                            if (dateStr < applicableAnchor.baseDate) continue; 
-                        }
-                    }
                     const start = parseDateStr(baseDateStr);
                     const diffTime = target.getTime() - start.getTime();
                     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
@@ -822,6 +814,11 @@
                     }
                 }
             }
+
+            if (isActive && habit.movedFrom && habit.movedFrom.includes(dateStr)) {
+                return false;
+            }
+
             return isActive;
         }
 
@@ -860,7 +857,7 @@
 
             let startDate = startDateInput.value || formatDateToYYYYMMDD(new Date()); let endDate = endDateInput.value || null;
 
-            habits.push({ id: generateId(), name: name, time: time, isExpanded: true, subHabits: [], startDate: startDate, endDate: endDate, anchors: [], frequencies: freqs });
+            habits.push({ id: generateId(), name: name, time: time, isExpanded: true, subHabits: [], startDate: startDate, endDate: endDate, overrides: [], movedFrom: [], frequencies: freqs });
             saveData();
             
             nameInput.value = ''; endDateInput.value = '';
@@ -881,7 +878,7 @@
             if (!name) return;
             const parent = habits.find(h => h.id === parentId);
             if (parent) {
-                if (parent.time === '상담') return; // 방어 코드
+                if (parent.time === '상담') return;
                 if (!parent.subHabits) parent.subHabits = [];
                 parent.subHabits.push({ id: generateId(), name: name }); parent.isExpanded = true; saveData();
                 if(inputEl) inputEl.value = '';
@@ -999,31 +996,34 @@
         }
 
         function openPostponeModal(id, oldDate) {
-            postponeTarget = { id, oldDate }; const habit = habits.find(h => h.id === id);
-            document.getElementById('postpone-habit-name').innerText = habit.name; document.getElementById('postpone-old-date').innerText = oldDate;
-            const nextDate = new Date(parseDateStr(oldDate)); nextDate.setDate(nextDate.getDate() + 1);
-            const minDateStr = formatDateToYYYYMMDD(nextDate);
-            document.getElementById('postpone-new-date').min = minDateStr; document.getElementById('postpone-new-date').value = minDateStr;
+            postponeTarget = { id, oldDate }; 
+            const habit = habits.find(h => h.id === id);
+            document.getElementById('postpone-habit-name').innerText = habit.name; 
+            document.getElementById('postpone-old-date').innerText = oldDate;
+            document.getElementById('postpone-new-date').value = oldDate;
             document.getElementById('postpone-modal').classList.remove('hidden');
         }
         function closePostponeModal() { document.getElementById('postpone-modal').classList.add('hidden'); postponeTarget = { id: null, oldDate: null }; }
 
         function savePostpone() {
             const newDate = document.getElementById('postpone-new-date').value;
-            if (!newDate) return;
+            if (!newDate || newDate === postponeTarget.oldDate) {
+                closePostponeModal();
+                return;
+            }
             const habit = habits.find(h => h.id === postponeTarget.id);
             if (!habit) return;
-            if (!habit.anchors) habit.anchors = [];
-            const existingAnchorIndex = habit.anchors.findIndex(a => a.effectiveFrom === postponeTarget.oldDate);
-            if (existingAnchorIndex > -1) habit.anchors[existingAnchorIndex].baseDate = newDate;
-            else habit.anchors.push({ effectiveFrom: postponeTarget.oldDate, baseDate: newDate });
-            habit.anchors.sort((a, b) => a.effectiveFrom.localeCompare(b.effectiveFrom));
-            saveData(); closePostponeModal(); updateDailyView(); renderCalendar();
-        }
 
-        function toggleExpand(id) {
-            const parent = habits.find(h => h.id === id);
-            if (parent) { parent.isExpanded = !parent.isExpanded; saveData(); renderManagedHabits(); updateDailyView(); }
+            if (!habit.overrides) habit.overrides = [];
+            if (!habit.movedFrom) habit.movedFrom = [];
+
+            habit.movedFrom.push(postponeTarget.oldDate);
+            habit.overrides.push(newDate);
+
+            saveData(); 
+            closePostponeModal(); 
+            updateDailyView(); 
+            renderCalendar();
         }
 
         function getFreqText(freqsArray) {
@@ -1231,7 +1231,6 @@
                     if (stampText !== '') stampHtml = `<div class="stamp-base ${stampClass}">${stampText}</div>`;
                 }
 
-                // === [NEW] 4주차 금요일 정산일 체크하여 아이콘 추가 ===
                 let isSettlementDay = false;
                 if (dateObj.getDay() === 5) {
                     habits.forEach(habit => {
@@ -1245,7 +1244,6 @@
                     });
                 }
                 const settlementIcon = isSettlementDay ? `<i class="fas fa-comment-dollar absolute bottom-1 right-1 text-indigo-500 text-[11px] z-10" title="정산일"></i>` : '';
-                // ====================================================
 
                 const topHtml = `
                     <div class="day-box w-full aspect-square bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center transition-all duration-200 relative overflow-hidden">
@@ -1422,7 +1420,7 @@
                                         <span class="${textClass} transition-all duration-300 truncate">${parent.name}</span>
                                         ${freqBadge}
                                     </div>
-                                    ${(isPeriodic && !isParentCompleted) ? `<button type="button" onclick="event.preventDefault(); event.stopPropagation(); openPostponeModal('${parent.id}', '${dateStr}')" class="p-2 text-blue-400 hover:text-blue-600 transition focus:outline-none shrink-0" title="일정 미루기"><i class="fas fa-calendar-plus"></i></button>` : ''}
+                                    ${(isPeriodic && !isParentCompleted) ? `<button type="button" onclick="event.preventDefault(); event.stopPropagation(); openPostponeModal('${parent.id}', '${dateStr}')" class="p-2 text-blue-400 hover:text-blue-600 transition focus:outline-none shrink-0" title="일정 조정"><i class="fas fa-calendar-alt"></i></button>` : ''}
                                     ${hasSubs ? `<button type="button" onclick="event.preventDefault(); event.stopPropagation(); toggleExpand('${parent.id}')" class="p-2 text-slate-400 hover:text-slate-600 focus:outline-none shrink-0"><i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'}"></i></button>` : ''}
                                 </label>
                         `;
@@ -1479,8 +1477,9 @@
                 return aTimeIdx - bTimeIdx;
             });
 
+            // 요약 리스트가 스크롤되지 않고 전부 보여지도록 max-h 및 overflow 제거 후 자연스러운 높이 유지
             let html = `<h3 class="text-sm font-bold text-slate-700 mb-2 shrink-0"><i class="fas fa-list-check mr-2 text-blue-500"></i>요약 리스트</h3>`;
-            html += `<div class="overflow-y-auto flex-1 pr-1 flex flex-col gap-1.5 custom-scrollbar pb-2">`;
+            html += `<div class="flex flex-col gap-1.5 pb-2">`;
             
             sortedHabits.forEach(habit => {
                 const pIndex = habits.findIndex(h => h.id === habit.id);
@@ -1512,50 +1511,54 @@
             });
             html += `</div>`;
 
-            // === [NEW] 4주 차 금요일 상담비 정산 표시 (종료일을 4주차 금요일로 설정) ===
             const targetDateObj = parseDateStr(dateStr);
-            if (targetDateObj.getDay() === 5) { // 금요일인지 확인
+            if (targetDateObj.getDay() === 5) {
+                let totalCheckCount = 0;
+                let minCycleStart = null;
+                let maxCycleEnd = null;
+
                 habits.forEach(habit => {
                     if (habit.time === '상담' && habit.startDate) {
                         const startObj = parseDateStr(habit.startDate);
                         const diffDays = Math.round((targetDateObj - startObj) / 86400000);
 
-                        // 시작일 기준 4주차 금요일 판별 (0주차~3주차 -> 3주차 금요일이 주기 상 마지막 금요일)
                         if (diffDays >= 0 && Math.floor(diffDays / 7) % 4 === 3) {
                             const cycleIndex = Math.floor(diffDays / 28);
                             const cycleStartObj = new Date(startObj.getTime() + cycleIndex * 28 * 86400000);
-                            const cycleEndObj = targetDateObj; // 변경됨: 4주차 금요일 당일을 종료일로 세팅
+                            const cycleEndObj = targetDateObj;
 
-                            let checkCount = 0;
-                            // 4주 동안 해당 상담 일정이 완료(체크)된 날이 있는지 카운트
+                            if (!minCycleStart || cycleStartObj < minCycleStart) minCycleStart = cycleStartObj;
+                            if (!maxCycleEnd || cycleEndObj > maxCycleEnd) maxCycleEnd = cycleEndObj;
+
                             for (let d = new Date(cycleStartObj); d <= cycleEndObj; d.setDate(d.getDate() + 1)) {
                                 const dStr = formatDateToYYYYMMDD(d);
                                 if (records[dStr] && records[dStr].includes(habit.id)) {
-                                    checkCount++;
+                                    totalCheckCount++;
                                 }
                             }
-
-                            const totalAmount = checkCount * 90000;
-                            const cycleStartStr = formatDateToYYYYMMDD(cycleStartObj);
-                            const cycleEndStr = formatDateToYYYYMMDD(cycleEndObj);
-
-                            html += `
-                                <div class="mt-2 p-3 bg-indigo-50 border border-indigo-200 rounded-xl shrink-0 shadow-sm">
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <span class="text-sm font-bold text-indigo-700 flex items-center gap-1.5"><i class="fas fa-file-invoice-dollar"></i>상담비 정산 (${habit.name})</span>
-                                        <span class="text-[10px] font-medium text-indigo-500 bg-indigo-100/50 px-2 py-0.5 rounded-full">${cycleStartStr} ~ ${cycleEndStr}</span>
-                                    </div>
-                                    <div class="flex items-center justify-between bg-white/60 p-2 rounded-lg">
-                                        <span class="text-xs text-indigo-600 font-medium">완료 횟수: <b class="text-indigo-700 text-sm">${checkCount}</b>회</span>
-                                        <span class="text-base font-black text-indigo-600">${totalAmount.toLocaleString()}<span class="text-xs font-medium ml-0.5">원</span></span>
-                                    </div>
-                                </div>
-                            `;
                         }
                     }
                 });
+
+                if (totalCheckCount > 0 || minCycleStart) {
+                    const totalAmount = totalCheckCount * 90000;
+                    const cycleStartStr = minCycleStart ? formatDateToYYYYMMDD(minCycleStart) : '';
+                    const cycleEndStr = maxCycleEnd ? formatDateToYYYYMMDD(maxCycleEnd) : '';
+
+                    html += `
+                        <div class="mt-2 p-3 bg-indigo-50 border border-indigo-200 rounded-xl shrink-0 shadow-sm">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-sm font-bold text-indigo-700 flex items-center gap-1.5"><i class="fas fa-file-invoice-dollar"></i>상담비 통합 정산</span>
+                                <span class="text-[10px] font-medium text-indigo-500 bg-indigo-100/50 px-2 py-0.5 rounded-full">${cycleStartStr} ~ ${cycleEndStr}</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-white/60 p-2 rounded-lg">
+                                <span class="text-xs text-indigo-600 font-medium">전체 완료 횟수: <b class="text-indigo-700 text-sm">${totalCheckCount}</b>회</span>
+                                <span class="text-base font-black text-indigo-600">${totalAmount.toLocaleString()}<span class="text-xs font-medium ml-0.5">원</span></span>
+                            </div>
+                        </div>
+                    `;
+                }
             }
-            // ============================================
 
             container.innerHTML = html;
         }
