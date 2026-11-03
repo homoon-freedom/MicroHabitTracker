@@ -129,13 +129,12 @@
                         <div class="flex flex-col gap-3">
                             <!-- 시간대 -->
                             <div class="flex gap-2">
-                                <select id="new-habit-time" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base bg-white text-slate-700" onchange="checkCustomTime()">
+                                <select id="new-habit-time" class="flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base bg-white text-slate-700" onchange="checkTimeSelection()">
                                 </select>
-                                <input type="text" id="custom-time-input" placeholder="새로운 시간대" class="hidden flex-1 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">
                             </div>
                             
-                            <!-- 다중 선택 습관 주기 패널 (버튼형 UI) -->
-                            <div class="flex flex-col gap-2 p-3 bg-white border border-slate-200 rounded-lg text-sm shadow-sm">
+                            <!-- 일반 습관 주기 패널 (버튼형 UI) -->
+                            <div id="standard-freq-panel" class="flex flex-col gap-2 p-3 bg-white border border-slate-200 rounded-lg text-sm shadow-sm">
                                 <span class="text-xs font-bold text-slate-500">습관 주기 (중복 선택 가능)</span>
                                 <div class="flex flex-wrap items-center gap-2">
                                     <label class="cursor-pointer">
@@ -176,6 +175,41 @@
                                 </div>
                             </div>
 
+                            <!-- 상담 요일 선택 패널 -->
+                            <div id="counseling-freq-panel" class="hidden flex-col gap-2 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-sm shadow-sm">
+                                <span class="text-xs font-bold text-indigo-500">상담 요일 선택 (매주 반복)</span>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="new-counseling-day" value="0" class="peer sr-only">
+                                        <span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">일</span>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="new-counseling-day" value="1" class="peer sr-only">
+                                        <span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">월</span>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="new-counseling-day" value="2" class="peer sr-only">
+                                        <span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">화</span>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="new-counseling-day" value="3" class="peer sr-only">
+                                        <span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">수</span>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="new-counseling-day" value="4" class="peer sr-only" checked>
+                                        <span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">목</span>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="new-counseling-day" value="5" class="peer sr-only">
+                                        <span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">금</span>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="new-counseling-day" value="6" class="peer sr-only">
+                                        <span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">토</span>
+                                    </label>
+                                </div>
+                            </div>
+
                             <div id="periodic-date-inputs" class="flex gap-2 mt-1">
                                 <div class="flex-1">
                                     <label class="block text-[10px] text-slate-500 mb-0.5 ml-1">기준 시작일</label>
@@ -188,9 +222,9 @@
                             </div>
 
                             <div class="flex gap-2 mt-1">
-                                <input type="text" id="new-habit-name" placeholder="최상위 습관 이름" class="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">
+                                <input type="text" id="new-habit-name" placeholder="최상위 습관 이름 (예: 상담)" class="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base">
                                 <button onclick="addParentHabit()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition text-base font-medium whitespace-nowrap shrink-0">
-                                    습관 추가
+                                    추가
                                 </button>
                             </div>
                         </div>
@@ -230,7 +264,7 @@
                     <div class="p-6 flex-1 bg-white" id="daily-habits-container">
                         <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
                             <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
-                            <p>등록된 습관이 없습니다.<br>상단의 '습관 관리 열기'를 눌러 새로운 습관을 추가해보세요!</p>
+                            <p>등록된 일정이 없습니다.<br>상단의 '습관 관리 열기'를 눌러 추가해보세요!</p>
                         </div>
                     </div>
                 </div>
@@ -243,9 +277,7 @@
                         </label>
                         <button id="gratitude-edit-btn" onclick="toggleInlineEdit('gratitude', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                     </div>
-                    <!-- 읽기 모드 -->
                     <div id="gratitude-read-mode" onclick="toggleInlineEdit('gratitude', true)" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 cursor-pointer hover:bg-slate-200/50 transition min-h-[4rem] whitespace-pre-wrap"></div>
-                    <!-- 편집 모드 -->
                     <div id="gratitude-edit-mode" class="hidden">
                         <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="3" class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
                         <div class="flex justify-end gap-2 mt-3">
@@ -263,9 +295,7 @@
                         </label>
                         <button id="thought-edit-btn" onclick="toggleInlineEdit('thought', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                     </div>
-                    <!-- 읽기 모드 -->
                     <div id="thought-read-mode" onclick="toggleInlineEdit('thought', true)" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 cursor-pointer hover:bg-slate-100 transition min-h-[4rem] whitespace-pre-wrap"></div>
-                    <!-- 편집 모드 -->
                     <div id="thought-edit-mode" class="hidden">
                         <textarea id="daily-thought" placeholder="오늘 하루를 돌아보며 느낀 점이나 소감을 자유롭게 기록해보세요." rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
                         <div class="flex justify-end gap-2 mt-3">
@@ -285,7 +315,7 @@
     <div id="custom-holiday-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[100] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100 flex flex-col max-h-[85vh]">
             <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fas fa-umbrella-beach text-green-500"></i> 개인 휴가/대체휴일 지정</h3>
-            <p class="text-xs text-slate-500 mb-4">지정된 날짜에는 평일 습관이 쉬어가고, 휴일 습관이 활성화됩니다.</p>
+            <p class="text-xs text-slate-500 mb-4">지정된 날짜에는 평일 일정이 쉬어가고, 휴일 일정이 활성화됩니다.</p>
             
             <div class="flex gap-2 mb-4 shrink-0">
                 <input type="date" id="custom-holiday-input" class="flex-1 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 text-sm bg-white">
@@ -362,8 +392,8 @@
 
     <div id="edit-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[70] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">습관 수정</h3>
-            <label class="block text-xs text-slate-500 mb-1 ml-1">습관 이름</label>
+            <h3 class="text-lg font-bold text-slate-800 mb-4">습관/일정 수정</h3>
+            <label class="block text-xs text-slate-500 mb-1 ml-1">이름</label>
             <input type="text" id="edit-habit-input" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 text-base">
             
             <div id="edit-frequency-section" class="hidden mb-4 border-b border-slate-100 pb-4">
@@ -409,6 +439,22 @@
                 </div>
             </div>
 
+            <!-- 상담(요일) 수정 영역 -->
+            <div id="edit-counseling-section" class="hidden mb-4 border-b border-slate-100 pb-4">
+                <div class="flex flex-col gap-2 p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-sm">
+                    <span class="text-xs font-bold text-indigo-500">상담 요일 선택</span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <label class="cursor-pointer"><input type="radio" name="edit-counseling-day" value="0" class="peer sr-only"><span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">일</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="edit-counseling-day" value="1" class="peer sr-only"><span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">월</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="edit-counseling-day" value="2" class="peer sr-only"><span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">화</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="edit-counseling-day" value="3" class="peer sr-only"><span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">수</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="edit-counseling-day" value="4" class="peer sr-only"><span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">목</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="edit-counseling-day" value="5" class="peer sr-only"><span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">금</span></label>
+                        <label class="cursor-pointer"><input type="radio" name="edit-counseling-day" value="6" class="peer sr-only"><span class="block px-3 py-1.5 rounded border border-indigo-200 bg-white text-indigo-600 text-sm font-medium peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 hover:bg-indigo-100 transition-colors select-none">토</span></label>
+                    </div>
+                </div>
+            </div>
+
             <div id="edit-periodic-dates" class="hidden mb-6">
                 <div class="flex gap-2">
                     <div class="flex-1">
@@ -440,9 +486,9 @@
 
     <div id="postpone-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[80] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-calendar-plus text-blue-500"></i> 습관 일정 미루기</h3>
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-calendar-plus text-blue-500"></i> 일정 미루기</h3>
             <p class="text-sm text-slate-600 mb-4">
-                <span id="postpone-habit-name" class="font-bold text-slate-800"></span> 주기적 일정을 언제로 미루시겠습니까?<br>
+                <span id="postpone-habit-name" class="font-bold text-slate-800"></span> 일정을 언제로 미루시겠습니까?<br>
                 <span class="text-xs text-slate-400 block mt-1">선택하신 날짜 기준으로 다음 주기가 새롭게 세팅됩니다.<br>(기존 일정: <span id="postpone-old-date" class="font-semibold"></span>)</span>
             </p>
             <label class="block text-xs text-slate-500 mb-1 ml-1">변경할 기준일</label>
@@ -467,8 +513,11 @@
 
         let customTimes = JSON.parse(localStorage.getItem('customTimes'));
         if (!customTimes || customTimes.length === 0) {
-            customTimes = ['아침', '오전', '점심', '오후', '저녁', '자기전', '수시'];
-        } 
+            customTimes = ['아침', '오전', '점심', '오후', '저녁', '자기전', '수시', '상담'];
+        } else {
+            customTimes = customTimes.filter(t => t !== 'custom');
+            if (!customTimes.includes('상담')) customTimes.push('상담');
+        }
         
         let customHolidays = JSON.parse(localStorage.getItem('customHolidays')) || [];
         
@@ -494,7 +543,7 @@
         let isManagerVisible = false;
 
         const HABIT_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
-        const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50'];
+        const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50', 'text-rose-500 bg-rose-50'];
 
         function autoResize(element) { element.style.height = 'auto'; element.style.height = element.scrollHeight + 'px'; }
         
@@ -560,7 +609,7 @@
             const dateStr = formatDateToYYYYMMDD(selectedDate);
             const currentSchedule = dailySchedules[dateStr] || '';
             const displayEl = document.getElementById('schedule-display');
-            if (currentSchedule.trim() === '') displayEl.innerHTML = '<span class="text-slate-400">등록된 일정이 없습니다. 하단의 수정 버튼을 눌러 추가해보세요.</span>';
+            if (currentSchedule.trim() === '') displayEl.innerHTML = '<span class="text-slate-400">등록된 메모가 없습니다. 하단의 수정 버튼을 눌러 추가해보세요.</span>';
             else displayEl.innerText = currentSchedule;
             document.getElementById('schedule-textarea').value = currentSchedule;
             toggleScheduleEditMode(false);
@@ -664,7 +713,9 @@
         function init() {
             document.getElementById('today-display').innerText = formatDisplayDate(new Date());
             document.getElementById('new-habit-start-date').value = formatDateToYYYYMMDD(new Date());
-            updateTimeSelects(); renderCalendar(); renderManagedHabits(); updateDailyView();
+            updateTimeSelects(); 
+            checkTimeSelection();
+            renderCalendar(); renderManagedHabits(); updateDailyView();
         }
 
         function toggleHabitManager() {
@@ -684,11 +735,22 @@
         function updateTimeSelects() {
             const select = document.getElementById('new-habit-time');
             select.innerHTML = customTimes.map(t => `<option value="${t}">${t}</option>`).join('');
-            select.innerHTML += `<option value="custom">+ 직접 입력</option>`;
         }
-        function checkCustomTime() {
-            const select = document.getElementById('new-habit-time'); const input = document.getElementById('custom-time-input');
-            if (select.value === 'custom') { input.classList.remove('hidden'); input.focus(); } else { input.classList.add('hidden'); input.value = ''; }
+        
+        function checkTimeSelection() {
+            const select = document.getElementById('new-habit-time');
+            const standardFreq = document.getElementById('standard-freq-panel');
+            const counselingFreq = document.getElementById('counseling-freq-panel');
+            
+            if (select.value === '상담') {
+                standardFreq.classList.add('hidden');
+                counselingFreq.classList.remove('hidden');
+                counselingFreq.classList.add('flex');
+            } else {
+                standardFreq.classList.remove('hidden');
+                counselingFreq.classList.add('hidden');
+                counselingFreq.classList.remove('flex');
+            }
         }
 
         function toggleFreq(checkbox, prefix) {
@@ -723,6 +785,9 @@
             let isActive = false;
 
             for (let freq of freqs) {
+                if (freq.type === 'dayOfWeek') {
+                    if (target.getDay() === freq.value) { isActive = true; break; }
+                }
                 if (freq.type === 'daily') { isActive = true; break; }
                 if (freq.type === 'weekdays' && !isHol) { isActive = true; break; }
                 if (freq.type === 'holidays' && isHol) { isActive = true; break; }
@@ -761,29 +826,37 @@
         }
 
         function addParentHabit() {
-            const nameInput = document.getElementById('new-habit-name'); const timeSelect = document.getElementById('new-habit-time');
-            const customTimeInput = document.getElementById('custom-time-input'); 
+            const nameInput = document.getElementById('new-habit-name'); 
+            const timeSelect = document.getElementById('new-habit-time');
             const startDateInput = document.getElementById('new-habit-start-date');
             const endDateInput = document.getElementById('new-habit-end-date');
             
-            const name = nameInput.value.trim(); let time = timeSelect.value;
-            if (time === 'custom') {
-                time = customTimeInput.value.trim();
-                if (time && !customTimes.includes(time)) { customTimes.push(time); updateTimeSelects(); }
-            }
+            const name = nameInput.value.trim(); 
+            let time = timeSelect.value;
+            
             if (!name || !time) {
                 nameInput.classList.add('border-red-500'); setTimeout(() => nameInput.classList.remove('border-red-500'), 1000); return;
             }
 
             let freqs = [];
-            document.querySelectorAll('input[name="new-freq"]:checked').forEach(cb => {
-                let val = 1;
-                if (['days', 'weeks', 'months'].includes(cb.value)) {
-                    val = parseInt(document.getElementById(`new-freq-${cb.value}-val`).value) || 1;
+            
+            if (time === '상담') {
+                const checkedDay = document.querySelector('input[name="new-counseling-day"]:checked');
+                if (!checkedDay) {
+                    alert('상담 요일을 선택해주세요.');
+                    return;
                 }
-                freqs.push({ type: cb.value, value: val });
-            });
-            if (freqs.length === 0) freqs.push({ type: 'daily', value: 1 });
+                freqs.push({ type: 'dayOfWeek', value: parseInt(checkedDay.value) });
+            } else {
+                document.querySelectorAll('input[name="new-freq"]:checked').forEach(cb => {
+                    let val = 1;
+                    if (['days', 'weeks', 'months'].includes(cb.value)) {
+                        val = parseInt(document.getElementById(`new-freq-${cb.value}-val`).value) || 1;
+                    }
+                    freqs.push({ type: cb.value, value: val });
+                });
+                if (freqs.length === 0) freqs.push({ type: 'daily', value: 1 });
+            }
 
             let startDate = startDateInput.value || formatDateToYYYYMMDD(new Date()); let endDate = endDateInput.value || null;
 
@@ -799,7 +872,6 @@
                 const input = document.getElementById(`new-freq-${type}-val`);
                 if(input) input.value = '';
             });
-            if(timeSelect.value === 'custom') { timeSelect.value = time; checkCustomTime(); }
             
             renderManagedHabits(); updateDailyView(); renderCalendar();
         }
@@ -809,6 +881,7 @@
             if (!name) return;
             const parent = habits.find(h => h.id === parentId);
             if (parent) {
+                if (parent.time === '상담') return; // 방어 코드
                 if (!parent.subHabits) parent.subHabits = [];
                 parent.subHabits.push({ id: generateId(), name: name }); parent.isExpanded = true; saveData();
                 if(inputEl) inputEl.value = '';
@@ -847,6 +920,7 @@
             editTarget = { id, parentId };
             const nameInput = document.getElementById('edit-habit-input'); 
             const freqSection = document.getElementById('edit-frequency-section');
+            const counselingSection = document.getElementById('edit-counseling-section');
             const datesContainer = document.getElementById('edit-periodic-dates');
             const startInput = document.getElementById('edit-habit-start-date');
             const endInput = document.getElementById('edit-habit-end-date');
@@ -855,25 +929,37 @@
             if (!parentId) {
                 const parent = habits.find(h => h.id === id);
                 if (parent) {
-                    freqSection.classList.remove('hidden'); datesContainer.classList.remove('hidden');
+                    datesContainer.classList.remove('hidden');
                     startInput.value = parent.startDate || ''; endInput.value = parent.endDate || '';
                     
-                    document.querySelectorAll('input[name="edit-freq"]').forEach(cb => { cb.checked = false; toggleFreq(cb, 'edit'); });
-                    ['days', 'weeks', 'months'].forEach(type => document.getElementById(`edit-freq-${type}-val`).value = '');
-
-                    const freqs = parent.frequencies || [{type:'daily', value:1}];
-                    freqs.forEach(f => {
-                        const cb = document.querySelector(`input[name="edit-freq"][value="${f.type}"]`);
-                        if(cb) {
-                            cb.checked = true;
-                            toggleFreq(cb, 'edit');
-                            if (['days', 'weeks', 'months'].includes(f.type)) {
-                                document.getElementById(`edit-freq-${f.type}-val`).value = f.value;
-                            }
+                    if (parent.time === '상담') {
+                        freqSection.classList.add('hidden');
+                        counselingSection.classList.remove('hidden');
+                        const dayFreq = (parent.frequencies || []).find(f => f.type === 'dayOfWeek');
+                        if (dayFreq) {
+                            const radio = document.querySelector(`input[name="edit-counseling-day"][value="${dayFreq.value}"]`);
+                            if(radio) radio.checked = true;
                         }
-                    });
-                } else { freqSection.classList.add('hidden'); datesContainer.classList.add('hidden'); }
-            } else { freqSection.classList.add('hidden'); datesContainer.classList.add('hidden'); }
+                    } else {
+                        counselingSection.classList.add('hidden');
+                        freqSection.classList.remove('hidden'); 
+                        document.querySelectorAll('input[name="edit-freq"]').forEach(cb => { cb.checked = false; toggleFreq(cb, 'edit'); });
+                        ['days', 'weeks', 'months'].forEach(type => document.getElementById(`edit-freq-${type}-val`).value = '');
+
+                        const freqs = parent.frequencies || [{type:'daily', value:1}];
+                        freqs.forEach(f => {
+                            const cb = document.querySelector(`input[name="edit-freq"][value="${f.type}"]`);
+                            if(cb) {
+                                cb.checked = true;
+                                toggleFreq(cb, 'edit');
+                                if (['days', 'weeks', 'months'].includes(f.type)) {
+                                    document.getElementById(`edit-freq-${f.type}-val`).value = f.value;
+                                }
+                            }
+                        });
+                    }
+                } else { freqSection.classList.add('hidden'); counselingSection.classList.add('hidden'); datesContainer.classList.add('hidden'); }
+            } else { freqSection.classList.add('hidden'); counselingSection.classList.add('hidden'); datesContainer.classList.add('hidden'); }
             document.getElementById('edit-modal').classList.remove('hidden'); nameInput.focus();
         }
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); editTarget = { id: null, parentId: null }; }
@@ -892,15 +978,20 @@
                     parent.endDate = document.getElementById('edit-habit-end-date').value || null;
                     
                     let freqs = [];
-                    document.querySelectorAll('input[name="edit-freq"]:checked').forEach(cb => {
-                        let val = 1;
-                        if (['days', 'weeks', 'months'].includes(cb.value)) {
-                            val = parseInt(document.getElementById(`edit-freq-${cb.value}-val`).value) || 1;
-                        }
-                        freqs.push({ type: cb.value, value: val });
-                    });
-                    if (freqs.length === 0) freqs.push({ type: 'daily', value: 1 });
-                    parent.frequencies = freqs;
+                    if (parent.time === '상담') {
+                        const checkedDay = document.querySelector('input[name="edit-counseling-day"]:checked');
+                        if (checkedDay) freqs.push({ type: 'dayOfWeek', value: parseInt(checkedDay.value) });
+                    } else {
+                        document.querySelectorAll('input[name="edit-freq"]:checked').forEach(cb => {
+                            let val = 1;
+                            if (['days', 'weeks', 'months'].includes(cb.value)) {
+                                val = parseInt(document.getElementById(`edit-freq-${cb.value}-val`).value) || 1;
+                            }
+                            freqs.push({ type: cb.value, value: val });
+                        });
+                        if (freqs.length === 0) freqs.push({ type: 'daily', value: 1 });
+                    }
+                    if(freqs.length > 0) parent.frequencies = freqs;
                 }
             }
             saveData(); closeEditModal(); renderManagedHabits(); updateDailyView(); renderCalendar();
@@ -938,6 +1029,10 @@
         function getFreqText(freqsArray) {
             if (!freqsArray || freqsArray.length === 0) return '';
             const texts = freqsArray.map(f => {
+                if (f.type === 'dayOfWeek') {
+                    const days = ['일', '월', '화', '수', '목', '금', '토'];
+                    return `매주 ${days[f.value]}요일`;
+                }
                 if (f.type === 'daily') return ''; 
                 if (f.type === 'weekdays') return '평일';
                 if (f.type === 'holidays') return '휴일';
@@ -955,7 +1050,7 @@
                 const freqs = h.frequencies || [];
                 return freqs.some(f => f.type !== 'daily');
             });
-            if (periodicHabits.length === 0) listContainer.innerHTML = '<div class="text-center py-8 text-slate-400">등록된 주기적 습관이 없습니다.</div>';
+            if (periodicHabits.length === 0) listContainer.innerHTML = '<div class="text-center py-8 text-slate-400">등록된 주기적 일정이 없습니다.</div>';
             else {
                 let html = '';
                 periodicHabits.forEach((habit, index) => {
@@ -990,9 +1085,8 @@
 
         function renderManagedHabits() {
             const container = document.getElementById('managed-habits-list'); container.innerHTML = '';
-            if (habits.length === 0) { container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">등록된 습관이 없습니다.</p>'; return; }
+            if (habits.length === 0) { container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">등록된 일정이 없습니다.</p>'; return; }
 
-            // [요청 반영] 정렬 로직: 아침, 오전, 점심, 오후, 저녁 순서 우선 + 이후 N일/N주/N개월 주기 순서 정렬
             const sortedHabits = [...habits].sort((a, b) => {
                 const defaultTimes = ['아침', '오전', '점심', '오후', '저녁'];
                 let ia = defaultTimes.indexOf(a.time);
@@ -1001,9 +1095,8 @@
                 if (ib === -1) ib = customTimes.indexOf(b.time) !== -1 ? customTimes.indexOf(b.time) : 999;
                 if (ia !== ib) return ia - ib;
 
-                // 시간대가 같을 경우, 주기 형태에 따른 정렬 (매일/평일/휴일 우선, 이후 N일/N주/N개월 주기)
-                const aIsPeriodic = (a.frequencies || []).some(f => ['days', 'weeks', 'months'].includes(f.type));
-                const bIsPeriodic = (b.frequencies || []).some(f => ['days', 'weeks', 'months'].includes(f.type));
+                const aIsPeriodic = (a.frequencies || []).some(f => ['days', 'weeks', 'months', 'dayOfWeek'].includes(f.type));
+                const bIsPeriodic = (b.frequencies || []).some(f => ['days', 'weeks', 'months', 'dayOfWeek'].includes(f.type));
                 if (!aIsPeriodic && bIsPeriodic) return -1;
                 if (aIsPeriodic && !bIsPeriodic) return 1;
 
@@ -1035,33 +1128,43 @@
                         <div class="${parent.isExpanded ? 'block' : 'hidden'} p-3 space-y-2 bg-white">
                 `;
 
-                if (parent.subHabits) {
-                    parent.subHabits.forEach((sub, index) => {
-                        html += `
-                            <div class="flex items-center justify-between pl-4 py-1.5 group border-b border-slate-50 last:border-0">
-                                <div class="flex items-center gap-2 overflow-hidden flex-1 pr-2">
+                if (parent.time !== '상담') {
+                    if (parent.subHabits) {
+                        parent.subHabits.forEach((sub, index) => {
+                            html += `
+                                <div class="flex items-center justify-between pl-4 py-1.5 group border-b border-slate-50 last:border-0">
+                                    <div class="flex items-center gap-2 overflow-hidden flex-1 pr-2">
+                                        <i class="fas fa-level-up-alt rotate-90 text-slate-300 text-xs shrink-0"></i>
+                                        <span class="text-sm text-slate-700 truncate">${sub.name}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <button onclick="moveSubHabit('${parent.id}', '${sub.id}', 'up')" class="p-1 text-slate-400 hover:text-slate-700 transition" ${index === 0 ? 'disabled style="opacity:0.2"' : ''}><i class="fas fa-arrow-up text-xs"></i></button>
+                                        <button onclick="moveSubHabit('${parent.id}', '${sub.id}', 'down')" class="p-1 text-slate-400 hover:text-slate-700 transition" ${index === parent.subHabits.length - 1 ? 'disabled style="opacity:0.2"' : ''}><i class="fas fa-arrow-down text-xs"></i></button>
+                                        <button onclick="openEditModal('${sub.id}', '${parent.id}', '${sub.name.replace(/'/g, "\\'")}')" class="p-1 text-slate-400 hover:text-blue-500 transition ml-1"><i class="fas fa-pen text-xs"></i></button>
+                                        <button onclick="deleteHabit('${sub.id}', true, '${parent.id}')" class="p-1 text-slate-400 hover:text-red-500 transition"><i class="fas fa-trash-alt text-xs"></i></button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    html += `
+                                <div class="flex flex-row items-center gap-2 mt-2 pl-4 pr-1">
                                     <i class="fas fa-level-up-alt rotate-90 text-slate-300 text-xs shrink-0"></i>
-                                    <span class="text-sm text-slate-700 truncate">${sub.name}</span>
+                                    <input type="text" id="new-sub-${parent.id}" placeholder="하위 습관 추가..." class="flex-1 min-w-0 px-2.5 py-1.5 text-base rounded border border-slate-200 focus:outline-none focus:border-blue-400 bg-slate-50 focus:bg-white transition" onkeypress="if(event.key==='Enter') addSubHabit('${parent.id}')">
+                                    <button onclick="addSubHabit('${parent.id}')" class="px-3 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 text-slate-600 rounded transition font-medium shrink-0 whitespace-nowrap">추가</button>
                                 </div>
-                                <div class="flex items-center gap-1 shrink-0">
-                                    <button onclick="moveSubHabit('${parent.id}', '${sub.id}', 'up')" class="p-1 text-slate-400 hover:text-slate-700 transition" ${index === 0 ? 'disabled style="opacity:0.2"' : ''}><i class="fas fa-arrow-up text-xs"></i></button>
-                                    <button onclick="moveSubHabit('${parent.id}', '${sub.id}', 'down')" class="p-1 text-slate-400 hover:text-slate-700 transition" ${index === parent.subHabits.length - 1 ? 'disabled style="opacity:0.2"' : ''}><i class="fas fa-arrow-down text-xs"></i></button>
-                                    <button onclick="openEditModal('${sub.id}', '${parent.id}', '${sub.name.replace(/'/g, "\\'")}')" class="p-1 text-slate-400 hover:text-blue-500 transition ml-1"><i class="fas fa-pen text-xs"></i></button>
-                                    <button onclick="deleteHabit('${sub.id}', true, '${parent.id}')" class="p-1 text-slate-400 hover:text-red-500 transition"><i class="fas fa-trash-alt text-xs"></i></button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                html += `
-                            <div class="flex flex-row items-center gap-2 mt-2 pl-4 pr-1">
-                                <i class="fas fa-level-up-alt rotate-90 text-slate-300 text-xs shrink-0"></i>
-                                <input type="text" id="new-sub-${parent.id}" placeholder="하위 습관 추가..." class="flex-1 min-w-0 px-2.5 py-1.5 text-base rounded border border-slate-200 focus:outline-none focus:border-blue-400 bg-slate-50 focus:bg-white transition" onkeypress="if(event.key==='Enter') addSubHabit('${parent.id}')">
-                                <button onclick="addSubHabit('${parent.id}')" class="px-3 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 text-slate-600 rounded transition font-medium shrink-0 whitespace-nowrap">추가</button>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    html += `
+                                <div class="mt-2 pl-4 pr-1 pb-1 text-xs text-slate-400">
+                                    <i class="fas fa-info-circle mr-1"></i>상담 일정은 하위 습관을 추가할 수 없습니다.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
                 container.innerHTML += html;
             });
         }
@@ -1110,7 +1213,7 @@
                 const hasPeriodicHabit = habits.some(h => {
                     if(!isHabitActiveOnDate(h, dateStr)) return false;
                     const freqs = h.frequencies || [];
-                    return freqs.some(f => ['days', 'weeks', 'months'].includes(f.type));
+                    return freqs.some(f => ['days', 'weeks', 'months', 'dayOfWeek'].includes(f.type));
                 });
                 const dotHtml = hasPeriodicHabit ? `<div class="absolute top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-500 rounded-full"></div>` : '';
 
@@ -1128,11 +1231,28 @@
                     if (stampText !== '') stampHtml = `<div class="stamp-base ${stampClass}">${stampText}</div>`;
                 }
 
+                // === [NEW] 4주차 금요일 정산일 체크하여 아이콘 추가 ===
+                let isSettlementDay = false;
+                if (dateObj.getDay() === 5) {
+                    habits.forEach(habit => {
+                        if (habit.time === '상담' && habit.startDate) {
+                            const startObj = parseDateStr(habit.startDate);
+                            const diffDays = Math.round((dateObj - startObj) / 86400000);
+                            if (diffDays >= 0 && Math.floor(diffDays / 7) % 4 === 3) {
+                                isSettlementDay = true;
+                            }
+                        }
+                    });
+                }
+                const settlementIcon = isSettlementDay ? `<i class="fas fa-comment-dollar absolute bottom-1 right-1 text-indigo-500 text-[11px] z-10" title="정산일"></i>` : '';
+                // ====================================================
+
                 const topHtml = `
                     <div class="day-box w-full aspect-square bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center transition-all duration-200 relative overflow-hidden">
                         ${dotHtml}
                         <span class="${textClass} text-sm font-medium z-10 ${hasPeriodicHabit ? 'mt-2' : ''}">${i}</span>
                         ${stampHtml}
+                        ${settlementIcon}
                     </div>
                 `;
 
@@ -1147,7 +1267,7 @@
                 progressBarsHtml += `</div>`;
 
                 dayDiv.innerHTML = topHtml + progressBarsHtml;
-dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar(); updateDailyView(); };
+                dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar(); updateDailyView(); };
                 daysContainer.appendChild(dayDiv);
             }
         }
@@ -1203,7 +1323,7 @@ dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar
 
             const overallProgress = calculateOverallProgress(dateStr);
             const progressText = document.getElementById('daily-progress-text');
-            progressText.innerText = getTotalHabitCount(dateStr) === 0 ? '이날 등록된 습관이 없습니다.' : `(달성률:${overallProgress}%)`;
+            progressText.innerText = getTotalHabitCount(dateStr) === 0 ? '이날 등록된 일정이 없습니다.' : `(달성률:${overallProgress}%)`;
             
             const container = document.getElementById('daily-habits-container');
             const emptyMsg = document.getElementById('empty-habits-msg');
@@ -1270,7 +1390,7 @@ dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar
                         const bgClass = isParentCompleted ? 'bg-green-50/40 border-green-200' : 'bg-white border-slate-200 shadow-sm';
                         const hasSubs = parent.subHabits && parent.subHabits.length > 0;
                         
-                        const isPeriodic = (parent.frequencies || []).some(f => ['days', 'weeks', 'months'].includes(f.type));
+                        const isPeriodic = (parent.frequencies || []).some(f => ['days', 'weeks', 'months', 'dayOfWeek'].includes(f.type));
                         
                         const pIndex = habits.findIndex(h => h.id === parent.id);
                         const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
@@ -1349,7 +1469,7 @@ dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar
         function updateCalendarBottomSummary(dateStr, activeHabits) {
             const container = document.getElementById('calendar-bottom-summary');
             if (activeHabits.length === 0) {
-                container.innerHTML = '<div class="h-full flex items-center justify-center text-sm text-slate-400">이날 등록된 습관이 없습니다.</div>';
+                container.innerHTML = '<div class="h-full flex items-center justify-center text-sm text-slate-400">이날 등록된 일정이 없습니다.</div>';
                 return;
             }
 
@@ -1359,7 +1479,7 @@ dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar
                 return aTimeIdx - bTimeIdx;
             });
 
-            let html = `<h3 class="text-sm font-bold text-slate-700 mb-2 shrink-0"><i class="fas fa-list-check mr-2 text-blue-500"></i>습관 요약 리스트</h3>`;
+            let html = `<h3 class="text-sm font-bold text-slate-700 mb-2 shrink-0"><i class="fas fa-list-check mr-2 text-blue-500"></i>요약 리스트</h3>`;
             html += `<div class="overflow-y-auto flex-1 pr-1 flex flex-col gap-1.5 custom-scrollbar pb-2">`;
             
             sortedHabits.forEach(habit => {
@@ -1378,7 +1498,7 @@ dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar
                     if (freqs.some(f => f.type === 'holidays')) {
                         badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-red-50 text-red-500 border-red-100">휴일</span>`;
                     }
-                } else if (freqs.some(f => ['days', 'weeks', 'months'].includes(f.type))) {
+                } else if (freqs.some(f => ['days', 'weeks', 'months', 'dayOfWeek'].includes(f.type))) {
                     badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-purple-50 text-purple-500 border-purple-100">주기적</span>`;
                 }
                 
@@ -1391,6 +1511,52 @@ dayDiv.onclick = () => { selectedDate = new Date(year, month, i); renderCalendar
                 `;
             });
             html += `</div>`;
+
+            // === [NEW] 4주 차 금요일 상담비 정산 표시 (종료일을 4주차 금요일로 설정) ===
+            const targetDateObj = parseDateStr(dateStr);
+            if (targetDateObj.getDay() === 5) { // 금요일인지 확인
+                habits.forEach(habit => {
+                    if (habit.time === '상담' && habit.startDate) {
+                        const startObj = parseDateStr(habit.startDate);
+                        const diffDays = Math.round((targetDateObj - startObj) / 86400000);
+
+                        // 시작일 기준 4주차 금요일 판별 (0주차~3주차 -> 3주차 금요일이 주기 상 마지막 금요일)
+                        if (diffDays >= 0 && Math.floor(diffDays / 7) % 4 === 3) {
+                            const cycleIndex = Math.floor(diffDays / 28);
+                            const cycleStartObj = new Date(startObj.getTime() + cycleIndex * 28 * 86400000);
+                            const cycleEndObj = targetDateObj; // 변경됨: 4주차 금요일 당일을 종료일로 세팅
+
+                            let checkCount = 0;
+                            // 4주 동안 해당 상담 일정이 완료(체크)된 날이 있는지 카운트
+                            for (let d = new Date(cycleStartObj); d <= cycleEndObj; d.setDate(d.getDate() + 1)) {
+                                const dStr = formatDateToYYYYMMDD(d);
+                                if (records[dStr] && records[dStr].includes(habit.id)) {
+                                    checkCount++;
+                                }
+                            }
+
+                            const totalAmount = checkCount * 90000;
+                            const cycleStartStr = formatDateToYYYYMMDD(cycleStartObj);
+                            const cycleEndStr = formatDateToYYYYMMDD(cycleEndObj);
+
+                            html += `
+                                <div class="mt-2 p-3 bg-indigo-50 border border-indigo-200 rounded-xl shrink-0 shadow-sm">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <span class="text-sm font-bold text-indigo-700 flex items-center gap-1.5"><i class="fas fa-file-invoice-dollar"></i>상담비 정산 (${habit.name})</span>
+                                        <span class="text-[10px] font-medium text-indigo-500 bg-indigo-100/50 px-2 py-0.5 rounded-full">${cycleStartStr} ~ ${cycleEndStr}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-white/60 p-2 rounded-lg">
+                                        <span class="text-xs text-indigo-600 font-medium">완료 횟수: <b class="text-indigo-700 text-sm">${checkCount}</b>회</span>
+                                        <span class="text-base font-black text-indigo-600">${totalAmount.toLocaleString()}<span class="text-xs font-medium ml-0.5">원</span></span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                });
+            }
+            // ============================================
+
             container.innerHTML = html;
         }
 
