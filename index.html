@@ -54,7 +54,7 @@
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen p-4 md:p-8">
+<body class="text-slate-800 antialiased min-h-screen p-2 md:p-8">
 
     <div class="max-w-7xl mx-auto">
         <header class="mb-4 text-center md:text-left flex flex-col md:flex-row md:items-center justify-between">
@@ -229,18 +229,22 @@
                             
                             <div class="flex items-center gap-3 shrink-0">
                                 <p class="text-base font-medium text-slate-500 whitespace-nowrap" id="daily-progress-text">(달성률:0%)</p>
+                                <!-- 메모 버튼 추가 -->
+                                <button onclick="openQuickMemoModal()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-sm font-medium transition flex items-center gap-1.5 border border-indigo-100 shadow-sm">
+                                    <i class="fas fa-pen-to-square"></i>메모
+                                </button>
                             </div>
                         </div>
                         
                         <div class="mt-4">
-                            <div class="flex items-center justify-between mb-1.5 px-2">
+                            <div class="flex items-center justify-between mb-1.5 px-0">
                                 <label class="block text-sm font-bold text-slate-500"><i class="fas fa-quote-left text-slate-300 mr-1"></i>오늘 아침, 힘이 되는 글귀</label>
                                 <button id="quote-edit-btn" onclick="toggleQuoteEdit(true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                             </div>
-                            <!-- 오늘의 글귀: 초록색(text-emerald-600) 및 폰트 크기 한 단계 줄임(text-sm) -->
-                            <div id="quote-read-mode" class="w-full px-2 py-2 text-sm text-emerald-600 font-medium rounded-lg transition min-h-[3rem] whitespace-pre-wrap leading-relaxed"></div>
+                            <!-- 오늘의 글귀: 테두리 및 여백 제거하여 좌우로 넓게 배치 -->
+                            <div id="quote-read-mode" class="w-full px-0 py-1 text-sm text-emerald-600 font-medium transition min-h-[3rem] whitespace-pre-wrap leading-relaxed"></div>
                             <div id="quote-edit-mode" class="hidden mt-2">
-                                <textarea id="daily-quote-textarea" rows="4" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-sm resize-none text-slate-700" oninput="autoResize(this)"></textarea>
+                                <textarea id="daily-quote-textarea" rows="4" placeholder="오늘 하루 나에게 힘이 되는 한마디를 적어보세요." class="w-full px-0 py-2 bg-transparent border-0 border-b border-slate-300 rounded-none text-base focus:outline-none focus:border-blue-500 focus:ring-0 transition resize-none text-slate-700" oninput="autoResize(this)"></textarea>
                                 <div class="flex justify-end gap-2 mt-2">
                                     <button onclick="toggleQuoteEdit(false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition text-sm font-medium">취소</button>
                                     <button onclick="saveQuoteInline()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm font-medium">저장</button>
@@ -257,7 +261,7 @@
                     </div>
                 </div>
 
-                <!-- 메모 (오늘의 주요일정) 영역 - 검은색(text-black) -->
+                <!-- 메모 (오늘의 주요일정) 영역 - 테두리 제거 및 좌우 확장 -->
                 <div class="p-5 bg-slate-50 border-t border-slate-100 shrink-0">
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
@@ -265,9 +269,9 @@
                         </label>
                         <button id="schedule-edit-btn" onclick="toggleInlineEdit('schedule', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                     </div>
-                    <div id="schedule-read-mode" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-black transition min-h-[4rem] whitespace-pre-wrap"></div>
+                    <div id="schedule-read-mode" class="w-full px-0 py-2 text-sm text-black transition min-h-[4rem] whitespace-pre-wrap"></div>
                     <div id="schedule-edit-mode" class="hidden">
-                        <textarea id="daily-schedule" placeholder="오늘 잊지 말아야 할 중요한 일정이나 할 일을 메모해보세요." rows="3" class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
+                        <textarea id="daily-schedule" placeholder="오늘 잊지 말아야 할 중요한 일정이나 할 일을 메모해보세요." rows="3" class="w-full px-0 py-2 bg-transparent border-0 border-b border-indigo-400 rounded-none text-sm focus:outline-none focus:ring-0 transition resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
                         <div class="flex justify-end gap-2 mt-3">
                             <button onclick="toggleInlineEdit('schedule', false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-200 transition text-sm font-medium">취소</button>
                             <button onclick="saveInlineText('schedule')" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition text-sm font-medium">저장</button>
@@ -275,7 +279,7 @@
                     </div>
                 </div>
 
-                <!-- 감사하기 영역 - 파란색(text-blue-600) -->
+                <!-- 감사하기 영역 - 테두리 제거 및 좌우 확장 -->
                 <div class="p-5 bg-white border-t border-slate-100 shrink-0">
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
@@ -283,9 +287,9 @@
                         </label>
                         <button id="gratitude-edit-btn" onclick="toggleInlineEdit('gratitude', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                     </div>
-                    <div id="gratitude-read-mode" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-blue-600 transition min-h-[4rem] whitespace-pre-wrap"></div>
+                    <div id="gratitude-read-mode" class="w-full px-0 py-2 text-sm text-blue-600 transition min-h-[4rem] whitespace-pre-wrap"></div>
                     <div id="gratitude-edit-mode" class="hidden">
-                        <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
+                        <textarea id="daily-gratitude" placeholder="오늘 하루, 사소하더라도 감사했던 일 한 가지를 기록해보세요." rows="3" class="w-full px-0 py-2 bg-transparent border-0 border-b border-pink-400 rounded-none text-sm focus:outline-none focus:ring-0 transition resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
                         <div class="flex justify-end gap-2 mt-3">
                             <button onclick="toggleInlineEdit('gratitude', false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition text-sm font-medium">취소</button>
                             <button onclick="saveInlineText('gratitude')" class="px-4 py-2 rounded-lg bg-pink-500 text-white hover:bg-pink-600 transition text-sm font-medium">저장</button>
@@ -293,7 +297,7 @@
                     </div>
                 </div>
 
-                <!-- 오늘의 소감 영역 - 진한 오렌지색(text-orange-600) -->
+                <!-- 오늘의 소감 영역 - 테두리 제거 및 좌우 확장 -->
                 <div class="p-5 bg-slate-50 border-t border-slate-100 shrink-0">
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-sm font-bold text-slate-700 flex items-center gap-2">
@@ -301,9 +305,9 @@
                         </label>
                         <button id="thought-edit-btn" onclick="toggleInlineEdit('thought', true)" class="text-sm text-blue-500 hover:text-blue-700 transition font-medium"><i class="fas fa-pen mr-1"></i>수정</button>
                     </div>
-                    <div id="thought-read-mode" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-orange-600 transition min-h-[4rem] whitespace-pre-wrap"></div>
+                    <div id="thought-read-mode" class="w-full px-0 py-2 text-sm text-orange-600 transition min-h-[4rem] whitespace-pre-wrap"></div>
                     <div id="thought-edit-mode" class="hidden">
-                        <textarea id="daily-thought" placeholder="오늘 하루를 돌아보며 느낀 점이나 소감을 자유롭게 기록해보세요." rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition shadow-sm resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
+                        <textarea id="daily-thought" placeholder="오늘 하루를 돌아보며 느낀 점이나 소감을 자유롭게 기록해보세요." rows="3" class="w-full px-0 py-2 bg-transparent border-0 border-b border-blue-400 rounded-none text-sm focus:outline-none focus:ring-0 transition resize-none overflow-hidden text-slate-700 min-h-[4rem]" oninput="autoResize(this)"></textarea>
                         <div class="flex justify-end gap-2 mt-3">
                             <button onclick="toggleInlineEdit('thought', false)" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition text-sm font-medium">취소</button>
                             <button onclick="saveInlineText('thought')" class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition text-sm font-medium">저장</button>
@@ -311,6 +315,21 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <!-- 빠른 메모 입력 모달 창 -->
+    <div id="quick-memo-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[110] backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-11/12 max-w-sm shadow-xl border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fas fa-pen-to-square text-indigo-500"></i> 메모 추가</h3>
+            <p class="text-xs text-slate-500 mb-4">입력한 내용이 하단 '메모 (오늘의 주요일정)'에 추가됩니다.</p>
+            
+            <textarea id="quick-memo-input" rows="4" placeholder="추가할 메모 내용을 적어보세요." class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition shadow-sm resize-none text-slate-700 mb-4"></textarea>
+            
+            <div class="flex justify-end gap-2">
+                <button onclick="closeQuickMemoModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition text-sm font-medium">취소</button>
+                <button onclick="saveQuickMemo()" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition text-sm font-medium">추가하기</button>
             </div>
         </div>
     </div>
@@ -647,6 +666,32 @@
             
             saveData();
             toggleQuoteEdit(false);
+            updateDailyView();
+        }
+
+        function openQuickMemoModal() {
+            document.getElementById('quick-memo-input').value = '';
+            document.getElementById('quick-memo-modal').classList.remove('hidden');
+            document.getElementById('quick-memo-input').focus();
+        }
+        function closeQuickMemoModal() {
+            document.getElementById('quick-memo-modal').classList.add('hidden');
+        }
+        function saveQuickMemo() {
+            const val = document.getElementById('quick-memo-input').value.trim();
+            if (!val) {
+                closeQuickMemoModal();
+                return;
+            }
+            const dateStr = formatDateToYYYYMMDD(selectedDate);
+            let current = dailySchedules[dateStr] || '';
+            if (current) {
+                dailySchedules[dateStr] = current + '\n' + val;
+            } else {
+                dailySchedules[dateStr] = val;
+            }
+            saveData();
+            closeQuickMemoModal();
             updateDailyView();
         }
 
@@ -1324,20 +1369,20 @@
             document.getElementById('selected-date-title').innerText = formatDisplayDate(selectedDate);
             document.getElementById('today-display').innerText = formatDisplayDate(selectedDate);
             
-            // 힘이 되는 글귀 처리 (초록색, 폰트 한 단계 줄임)
+            // 힘이 되는 글귀 처리
             const quoteReadEl = document.getElementById('quote-read-mode');
             const effectiveQuote = getEffectiveQuote(dateStr);
             if (effectiveQuote) {
                 quoteReadEl.innerText = effectiveQuote;
-                quoteReadEl.classList.remove('text-slate-400'); quoteReadEl.classList.add('text-sm', 'text-emerald-600', 'bg-slate-50', 'border', 'border-slate-200', 'px-4', 'py-3', 'rounded-xl');
+                quoteReadEl.classList.remove('text-slate-400'); quoteReadEl.classList.add('text-sm', 'text-emerald-600');
             } else {
                 quoteReadEl.innerText = '오늘의 힘이 되는 글귀를 입력해주세요.';
-                quoteReadEl.classList.remove('text-emerald-600', 'bg-slate-50', 'border', 'border-slate-200', 'px-4', 'py-3'); 
-                quoteReadEl.classList.add('text-sm', 'text-slate-400', 'px-2', 'py-2');
+                quoteReadEl.classList.remove('text-emerald-600'); 
+                quoteReadEl.classList.add('text-sm', 'text-slate-400');
             }
             toggleQuoteEdit(false);
 
-            // 메모 (오늘의 주요일정) 처리 (검은색)
+            // 메모 (오늘의 주요일정) 처리
             const scheduleText = dailySchedules[dateStr] || '';
             const scheduleDisplay = document.getElementById('schedule-read-mode');
             if (scheduleText) {
@@ -1351,7 +1396,7 @@
             }
             toggleInlineEdit('schedule', false);
 
-            // 감사하기 처리 (파란색)
+            // 감사하기 처리
             const gratitudeText = dailyGratitudes[dateStr] || '';
             const gratitudeDisplay = document.getElementById('gratitude-read-mode');
             if (gratitudeText) {
@@ -1365,7 +1410,7 @@
             }
             toggleInlineEdit('gratitude', false);
 
-            // 오늘의 소감 처리 (진한 오렌지색)
+            // 오늘의 소감 처리
             const thoughtText = dailyThoughts[dateStr] || '';
             const thoughtDisplay = document.getElementById('thought-read-mode');
             if (thoughtText) {
