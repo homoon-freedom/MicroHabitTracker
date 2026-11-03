@@ -1,3 +1,5 @@
+요청하신 대로 달력 모달 안의 '요약 리스트 보기/숨기기' 토글 기능은 유지하되, 하단에 출력되는 '상담비 통합 정산' 결과는 토글 상태와 상관없이 항상 표시되도록 코드를 수정하였습니다.
+수정된 전체 HTML 코드입니다.
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -64,26 +66,26 @@
             </div>
             <div class="mt-4 md:mt-0 flex flex-wrap items-center justify-center gap-2">
                 <!-- 설정 버튼 -->
-                <button onclick="toggleHabitManager()" id="toggle-manager-btn" class="px-4 py-2 bg-slate-800 text-white rounded-full shadow-sm hover:bg-slate-700 transition flex items-center gap-2 text-sm font-medium">
+                <button onclick="toggleHabitManager()" id="toggle-manager-btn" class="px-4 py-2 bg-slate-800 text-white rounded-full shadow-sm hover:bg-slate-700 transition flex items-center justify-center gap-2 text-sm font-medium box-border h-[38px]">
                     <i id="toggle-manager-icon" class="fas fa-cog"></i>
                     <span id="toggle-manager-text">설정</span>
                 </button>
                 
                 <!-- 날짜 이동 컨트롤 및 우측 '오늘' 버튼 -->
                 <div class="flex items-center gap-2">
-                    <div class="flex items-center bg-white rounded-full shadow-sm border border-slate-200 px-2 py-1">
-                        <button onclick="changeSelectedDate(-1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600" title="어제로 이동">
+                    <div class="flex items-center bg-white rounded-full shadow-sm border border-slate-200 px-2 box-border h-[38px]">
+                        <button onclick="changeSelectedDate(-1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600 flex items-center justify-center" title="어제로 이동">
                             <i class="fas fa-chevron-left text-xs"></i>
                         </button>
                         <button onclick="openCalendarModal()" class="px-3 py-1 inline-flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
                             <i class="far fa-calendar-check text-blue-500"></i>
                             <span id="today-display" class="font-medium text-slate-700 text-sm"></span>
                         </button>
-                        <button onclick="changeSelectedDate(1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600" title="내일로 이동">
+                        <button onclick="changeSelectedDate(1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600 flex items-center justify-center" title="내일로 이동">
                             <i class="fas fa-chevron-right text-xs"></i>
                         </button>
                     </div>
-                    <button onclick="goToToday()" class="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-full shadow-sm text-sm font-medium text-slate-700 transition">
+                    <button onclick="goToToday()" class="px-3.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-full shadow-sm text-sm font-medium text-slate-700 transition flex items-center justify-center box-border h-[38px]">
                         오늘
                     </button>
                 </div>
@@ -339,7 +341,7 @@
             </div>
             <div id="calendar-days" class="calendar-grid content-start gap-y-4 mb-4 shrink-0"></div>
             
-            <!-- 요약 리스트 토글 버튼 (기본 숨김 상태) -->
+            <!-- 요약 리스트 토글 버튼 -->
             <div class="border-t border-slate-100 pt-4 mt-auto shrink-0">
                 <button onclick="toggleCalendarSummary()" id="summary-toggle-btn" class="w-full py-2.5 px-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-700 text-sm font-semibold transition flex items-center justify-between">
                     <span class="flex items-center gap-2"><i class="fas fa-list-check text-blue-500"></i>요약 리스트 보기</span>
@@ -347,8 +349,11 @@
                 </button>
             </div>
 
-            <!-- 요약 리스트 본체 (기본 숨김: hidden) -->
+            <!-- 요약 리스트 본체 (토글 대상) -->
             <div id="calendar-bottom-summary" class="hidden flex-col pt-3 mt-2"></div>
+            
+            <!-- 상담비 통합 정산 영역 (토글과 무관하게 항상 표시) -->
+            <div id="calendar-settlement-summary" class="pt-3 mt-1 shrink-0"></div>
         </div>
     </div>
 
@@ -1191,7 +1196,6 @@
             });
         }
 
-        // 상담 일정 제외한 달성률 계산 함수 (상담 일정은 전체 대상 및 완료 수에서 제외)
         function getTotalHabitCount(dateStr) {
             let count = 0;
             habits.forEach(p => { 
@@ -1514,50 +1518,52 @@
         }
 
         function updateCalendarBottomSummary(dateStr, activeHabits) {
-            const container = document.getElementById('calendar-bottom-summary');
+            // 1. 요약 리스트 영역 렌더링 (토글 상태에 따라 보임/숨김)
+            const summaryContainer = document.getElementById('calendar-bottom-summary');
             if (activeHabits.length === 0) {
-                container.innerHTML = '<div class="h-full flex items-center justify-center text-sm text-slate-400 py-4">이날 등록된 일정이 없습니다.</div>';
-                return;
+                summaryContainer.innerHTML = '<div class="h-full flex items-center justify-center text-sm text-slate-400 py-4">이날 등록된 일정이 없습니다.</div>';
+            } else {
+                const sortedHabits = [...activeHabits].sort((a, b) => {
+                    let aTimeIdx = customTimes.indexOf(a.time); let bTimeIdx = customTimes.indexOf(b.time);
+                    if (aTimeIdx === -1) aTimeIdx = 9999; if (bTimeIdx === -1) bTimeIdx = 9999;
+                    return aTimeIdx - bTimeIdx;
+                });
+
+                let html = `<div class="flex flex-col gap-1.5 pb-2">`;
+                sortedHabits.forEach(habit => {
+                    const pIndex = habits.findIndex(h => h.id === habit.id);
+                    const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
+                    
+                    let badgeHtml = '';
+                    const freqs = habit.frequencies || [];
+                    
+                    if (freqs.some(f => f.type === 'daily')) {
+                        badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-slate-100 text-slate-500 border-slate-200">매일</span>`;
+                    } else if (freqs.some(f => f.type === 'weekdays' || f.type === 'holidays')) {
+                        if (freqs.some(f => f.type === 'weekdays')) {
+                            badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-blue-50 text-blue-500 border-blue-100 mr-1">평일</span>`;
+                        }
+                        if (freqs.some(f => f.type === 'holidays')) {
+                            badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-red-50 text-red-500 border-red-100">휴일</span>`;
+                        }
+                    } else if (freqs.some(f => ['days', 'weeks', 'months', 'dayOfWeek'].includes(f.type))) {
+                        badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-purple-50 text-purple-500 border-purple-100">주기적</span>`;
+                    }
+                    
+                    html += `
+                        <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 shrink-0">
+                            <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${barColor}"></span>
+                            <span class="text-sm text-slate-700 font-medium truncate">${habit.name}</span>
+                            <div class="ml-auto flex items-center">${badgeHtml}</div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                summaryContainer.innerHTML = html;
             }
 
-            const sortedHabits = [...activeHabits].sort((a, b) => {
-                let aTimeIdx = customTimes.indexOf(a.time); let bTimeIdx = customTimes.indexOf(b.time);
-                if (aTimeIdx === -1) aTimeIdx = 9999; if (bTimeIdx === -1) bTimeIdx = 9999;
-                return aTimeIdx - bTimeIdx;
-            });
-
-            let html = `<div class="flex flex-col gap-1.5 pb-2">`;
-            
-            sortedHabits.forEach(habit => {
-                const pIndex = habits.findIndex(h => h.id === habit.id);
-                const barColor = HABIT_COLORS[pIndex % HABIT_COLORS.length];
-                
-                let badgeHtml = '';
-                const freqs = habit.frequencies || [];
-                
-                if (freqs.some(f => f.type === 'daily')) {
-                    badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-slate-100 text-slate-500 border-slate-200">매일</span>`;
-                } else if (freqs.some(f => f.type === 'weekdays' || f.type === 'holidays')) {
-                    if (freqs.some(f => f.type === 'weekdays')) {
-                        badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-blue-50 text-blue-500 border-blue-100 mr-1">평일</span>`;
-                    }
-                    if (freqs.some(f => f.type === 'holidays')) {
-                        badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-red-50 text-red-500 border-red-100">휴일</span>`;
-                    }
-                } else if (freqs.some(f => ['days', 'weeks', 'months', 'dayOfWeek'].includes(f.type))) {
-                    badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded border ml-auto whitespace-nowrap bg-purple-50 text-purple-500 border-purple-100">주기적</span>`;
-                }
-                
-                html += `
-                    <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 shrink-0">
-                        <span class="w-2 h-2 rounded-full shrink-0" style="background-color: ${barColor}"></span>
-                        <span class="text-sm text-slate-700 font-medium truncate">${habit.name}</span>
-                        <div class="ml-auto flex items-center">${badgeHtml}</div>
-                    </div>
-                `;
-            });
-            html += `</div>`;
-
+            // 2. 상담비 통합 정산 영역 렌더링 (토글 상태와 관계없이 항상 표시)
+            const settlementContainer = document.getElementById('calendar-settlement-summary');
             const targetDateObj = parseDateStr(dateStr);
             if (targetDateObj.getDay() === 5) {
                 let totalCheckCount = 0;
@@ -1592,8 +1598,8 @@
                     const cycleStartStr = minCycleStart ? formatDateToYYYYMMDD(minCycleStart) : '';
                     const cycleEndStr = maxCycleEnd ? formatDateToYYYYMMDD(maxCycleEnd) : '';
 
-                    html += `
-                        <div class="mt-2 p-3 bg-indigo-50 border border-indigo-200 rounded-xl shrink-0 shadow-sm mb-2">
+                    settlementContainer.innerHTML = `
+                        <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl shrink-0 shadow-sm mb-2">
                             <div class="flex items-center justify-between mb-1.5">
                                 <span class="text-sm font-bold text-indigo-700 flex items-center gap-1.5"><i class="fas fa-file-invoice-dollar"></i>상담비 통합 정산</span>
                                 <span class="text-[10px] font-medium text-indigo-500 bg-indigo-100/50 px-2 py-0.5 rounded-full">${cycleStartStr} ~ ${cycleEndStr}</span>
@@ -1604,13 +1610,16 @@
                             </div>
                         </div>
                     `;
+                } else {
+                    settlementContainer.innerHTML = '';
                 }
+            } else {
+                settlementContainer.innerHTML = '';
             }
-
-            container.innerHTML = html;
         }
 
         window.onload = init;
     </script>
 </body>
 </html>
+
