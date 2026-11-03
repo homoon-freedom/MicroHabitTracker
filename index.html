@@ -39,39 +39,6 @@
             border: 2px solid #3b82f6;
         }
 
-        .stamp-base {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-20deg);
-            border-radius: 50%;
-            width: 3.2rem;
-            height: 3.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            font-weight: 900;
-            text-align: center;
-            line-height: 1.1;
-            pointer-events: none;
-            z-index: 20;
-            background-color: rgba(255, 255, 255, 0.4);
-            animation: stampAnimation 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes stampAnimation {
-            0% { transform: translate(-50%, -50%) rotate(0deg) scale(1.5); opacity: 0; }
-            100% { transform: translate(-50%, -50%) rotate(-20deg) scale(1); opacity: 1; }
-        }
-
-        .stamp-100 { color: rgba(239, 68, 68, 0.9); border: 3px double rgba(239, 68, 68, 0.9); }
-        .stamp-90  { color: rgba(249, 115, 22, 0.9); border: 3px double rgba(249, 115, 22, 0.9); }
-        .stamp-80  { color: rgba(132, 204, 22, 0.9); border: 3px double rgba(132, 204, 22, 0.9); }
-        .stamp-70  { color: rgba(59, 130, 246, 0.9); border: 3px double rgba(59, 130, 246, 0.9); }
-        .stamp-60  { color: rgba(168, 85, 247, 0.9); border: 3px double rgba(168, 85, 247, 0.9); }
-        .stamp-0   { color: rgba(100, 116, 139, 0.9); border: 3px double rgba(100, 116, 139, 0.9); font-size: 0.55rem; }
-
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
@@ -102,17 +69,22 @@
                     <span id="toggle-manager-text">설정</span>
                 </button>
                 
-                <!-- 메인 화면 날짜 이동 컨트롤 (좌우 어제/내일 이동 버튼 추가) -->
-                <div class="flex items-center bg-white rounded-full shadow-sm border border-slate-200 px-2 py-1">
-                    <button onclick="changeSelectedDate(-1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600" title="어제로 이동">
-                        <i class="fas fa-chevron-left text-xs"></i>
-                    </button>
-                    <button onclick="openCalendarModal()" class="px-3 py-1 inline-flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
-                        <i class="far fa-calendar-check text-blue-500"></i>
-                        <span id="today-display" class="font-medium text-slate-700 text-sm"></span>
-                    </button>
-                    <button onclick="changeSelectedDate(1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600" title="내일로 이동">
-                        <i class="fas fa-chevron-right text-xs"></i>
+                <!-- 날짜 이동 컨트롤 및 우측 '오늘' 버튼 -->
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center bg-white rounded-full shadow-sm border border-slate-200 px-2 py-1">
+                        <button onclick="changeSelectedDate(-1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600" title="어제로 이동">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button onclick="openCalendarModal()" class="px-3 py-1 inline-flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
+                            <i class="far fa-calendar-check text-blue-500"></i>
+                            <span id="today-display" class="font-medium text-slate-700 text-sm"></span>
+                        </button>
+                        <button onclick="changeSelectedDate(1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600" title="내일로 이동">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                    <button onclick="goToToday()" class="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-full shadow-sm text-sm font-medium text-slate-700 transition">
+                        오늘
                     </button>
                 </div>
             </div>
@@ -1219,29 +1191,56 @@
             });
         }
 
+        // 상담 일정 제외한 달성률 계산 함수 (상담 일정은 전체 대상 및 완료 수에서 제외)
         function getTotalHabitCount(dateStr) {
             let count = 0;
-            habits.forEach(p => { if (isHabitActiveOnDate(p, dateStr)) { count += 1; if(p.subHabits) count += p.subHabits.length; } });
+            habits.forEach(p => { 
+                if (isHabitActiveOnDate(p, dateStr)) { 
+                    if (p.time !== '상담') {
+                        count += 1; 
+                        if (p.subHabits) count += p.subHabits.length; 
+                    }
+                } 
+            });
             return count;
         }
 
         function calculateOverallProgress(dateStr) {
-            const total = getTotalHabitCount(dateStr); if (total === 0) return 0;
-            const completed = records[dateStr] ? records[dateStr].length : 0;
-            return Math.round((completed / total) * 100);
+            const total = getTotalHabitCount(dateStr); 
+            if (total === 0) return 0;
+            
+            const completedIds = records[dateStr] || [];
+            let completedCount = 0;
+            
+            habits.forEach(p => {
+                if (isHabitActiveOnDate(p, dateStr) && p.time !== '상담') {
+                    if (completedIds.includes(p.id)) completedCount++;
+                    if (p.subHabits) {
+                        p.subHabits.forEach(sub => {
+                            if (completedIds.includes(sub.id)) completedCount++;
+                        });
+                    }
+                }
+            });
+
+            return Math.round((completedCount / total) * 100);
         }
 
         function changeMonth(delta) { currentMonthDate.setMonth(currentMonthDate.getMonth() + delta); renderCalendar(); }
         
-        // 날짜 이동 함수 (어제/내일 이동 버튼용)
         function changeSelectedDate(deltaDays) {
             selectedDate.setDate(selectedDate.getDate() + deltaDays);
-            currentMonthDate = new Date(selectedDate.getTime()); // 선택된 날짜의 달력 월로 동기화
+            currentMonthDate = new Date(selectedDate.getTime());
             renderCalendar();
             updateDailyView();
         }
 
-        function goToToday() { currentMonthDate = new Date(); selectedDate = new Date(); renderCalendar(); updateDailyView(); }
+        function goToToday() { 
+            currentMonthDate = new Date(); 
+            selectedDate = new Date(); 
+            renderCalendar(); 
+            updateDailyView(); 
+        }
 
         function renderCalendar() {
             const year = currentMonthDate.getFullYear(); const month = currentMonthDate.getMonth();
@@ -1249,8 +1248,6 @@
             const daysContainer = document.getElementById('calendar-days'); daysContainer.innerHTML = '';
             const firstDayIndex = new Date(year, month, 1).getDay(); const lastDay = new Date(year, month + 1, 0).getDate();
             const todayStr = formatDateToYYYYMMDD(new Date()); const selectedStr = formatDateToYYYYMMDD(selectedDate);
-            const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
-            const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
 
             for (let i = 0; i < firstDayIndex; i++) {
                 const emptyDiv = document.createElement('div'); emptyDiv.className = 'calendar-day empty'; daysContainer.appendChild(emptyDiv);
@@ -1277,18 +1274,6 @@
                 const dotHtml = hasPeriodicHabit ? `<div class="absolute top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-500 rounded-full"></div>` : '';
 
                 const overallProgress = calculateOverallProgress(dateStr); const totalCount = getTotalHabitCount(dateStr);
-                let stampHtml = '';
-                
-                if (totalCount > 0 && (dateObj <= todayEnd || records[dateStr])) {
-                    let stampText = ''; let stampClass = '';
-                    if (overallProgress === 100) { stampText = '참<br>잘했어요'; stampClass = 'stamp-100'; } 
-                    else if (overallProgress >= 90) { stampText = '더<br>힘내요'; stampClass = 'stamp-90'; } 
-                    else if (overallProgress >= 80) { stampText = '할 수<br>있어'; stampClass = 'stamp-80'; } 
-                    else if (overallProgress >= 70) { stampText = '화이팅'; stampClass = 'stamp-70'; } 
-                    else if (overallProgress >= 60) { stampText = '괜찮아'; stampClass = 'stamp-60'; } 
-                    else { if (overallProgress > 0 || dateObj < todayStart) { stampText = '오늘도<br>애썼어'; stampClass = 'stamp-0'; } }
-                    if (stampText !== '') stampHtml = `<div class="stamp-base ${stampClass}">${stampText}</div>`;
-                }
 
                 let isSettlementDay = false;
                 if (dateObj.getDay() === 5) {
@@ -1308,7 +1293,6 @@
                     <div class="day-box w-full aspect-square bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center transition-all duration-200 relative overflow-hidden">
                         ${dotHtml}
                         <span class="${textClass} text-sm font-medium z-10 ${hasPeriodicHabit ? 'mt-2' : ''}">${i}</span>
-                        ${stampHtml}
                         ${settlementIcon}
                     </div>
                 `;
@@ -1410,12 +1394,14 @@
                 let flatItems = [];
                 sortedTimes.forEach(time => {
                     grouped[time].forEach(parent => {
-                        flatItems.push(parent.id);
-                        const hasSubs = parent.subHabits && parent.subHabits.length > 0;
-                        if (hasSubs && parent.isExpanded) {
-                            parent.subHabits.forEach(sub => {
-                                flatItems.push(sub.id);
-                            });
+                        if (parent.time !== '상담') {
+                            flatItems.push(parent.id);
+                            const hasSubs = parent.subHabits && parent.subHabits.length > 0;
+                            if (hasSubs && parent.isExpanded) {
+                                parent.subHabits.forEach(sub => {
+                                    flatItems.push(sub.id);
+                                });
+                            }
                         }
                     });
                 });
@@ -1455,12 +1441,14 @@
                         const freqBadge = freqText ? `<span class="ml-2 text-[10px] font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[120px]">${freqText}</span>` : '';
 
                         let textClass = 'text-slate-800 text-base font-semibold';
-                        if (isParentCompleted || (!isParentCompleted && currentIndex < lastCheckedIndex)) {
-                            textClass = 'text-slate-500 text-base font-semibold';
-                        } else if (currentIndex === lastCheckedIndex + 1) {
-                            textClass = 'text-slate-900 text-lg font-extrabold';
+                        if (parent.time !== '상담') {
+                            if (isParentCompleted || (!isParentCompleted && currentIndex < lastCheckedIndex)) {
+                                textClass = 'text-slate-500 text-base font-semibold';
+                            } else if (currentIndex === lastCheckedIndex + 1) {
+                                textClass = 'text-slate-900 text-lg font-extrabold';
+                            }
+                            currentIndex++;
                         }
-                        currentIndex++;
 
                         html += `
                             <div class="rounded-xl border ${bgClass} transition-all duration-300 overflow-hidden relative">
@@ -1490,12 +1478,14 @@
                                 const isSubCompleted = completedIds.includes(sub.id);
                                 
                                 let subTextClass = 'text-slate-700 text-base font-normal';
-                                if (isSubCompleted || (!isSubCompleted && currentIndex < lastCheckedIndex)) {
-                                    subTextClass = 'text-slate-400 text-base font-normal';
-                                } else if (currentIndex === lastCheckedIndex + 1) {
-                                    subTextClass = 'text-slate-900 text-lg font-bold';
+                                if (parent.time !== '상담') {
+                                    if (isSubCompleted || (!isSubCompleted && currentIndex < lastCheckedIndex)) {
+                                        subTextClass = 'text-slate-400 text-base font-normal';
+                                    } else if (currentIndex === lastCheckedIndex + 1) {
+                                        subTextClass = 'text-slate-900 text-lg font-bold';
+                                    }
+                                    currentIndex++;
                                 }
-                                currentIndex++;
                                 
                                 html += `
                                     <label class="flex items-center p-2.5 pl-12 cursor-pointer hover:bg-slate-100/50 select-none group">
