@@ -96,14 +96,25 @@
                 <p class="text-slate-500 mt-2">상위 습관을 달성하고 하위 습관을 이어나가 보세요.</p>
             </div>
             <div class="mt-4 md:mt-0 flex flex-wrap items-center justify-center gap-2">
+                <!-- 설정 버튼 -->
                 <button onclick="toggleHabitManager()" id="toggle-manager-btn" class="px-4 py-2 bg-slate-800 text-white rounded-full shadow-sm hover:bg-slate-700 transition flex items-center gap-2 text-sm font-medium">
                     <i id="toggle-manager-icon" class="fas fa-cog"></i>
-                    <span id="toggle-manager-text">습관 관리 열기</span>
+                    <span id="toggle-manager-text">설정</span>
                 </button>
-                <button onclick="openCalendarModal()" class="px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200 inline-flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
-                    <i class="far fa-calendar-check text-blue-500"></i>
-                    <span id="today-display" class="font-medium text-slate-700"></span>
-                </button>
+                
+                <!-- 메인 화면 날짜 이동 컨트롤 (좌우 어제/내일 이동 버튼 추가) -->
+                <div class="flex items-center bg-white rounded-full shadow-sm border border-slate-200 px-2 py-1">
+                    <button onclick="changeSelectedDate(-1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600" title="어제로 이동">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                    <button onclick="openCalendarModal()" class="px-3 py-1 inline-flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition">
+                        <i class="far fa-calendar-check text-blue-500"></i>
+                        <span id="today-display" class="font-medium text-slate-700 text-sm"></span>
+                    </button>
+                    <button onclick="changeSelectedDate(1)" class="p-1.5 rounded-full hover:bg-slate-100 transition text-slate-600" title="내일로 이동">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -264,7 +275,7 @@
                     <div class="p-6 flex-1 bg-white" id="daily-habits-container">
                         <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center" id="empty-habits-msg">
                             <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
-                            <p>등록된 일정이 없습니다.<br>상단의 '습관 관리 열기'를 눌러 추가해보세요!</p>
+                            <p>등록된 일정이 없습니다.<br>상단의 '설정' 버튼을 눌러 추가해보세요!</p>
                         </div>
                     </div>
                 </div>
@@ -332,7 +343,7 @@
         </div>
     </div>
 
-    <!-- 달력 모달 (전체 창 스크롤 적용 + 요약리스트 토글 기능 추가) -->
+    <!-- 달력 모달 -->
     <div id="calendar-modal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-[90] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-11/12 max-w-md shadow-xl border border-slate-100 flex flex-col h-[85vh] max-h-[950px] overflow-y-auto transition-all duration-300 relative">
             <div class="flex items-center justify-between mb-6 shrink-0">
@@ -552,7 +563,7 @@
         let editTarget = { id: null, parentId: null };
         let postponeTarget = { id: null, oldDate: null };
         let isManagerVisible = false;
-        let isCalendarSummaryVisible = false; // 요약 리스트 기본 숨김 상태
+        let isCalendarSummaryVisible = false;
 
         const HABIT_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f43f5e'];
         const TIME_COLORS = ['text-orange-500 bg-orange-50', 'text-yellow-500 bg-yellow-50', 'text-indigo-500 bg-indigo-50', 'text-purple-500 bg-purple-50', 'text-teal-500 bg-teal-50', 'text-pink-500 bg-pink-50', 'text-blue-500 bg-blue-50', 'text-rose-500 bg-rose-50'];
@@ -757,10 +768,10 @@
             const toggleText = document.getElementById('toggle-manager-text');
             if (isManagerVisible) {
                 colManager.classList.remove('hidden'); colManager.classList.add('flex');
-                toggleText.innerText = '습관 관리 닫기'; toggleIcon.className = 'fas fa-times';
+                toggleText.innerText = '설정 닫기'; toggleIcon.className = 'fas fa-times';
             } else {
                 colManager.classList.add('hidden'); colManager.classList.remove('flex');
-                toggleText.innerText = '습관 관리 열기'; toggleIcon.className = 'fas fa-cog';
+                toggleText.innerText = '설정'; toggleIcon.className = 'fas fa-cog';
             }
         }
 
@@ -1221,6 +1232,15 @@
         }
 
         function changeMonth(delta) { currentMonthDate.setMonth(currentMonthDate.getMonth() + delta); renderCalendar(); }
+        
+        // 날짜 이동 함수 (어제/내일 이동 버튼용)
+        function changeSelectedDate(deltaDays) {
+            selectedDate.setDate(selectedDate.getDate() + deltaDays);
+            currentMonthDate = new Date(selectedDate.getTime()); // 선택된 날짜의 달력 월로 동기화
+            renderCalendar();
+            updateDailyView();
+        }
+
         function goToToday() { currentMonthDate = new Date(); selectedDate = new Date(); renderCalendar(); updateDailyView(); }
 
         function renderCalendar() {
