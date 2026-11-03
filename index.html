@@ -1026,6 +1026,11 @@
             renderCalendar();
         }
 
+        function toggleExpand(id) {
+            const parent = habits.find(h => h.id === id);
+            if (parent) { parent.isExpanded = !parent.isExpanded; saveData(); renderManagedHabits(); updateDailyView(); }
+        }
+
         function getFreqText(freqsArray) {
             if (!freqsArray || freqsArray.length === 0) return '';
             const texts = freqsArray.map(f => {
@@ -1111,18 +1116,20 @@
                 
                 let html = `
                     <div class="mb-3 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-                        <div class="flex items-center justify-between p-3 bg-slate-50 border-b border-slate-100 group">
-                            <div class="flex items-center gap-3 overflow-hidden flex-1 cursor-pointer" onclick="toggleExpand('${parent.id}')">
+                        <div class="flex items-center justify-between p-3 bg-slate-50 border-b border-slate-100 group cursor-pointer hover:bg-slate-100/60 transition" onclick="toggleExpand('${parent.id}')">
+                            <div class="flex items-center gap-3 overflow-hidden flex-1">
                                 <span class="text-xs font-semibold px-2 py-1 rounded-md ${timeColorClass} whitespace-nowrap relative pl-4 shrink-0">
                                     <span class="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full" style="background-color: ${barColor}"></span>${parent.time}
                                 </span>
                                 <span class="text-base font-semibold text-slate-800 truncate" title="${parent.name}">${parent.name}</span>
                                 ${freqBadge}
-                                ${hasSubs ? `<i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'} text-slate-400 text-xs ml-auto pr-1"></i>` : ''}
                             </div>
-                            <div class="flex items-center gap-1 transition-opacity pl-2">
-                                <button onclick="openEditModal('${parent.id}', null, '${parent.name.replace(/'/g, "\\'")}')" class="p-1.5 text-slate-400 hover:text-blue-500 transition rounded"><i class="fas fa-pen text-sm"></i></button>
-                                <button onclick="deleteHabit('${parent.id}', false)" class="p-1.5 text-slate-400 hover:text-red-500 transition rounded"><i class="fas fa-trash-alt text-sm"></i></button>
+                            <div class="flex items-center gap-2 pl-2">
+                                ${hasSubs ? `<i class="fas fa-chevron-${parent.isExpanded ? 'up' : 'down'} text-slate-400 text-xs transition-transform"></i>` : ''}
+                                <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+                                    <button onclick="openEditModal('${parent.id}', null, '${parent.name.replace(/'/g, "\\'")}')" class="p-1.5 text-slate-400 hover:text-blue-500 transition rounded"><i class="fas fa-pen text-sm"></i></button>
+                                    <button onclick="deleteHabit('${parent.id}', false)" class="p-1.5 text-slate-400 hover:text-red-500 transition rounded"><i class="fas fa-trash-alt text-sm"></i></button>
+                                </div>
                             </div>
                         </div>
                         <div class="${parent.isExpanded ? 'block' : 'hidden'} p-3 space-y-2 bg-white">
@@ -1477,7 +1484,6 @@
                 return aTimeIdx - bTimeIdx;
             });
 
-            // 요약 리스트가 스크롤되지 않고 전부 보여지도록 max-h 및 overflow 제거 후 자연스러운 높이 유지
             let html = `<h3 class="text-sm font-bold text-slate-700 mb-2 shrink-0"><i class="fas fa-list-check mr-2 text-blue-500"></i>요약 리스트</h3>`;
             html += `<div class="flex flex-col gap-1.5 pb-2">`;
             
